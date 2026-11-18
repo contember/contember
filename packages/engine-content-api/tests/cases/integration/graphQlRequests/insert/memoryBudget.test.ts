@@ -2,7 +2,6 @@ import { test } from 'bun:test'
 import { execute, failedTransaction, sqlTransaction } from '../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { RequestMemoryBudget } from '@contember/database'
 import { GQL, SQL } from '../../../../src/tags.js'
 import { testUuid } from '../../../../src/testUuid.js'
 
@@ -35,7 +34,7 @@ test('an exhausted memory budget fails every field of a mutation transaction', a
 		schema: new SchemaBuilder()
 			.entity('Author', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema(),
-		memoryBudget: new RequestMemoryBudget({ warnBytes: 200, maxBytes: 200 }),
+		memoryBudget: { warnBytes: 200, maxBytes: 200 },
 		query: GQL`
 			mutation {
 				transaction {
@@ -74,7 +73,7 @@ test('an exhausted memory budget fails its own mutation and keeps the committed 
 			.entity('Author', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema(),
 		// One hydrated author is estimated at 112 bytes, so the second result node exceeds the budget.
-		memoryBudget: new RequestMemoryBudget({ warnBytes: 200, maxBytes: 200 }),
+		memoryBudget: { warnBytes: 200, maxBytes: 200 },
 		query: GQL`
 			mutation {
 				first: createAuthor(data: {name: "John"}) { ok errors { type message } node { id } }

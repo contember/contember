@@ -1,9 +1,10 @@
 import { Acl, Model, Schema, Settings, Validation } from '@contember/schema'
-import { Authorizator, ExecutionContainerFactory, JsonContentSchemaBuilder } from '../../src/index.js'
+import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory, JsonContentSchemaBuilder } from '../../src/index.js'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
-import { executeGraphQlTest } from './testGraphql.js'
-import { Client, emptyDatabaseMetadata, RequestMemoryBudget } from '@contember/database'
+import { assertGraphQlTestResult, GraphQlTestSchema, normalizeGraphQlResult, runGraphQlTest, serializeGraphQlResult } from './testGraphql.js'
+import { Client, emptyDatabaseMetadata, RequestMemoryBudget, RequestMemoryBudgetOptions } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
+import { expect } from 'bun:test'
 import { createUuidGenerator, testUuid } from './testUuid.js'
 
 export interface SqlQuery {
@@ -22,9 +23,13 @@ export interface Test {
 	variables?: Acl.VariablesMap
 	query: string
 	queryVariables?: Record<string, any>
-	memoryBudget?: RequestMemoryBudget
+	/** Each engine run gets its own budget: an exceeded budget stays exceeded. */
+	memoryBudget?: RequestMemoryBudgetOptions
 	executes: SqlQuery[]
+	/** The graphql-json response; also the graphql-js one unless `graphqlJsReturn` is set. */
 	return: object
+	/** A known difference: graphql-js answers this instead (errors reduced to their messages). */
+	graphqlJsReturn?: object
 }
 
 const SQL_BEGIN = {
@@ -77,15 +82,45 @@ export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 	]
 }
 
+/**
+ * Runs the request on graphql-js, as clients get it by default, and on graphql-json. Both must answer with the same bytes
+ * (key order and errors included) and leave the same expected queries unused; then the answer is checked against `return`.
+ */
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
 	// Mirror production (GraphQlSchemaFactory): types are shaped by the nested set, root fields by the root set.
 	const nestedPermissions: Acl.Permissions = test.nestedPermissions ?? permissions
 	const authorizator = new Authorizator(nestedPermissions, false, false)
 	const rootAuthorizator = new Authorizator(permissions, false, false)
-	const graphQLSchema = new JsonContentSchemaBuilder(test.schema, authorizator, rootAuthorizator).build()
 
-	const connection = createConnectionMock(test.executes)
+	const graphqlJs = await executeOnEngine(test, permissions, nestedPermissions, {
+		engine: 'graphql-js',
+		schema: new GraphQlSchemaBuilderFactory().create(test.schema, authorizator, rootAuthorizator).build(),
+	})
+	const graphqlJson = await executeOnEngine(test, permissions, nestedPermissions, {
+		engine: 'graphql-json',
+		schema: new JsonContentSchemaBuilder(test.schema, authorizator, rootAuthorizator).build(),
+	})
+	if (test.graphqlJsReturn) {
+		expect(normalizeGraphQlResult(graphqlJs.result)).toStrictEqual(test.graphqlJsReturn)
+		assertGraphQlTestResult(graphqlJson.result, test.return)
+		return
+	}
+	expect(graphqlJson.serialized).toBe(graphqlJs.serialized)
+	expect(graphqlJson.unusedQueries).toBe(graphqlJs.unusedQueries)
+
+	assertGraphQlTestResult(graphqlJs.result, test.return)
+}
+
+const executeOnEngine = async (
+	test: Test,
+	permissions: Acl.Permissions,
+	nestedPermissions: Acl.Permissions,
+	graphQLSchema: GraphQlTestSchema,
+) => {
+	// the mock consumes the list, and a run must not see rows the other run's hydration touched
+	const expectedQueries = test.executes.map(it => ({ ...it, response: structuredClone(it.response) }))
+	const connection = createConnectionMock(expectedQueries)
 
 	const db = new Client(connection, 'public', {})
 	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {}, settings: test.settings || emptySchema.settings }
@@ -101,7 +136,7 @@ export const execute = async (test: Test) => {
 			})
 		})
 	})
-	await executeGraphQlTest({
+	const result = await runGraphQlTest({
 		context: {
 			db: db,
 			identityVariables: test.variables || {},
@@ -114,7 +149,7 @@ export const execute = async (test: Test) => {
 						id: 1,
 					},
 					db,
-					memoryBudget: test.memoryBudget,
+					memoryBudget: test.memoryBudget ? new RequestMemoryBudget(test.memoryBudget) : undefined,
 					identityVariables: test.variables || {},
 					identityId: '00000000-0000-0000-0000-000000000000',
 					systemSchema: 'system',
@@ -127,7 +162,7 @@ export const execute = async (test: Test) => {
 		},
 		query: test.query,
 		queryVariables: test.queryVariables,
-		return: test.return,
 		schema: graphQLSchema,
 	})
+	return { result, serialized: serializeGraphQlResult(result), unusedQueries: expectedQueries.length }
 }

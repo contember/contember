@@ -153,6 +153,11 @@ test('aliases named like Object.prototype members', async () => {
 				getPost: JSON.parse('{"toString":"Hello","constructor":"World","__proto__":{"title":{"readable":true}}}'),
 			},
 		},
+		// graphql-js builds the query tree with a plain object, where these aliases hit Object.prototype
+		graphqlJsReturn: {
+			errors: [{ message: 'GraphQlQueryAstFactory: cannot merge Function and FieldNode' }],
+			data: { getPost: null },
+		},
 	})
 	expect(Object.hasOwn(Object.prototype, 'title')).toBe(false)
 })

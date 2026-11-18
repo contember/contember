@@ -289,6 +289,8 @@ test('content request log: `until` is an ISO timestamp with a time zone, at most
 	const complete = { projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 100 }
 	expect(() => requestLog({ ...complete, until: 'tomorrow' })).toThrow(/ISO timestamp/)
 	expect(() => requestLog({ ...complete, until: '2026-01-02T18:00:00' })).toThrow(/time zone/)
+	expect(() => requestLog({ ...complete, until: 'Nov 19 2026 Z' })).toThrow(/ISO timestamp/)
+	expect(() => requestLog({ ...complete, until: '2026-11-19 10:00:00Z' })).toThrow(/ISO timestamp/)
 	expect(() => requestLog({ ...complete, until: new Date(Date.now() + 8 * 24 * 3600 * 1000).toISOString() })).toThrow(/7 days/)
 	// a past end is accepted: the forgotten configuration just records nothing
 	expect(requestLog({ ...complete, until: '2020-01-01T00:00:00+02:00' })).toEqual({
@@ -296,4 +298,20 @@ test('content request log: `until` is an ISO timestamp with a time zone, at most
 		projects: ['blog'],
 		until: '2019-12-31T22:00:00.000Z',
 	})
+})
+
+test('content request log: `until` from a YAML config must be quoted', async () => {
+	const yaml = (until: string) =>
+		`server:
+  contentApi:
+    requestLog:
+      projects: [blog]
+      file: /var/log/requests.jsonl
+      maxRequests: 100
+      until: ${until}
+`
+	const until = inOneDay()
+	const { serverConfig } = await readConfig([{ type: 'yaml', data: yaml(`'${until}'`) }])
+	expect(serverConfig.contentApi?.requestLog?.until).toBe(until)
+	await expect(readConfig([{ type: 'yaml', data: yaml(until) }])).rejects.toThrow(/quote it in YAML/)
 })

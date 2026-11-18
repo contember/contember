@@ -197,6 +197,9 @@ const contentRequestLogSchema = Typesafe.object({
 	until: Typesafe.string,
 })
 
+// Date.parse accepts implementation-defined formats too; only ISO 8601 is allowed, so Bun and Node agree
+const isoTimestampWithZone = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/
+
 const requestLogEnv = { file: 'FILE', maxRequests: 'MAX_REQUESTS', until: 'UNTIL' }
 
 /**
@@ -217,11 +220,14 @@ const contentRequestLog = (input: unknown, path: PropertyKey[] = []): ContentReq
 			return Typesafe.fail([...path, key], `is required when projects are listed (CONTEMBER_CONTENT_API_REQUEST_LOG_${env})`)
 		}
 	}
+	if (typeof Typesafe.valueAt(input, ['until']) !== 'string') {
+		return Typesafe.fail([...path, 'until'], 'must be a string; quote it in YAML, which otherwise reads a timestamp as a date')
+	}
 	const { file, maxRequests, until } = contentRequestLogSchema(input, path)
 	if (maxRequests > contentRequestLogMaxRequestsCeiling) {
 		return Typesafe.fail([...path, 'maxRequests'], `must be at most ${contentRequestLogMaxRequestsCeiling}`)
 	}
-	const untilTime = /(Z|[+-]\d{2}:\d{2})$/.test(until) ? Date.parse(until) : Number.NaN
+	const untilTime = isoTimestampWithZone.test(until) ? Date.parse(until) : Number.NaN
 	if (Number.isNaN(untilTime)) {
 		return Typesafe.fail([...path, 'until'], 'must be an ISO timestamp with a time zone, e.g. 2026-01-02T18:00:00Z')
 	}

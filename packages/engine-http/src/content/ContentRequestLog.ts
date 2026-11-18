@@ -7,7 +7,7 @@ export type ContentRequestLogOptions = {
 	readonly projects: readonly string[]
 	/** A JSON-lines file; the engine appends to it and creates it readable by its owner only. */
 	readonly file: string
-	/** Requests recorded per project by one engine process. */
+	/** Requests recorded per project slug by one engine process. */
 	readonly maxRequests: number
 	/** An ISO timestamp; nothing is recorded after it, in any process and after any restart. */
 	readonly until: string

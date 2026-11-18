@@ -110,6 +110,7 @@ export const nav: NavItem[] = [
 				collapsed: true,
 				items: [
 					doc('reference/engine/configuration/content-api-engine'),
+					doc('reference/engine/configuration/content-api-request-log'),
 					doc('reference/engine/configuration/content-schema-cache'),
 					doc('reference/engine/configuration/database'),
 					doc('reference/engine/configuration/egress'),

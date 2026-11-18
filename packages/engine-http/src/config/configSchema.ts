@@ -5,6 +5,7 @@ import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
 import { EgressError, EgressPolicy } from '@contember/engine-common'
 import { parseByteSize } from '../application/requestBody.js'
+import { contentRequestLogMaxRequestsCeiling, contentRequestLogMaxUntilDays, ContentRequestLogOptions } from '../content/ContentRequestLog.js'
 
 const dbConfigRequired = {
 	host: Typesafe.string,
@@ -179,6 +180,63 @@ const egressConfigSchema = Typesafe.transform(
 	},
 )
 
+/** A comma-separated string or a list of project slugs; empty means unset. */
+const projectSlugList = (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
+	if (val === undefined || val === null || val === '') {
+		return undefined
+	}
+	const raw = typeof val === 'string' ? val.split(',') : Typesafe.array(Typesafe.string)(val, path)
+	return raw.map(it => it.trim()).filter(Boolean)
+}
+
+const contentRequestLogProjectsSchema = Typesafe.partial({ projects: projectSlugList })
+
+const contentRequestLogSchema = Typesafe.object({
+	file: Typesafe.string,
+	maxRequests: positiveInteger,
+	until: Typesafe.string,
+})
+
+// Date.parse accepts implementation-defined formats too; only ISO 8601 is allowed, so Bun and Node agree
+const isoTimestampWithZone = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/
+
+const requestLogEnv = { file: 'FILE', maxRequests: 'MAX_REQUESTS', until: 'UNTIL' }
+
+/**
+ * Off unless projects are listed; only then are the other options read, so empty variables of an unused log are fine.
+ * `until` is absolute, so that no restart or cluster worker extends the recording.
+ */
+const contentRequestLog = (input: unknown, path: PropertyKey[] = []): ContentRequestLogOptions | undefined => {
+	if (input === undefined) {
+		return undefined
+	}
+	const { projects } = contentRequestLogProjectsSchema(input, path)
+	if (!projects?.length) {
+		return undefined
+	}
+	for (const [key, env] of Object.entries(requestLogEnv)) {
+		const value = Typesafe.valueAt(input, [key])
+		if (value === undefined || value === '') {
+			return Typesafe.fail([...path, key], `is required when projects are listed (CONTEMBER_CONTENT_API_REQUEST_LOG_${env})`)
+		}
+	}
+	if (typeof Typesafe.valueAt(input, ['until']) !== 'string') {
+		return Typesafe.fail([...path, 'until'], 'must be a string; quote it in YAML, which otherwise reads a timestamp as a date')
+	}
+	const { file, maxRequests, until } = contentRequestLogSchema(input, path)
+	if (maxRequests > contentRequestLogMaxRequestsCeiling) {
+		return Typesafe.fail([...path, 'maxRequests'], `must be at most ${contentRequestLogMaxRequestsCeiling}`)
+	}
+	const untilTime = isoTimestampWithZone.test(until) ? Date.parse(until) : Number.NaN
+	if (Number.isNaN(untilTime)) {
+		return Typesafe.fail([...path, 'until'], 'must be an ISO timestamp with a time zone, e.g. 2026-01-02T18:00:00Z')
+	}
+	if (untilTime > Date.now() + contentRequestLogMaxUntilDays * 24 * 3600 * 1000) {
+		return Typesafe.fail([...path, 'until'], `must be at most ${contentRequestLogMaxUntilDays} days ahead`)
+	}
+	return { projects, file, maxRequests, until: new Date(untilTime).toISOString() }
+}
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
@@ -305,13 +363,8 @@ export const serverConfigSchema = Typesafe.partial({
 		// an empty variable means unset, as for graphqlJsonProjects
 		graphqlEngine: (val: unknown, path: PropertyKey[] = []): 'graphql-js' | 'graphql-json' | undefined =>
 			val === undefined || val === '' ? undefined : Typesafe.enumeration('graphql-js', 'graphql-json')(val, path),
-		graphqlJsonProjects: (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
-			if (val === undefined || val === null || val === '') {
-				return undefined
-			}
-			const raw = typeof val === 'string' ? val.split(',') : Typesafe.array(Typesafe.string)(val, path)
-			return raw.map(it => it.trim()).filter(Boolean)
-		},
+		graphqlJsonProjects: projectSlugList,
+		requestLog: contentRequestLog,
 		whereOptimizer: Typesafe.partial({
 			disable: Typesafe.boolean,
 			maxCrossOptimizationInput: Typesafe.number,

@@ -131,6 +131,8 @@ process.on('warning', message => {
 		terminationJobs.push(async () => {
 			await (await httpServerPromise).close()
 			logger.info('API server terminated')
+			// after the server, so the requests it finished are written
+			await container.contentRequestLog?.close()
 		})
 		await httpServerPromise
 	}

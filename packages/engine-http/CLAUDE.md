@@ -44,6 +44,7 @@ Two resolution modes:
 - `application/forceHttpOk.ts` — opt-in `X-Contember-Force-Ok` header that coerces GraphQL API responses to HTTP 200 (errors stay in the JSON body); gated by `http.responseStatusHeader` config
 - `MasterContainer.ts` — DI container factory with all service definitions
 - `content/GraphQlSchemaFactory.ts` — per-role-combination content schema cache; builds on the engine `ContentGraphQLEngineResolver` picks for the project (graphql-js by default, graphql-json for `contentApi.graphqlJsonProjects` or when `contentApi.graphqlEngine` says so). The engine is part of the cache key.
+- `content/ContentRequestLog.ts` — opt-in sample of content requests (query, variables, roles, status) for listed projects, bounded by an absolute `until` (holds across restarts and workers) and a per-process `maxRequests`, written to `contentApi.requestLog.file`. Variables are client data: never default it on, never write it to stdout or the logger.
 - `content/ContentApiControllerFactory.ts` — Content API: schema resolution, membership check, GraphQL execution; honours `X-Contember-Force-Primary` only when `contentApi.forcePrimaryHeader` is enabled, and then marks mutations of projects with a read replica
 - `projectGroup/ProjectGroupResolver.ts` — Tenant resolution
 - `common/Authorizator.ts` — Token verification

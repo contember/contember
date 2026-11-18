@@ -1,18 +1,13 @@
 import { Input, Model } from '@contember/schema'
 import { getFieldReadPredicate, RelationFetcher, SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
+import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider.js'
 import { acceptFieldVisitor, getField } from '@contember/schema-utils'
 import { createPaginationHelper } from '../../utils/index.js'
 import { PaginatedHasManyCountVisitor } from './PaginatedHasManyCountVisitor.js'
 import { PaginatedHasManyNodesVisitor } from './PaginatedHasManyNodesVisitor.js'
 import { PredicateFactory } from '../../acl/index.js'
 
-export interface PaginatedHasManyExtension {
-	relationName: string
-}
-
-export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyExtension> {
-	static extensionName: string = 'PaginatedHasMany'
-
+export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension> {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly relationFetcher: RelationFetcher,
@@ -20,7 +15,7 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 	) {}
 
 	process(
-		context: SelectExecutionHandlerContext<Input.PaginationQueryInput, PaginatedHasManyExtension>,
+		context: SelectExecutionHandlerContext<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension>,
 	): void {
 		const { addData, entity, objectNode, mapper } = context
 		if (!objectNode) {

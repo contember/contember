@@ -4,10 +4,9 @@ import { FieldNode, ObjectNode } from '../inputProcessing/index.js'
 import { isDeepStrictEqual } from 'node:util'
 import { ResolveInfoUtils } from '../utils/index.js'
 import { FieldExtensions } from './JsonTypeRegistry.js'
+import type { NodeFilter } from '../resolvers/GraphQlQueryAstFactory.js'
 
 type AnyNode = ObjectNode | FieldNode
-
-export type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 
 /**
  * Turns the resolved field into Contember's query tree. The schema comes from the resolve info, so one factory

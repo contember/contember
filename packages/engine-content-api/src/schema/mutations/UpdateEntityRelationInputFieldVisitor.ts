@@ -1,0 +1,234 @@
+import {
+	GraphQLBoolean,
+	GraphQLEnumType,
+	GraphQLInputFieldConfig,
+	GraphQLInputFieldConfigMap,
+	GraphQLInputObjectType,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLString,
+} from 'graphql'
+import { Acl, Input, Model } from '@contember/schema'
+import { GqlTypeName } from '../utils.js'
+import { WhereTypeProvider } from '../WhereTypeProvider.js'
+import { Accessor, filterObject } from '../../utils/index.js'
+import { EntityInputProvider, EntityInputType } from './EntityInputProvider.js'
+import { acceptFieldVisitor } from '@contember/schema-utils'
+import { UpdateEntityRelationAllowedOperationsVisitor } from './UpdateEntityRelationAllowedOperationsVisitor.js'
+import { Authorizator } from '../../acl/index.js'
+import { ImplementationException } from '../../exception.js'
+import { ConnectOrCreateRelationInputProvider } from './ConnectOrCreateRelationInputProvider.js'
+
+const orphanRemovalStrategyEnum = new GraphQLEnumType({
+	name: 'OrphanRemovalStrategy',
+	values: {
+		[Input.OrphanRemovalStrategy.disconnect]: {},
+		[Input.OrphanRemovalStrategy.delete]: {},
+	},
+})
+
+export class UpdateEntityRelationInputFieldVisitor
+	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined>
+{
+	constructor(
+		private readonly schema: Model.Schema,
+		private readonly authorizator: Authorizator,
+		private readonly whereTypeBuilder: WhereTypeProvider,
+		private readonly updateEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputType.update>>,
+		private readonly createEntityInputProvider: EntityInputProvider<EntityInputType.create>,
+		private readonly updateEntityRelationAllowedOperationsVisitor: UpdateEntityRelationAllowedOperationsVisitor,
+		private readonly connectOrCreateRelationInputProvider: ConnectOrCreateRelationInputProvider,
+	) {
+	}
+
+	public visitColumn(): never {
+		throw new Error('UpdateEntityRelationInputFieldVisitor: Not applicable for a column')
+	}
+
+	public visitHasOne({ targetRelation, targetEntity, relation, entity }: Model.AnyHasOneRelationContext) {
+		const withoutRelation = targetRelation ? targetRelation.name : undefined
+
+		const whereInputType = this.createUniqueWhereInput(targetEntity)
+		const whereInput = whereInputType ? { type: whereInputType } : undefined
+
+		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
+		const createInput = createInputType ? { type: createInputType } : undefined
+
+		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
+		const updateInput = updateInputType ? { type: updateInputType } : undefined
+
+		const upsertInput = updateInputType && createInputType
+			? {
+				type: new GraphQLInputObjectType({
+					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
+					fields: () => ({
+						update: { type: new GraphQLNonNull(updateInputType) },
+						create: { type: new GraphQLNonNull(createInputType) },
+					}),
+				}),
+			}
+			: undefined
+
+		const booleanInput = {
+			type: GraphQLBoolean,
+		}
+
+		const connectOrCreateInput = createInput && whereInputType
+			? { type: this.connectOrCreateRelationInputProvider.getInput(entity.name, relation.name) }
+			: undefined
+
+		const fields = {
+			[Input.UpdateRelationOperation.connect]: whereInput,
+			[Input.UpdateRelationOperation.create]: createInput,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreateInput,
+			[Input.UpdateRelationOperation.update]: updateInput,
+			[Input.UpdateRelationOperation.upsert]: upsertInput,
+			[Input.UpdateRelationOperation.disconnect]: booleanInput,
+			[Input.UpdateRelationOperation.delete]: booleanInput,
+		}
+
+		const filteredFields = this.filterAllowedOperations(entity, relation, fields)
+		if (Object.keys(filteredFields).length === 0) {
+			return undefined
+		}
+
+		return new GraphQLInputObjectType({
+			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
+			fields: () => filteredFields,
+		})
+	}
+
+	public visitHasMany({ entity, relation, targetEntity, targetRelation }: Model.AnyHasManyRelationContext) {
+		const withoutRelation = targetRelation ? targetRelation.name : undefined
+
+		const whereInputType = this.createUniqueWhereInput(targetEntity)
+		const whereInput = whereInputType ? { type: whereInputType } : undefined
+
+		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
+		const createInput = createInputType ? { type: createInputType } : undefined
+
+		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
+
+		const updateSpecifiedInput = updateInputType && whereInputType
+			? {
+				type: new GraphQLInputObjectType({
+					name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
+					fields: () => ({
+						by: { type: new GraphQLNonNull(whereInputType) },
+						data: { type: new GraphQLNonNull(updateInputType) },
+					}),
+				}),
+			}
+			: undefined
+
+		const upsertInput = updateInputType && createInputType && whereInputType
+			? {
+				type: new GraphQLInputObjectType({
+					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
+					fields: () => ({
+						by: { type: new GraphQLNonNull(whereInputType) },
+						update: { type: new GraphQLNonNull(updateInputType) },
+						create: { type: new GraphQLNonNull(createInputType) },
+					}),
+				}),
+			}
+			: undefined
+
+		const connectOrCreateInput = createInput && whereInputType
+			? { type: this.connectOrCreateRelationInputProvider.getInput(entity.name, relation.name) }
+			: undefined
+
+		const fields = {
+			[Input.UpdateRelationOperation.create]: createInput,
+			[Input.UpdateRelationOperation.update]: updateSpecifiedInput,
+			[Input.UpdateRelationOperation.upsert]: upsertInput,
+			[Input.UpdateRelationOperation.connect]: whereInput,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreateInput,
+			[Input.UpdateRelationOperation.disconnect]: whereInput,
+			[Input.UpdateRelationOperation.delete]: whereInput,
+		}
+
+		const filteredFields = this.filterAllowedOperations(entity, relation, fields)
+		if (Object.keys(filteredFields).length === 0) {
+			return undefined
+		}
+
+		// The `set` operation declaratively replaces the whole collection. Its items reuse the
+		// positive operations (no delete/disconnect); orphans are removed via `orphanStrategy`.
+		const setItemFields = this.filterAllowedOperations(entity, relation, {
+			[Input.UpdateRelationOperation.create]: createInput,
+			[Input.UpdateRelationOperation.connect]: whereInput,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreateInput,
+			[Input.UpdateRelationOperation.update]: updateSpecifiedInput,
+			[Input.UpdateRelationOperation.upsert]: upsertInput,
+		})
+		// Orphans are computed by diffing the current members against the input, and that diff is taken
+		// through the target's read predicate. A role that cannot read the target sees an empty
+		// collection, so `set` could only ever add - it is not offered at all. This is about reading,
+		// not about `disconnect`: `orphanStrategy: delete` is just as unusable without it.
+		const canReadTarget = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
+		const canDeleteOrphans = this.getAllowedOperations(entity, relation).includes(Input.UpdateRelationOperation.delete)
+		const setField = canReadTarget && Object.keys(setItemFields).length > 0
+			? {
+				type: new GraphQLList(
+					new GraphQLNonNull(
+						new GraphQLInputObjectType({
+							name: GqlTypeName`${entity.name}Set${relation.name}ItemRelationInput`,
+							fields: () => ({
+								...setItemFields,
+								alias: { type: GraphQLString },
+							}),
+						}),
+					),
+				),
+			}
+			: undefined
+
+		return new GraphQLInputObjectType({
+			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
+			fields: () => ({
+				...filteredFields,
+				...(setField
+					? {
+						[Input.UpdateRelationOperation.set]: setField,
+						// Only exposed when the role may delete the target - `disconnect` is the default anyway.
+						...(canDeleteOrphans ? { orphanStrategy: { type: orphanRemovalStrategyEnum } } : {}),
+					}
+					: {}),
+				alias: { type: GraphQLString },
+			}),
+		})
+	}
+
+	private getAllowedOperations(entity: Model.Entity, relation: Model.Relation): Input.UpdateRelationOperation[] {
+		return acceptFieldVisitor(
+			this.schema,
+			entity,
+			relation.name,
+			this.updateEntityRelationAllowedOperationsVisitor,
+		)
+	}
+
+	private filterAllowedOperations(
+		entity: Model.Entity,
+		relation: Model.Relation,
+		graphQlFields: { [key: string]: GraphQLInputFieldConfig | undefined },
+	): GraphQLInputFieldConfigMap {
+		const allowedOperations = this.getAllowedOperations(entity, relation)
+		return filterObject(
+			graphQlFields,
+			(key, value): value is GraphQLInputFieldConfig => allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined,
+		)
+	}
+
+	private createUniqueWhereInput(targetEntity: Model.Entity): GraphQLInputObjectType | undefined {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) === 'no') {
+			return undefined
+		}
+		const uniqueWhere = this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
+		if (!uniqueWhere) {
+			throw new ImplementationException()
+		}
+		return uniqueWhere
+	}
+}

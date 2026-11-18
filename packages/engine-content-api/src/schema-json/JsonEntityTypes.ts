@@ -6,8 +6,8 @@ import { FieldAccessVisitor } from '../schema/FieldAccessVisitor.js'
 import { GqlTypeName } from '../schema/utils.js'
 import { capitalizeFirstLetter, getFieldsForUniqueWhere } from '../utils/index.js'
 import { ImplementationException } from '../exception.js'
-import { HasManyToHasOneReducerExecutionHandler } from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducerExecutionHandler.js'
-import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler.js'
+import { HasManyToHasOneReducer } from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer.js'
+import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider.js'
 import { JsonColumnTypes } from './JsonColumnTypes.js'
 import { JsonFilterTypes } from './JsonFilterTypes.js'
 import { JsonOutputField, JsonTypeRegistry, listOfNonNullRef, namedRef, nonNullListOfNonNullRef, nonNullRef, toNonNull } from './JsonTypeRegistry.js'
@@ -180,7 +180,7 @@ export class JsonEntityTypes {
 			.filter(uniqueKey => uniqueKey.every(isReadable))
 
 		const entityType = this.getEntity(targetEntity.name)
-		const extensions = { relationName: relation.name, extensionKey: HasManyToHasOneReducerExecutionHandler.extensionName }
+		const extensions = { relationName: relation.name, extensionKey: HasManyToHasOneReducer.extensionName }
 		const createField = (uniqueWhereName: string, keys: (readonly string[])[], description: string | undefined): JsonOutputField => ({
 			type: namedRef(entityType),
 			deprecationReason: relation.deprecationReason,
@@ -229,7 +229,7 @@ export class JsonEntityTypes {
 				...this.createPaginatedField(field.target),
 				deprecationReason: field.deprecationReason,
 				description: field.description,
-				extensions: { relationName: field.name, extensionKey: PaginatedHasManyExecutionHandler.extensionName },
+				extensions: { relationName: field.name, extensionKey: PaginatedHasManyFieldProvider.extensionName },
 				resolve: aliasAwareResolver,
 			},
 		}

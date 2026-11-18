@@ -2,7 +2,6 @@ import { describe, expect, test } from 'bun:test'
 import { fetch } from 'bun'
 import { once } from 'node:events'
 import Koa from 'koa'
-import bodyParser from 'koa-bodyparser'
 import {
 	getIntrospectionQuery,
 	GraphQLError,
@@ -23,6 +22,7 @@ import { ForbiddenError } from '@contember/graphql-utils'
 import { createLogger, TestLoggerHandler, withLogger } from '@contember/logger'
 import { Schema } from '@contember/schema'
 import { AllowAllPermissionFactory, c, createSchema } from '@contember/schema-definition'
+import { createRequestBodyMiddleware, defaultFormBodyLimit, defaultJsonBodyLimit } from '../../../src/application/requestBody.js'
 import { ContentApiSpecificCache } from '../../../src/content/ContentApiSpecificCache.js'
 import { ContentGraphqlContext } from '../../../src/content/ContentGraphqlContext.js'
 import { ContentQueryHandlerFactory } from '../../../src/content/ContentQueryHandlerFactory.js'
@@ -241,7 +241,7 @@ const request = async (role: string, query: string, variables?: Record<string, u
 	const result = await schemaFactory.create(schema, { projectRoles: [role] }, project)
 	const handler = new ContentQueryHandlerFactory(false).create(result.schema)
 	const app = new Koa()
-	app.use(bodyParser())
+	app.use(createRequestBodyMiddleware({ json: defaultJsonBodyLimit, form: defaultFormBodyLimit }))
 	app.use(async context => {
 		await withLogger(
 			createLogger(new TestLoggerHandler()),

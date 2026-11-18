@@ -33,3 +33,5 @@ Both options are disabled by default, and they can be combined.
 :::
 
 A request whose schema was removed builds it again. This costs CPU time and adds latency to that request, so set the limits high enough for the combinations of roles that are in active use.
+
+The [`graphql-json` engine](/reference/engine/configuration/content-api-engine) keeps a cached schema in several times less memory, so the same heap holds more combinations of roles.

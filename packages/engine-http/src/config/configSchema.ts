@@ -302,6 +302,14 @@ export const serverConfigSchema = Typesafe.partial({
 			return maxEntries > 0 ? maxEntries : Typesafe.fail(path, 'must be a positive integer')
 		},
 		forcePrimaryHeader: Typesafe.boolean,
+		graphqlEngine: Typesafe.enumeration('graphql-js', 'graphql-json'),
+		graphqlJsonProjects: (val: unknown): string[] | undefined => {
+			if (val === undefined || val === null || val === '') {
+				return undefined
+			}
+			const raw = Array.isArray(val) ? val : String(val).split(',')
+			return raw.map(it => String(it).trim()).filter(Boolean)
+		},
 		whereOptimizer: Typesafe.partial({
 			disable: Typesafe.boolean,
 			maxCrossOptimizationInput: Typesafe.number,

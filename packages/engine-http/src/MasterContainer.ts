@@ -7,7 +7,7 @@ import { Initializer } from './bootstrap/index.js'
 import { Env, ServerConfig } from './config/config.js'
 
 import { DatabaseMetadataResolver } from '@contember/database'
-import { ExecutionContainerFactory, PermissionFactory } from '@contember/engine-content-api'
+import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
 import { noopTracer, Tracer } from '@contember/telemetry'
 import { Schema } from '@contember/schema'
@@ -19,6 +19,7 @@ import { ProjectConfigResolver } from './config/projectConfigResolver.js'
 import { TenantConfigResolver } from './config/tenantConfigResolver.js'
 import {
 	ContentApiControllerFactory,
+	ContentGraphQLEngineResolver,
 	ContentQueryHandlerFactory,
 	GraphQLSchemaContributor,
 	GraphQlSchemaFactory,
@@ -123,7 +124,16 @@ export class MasterContainerFactory {
 				'executionContainerFactory',
 				({ providers, serverConfig }) => new ExecutionContainerFactory(providers, serverConfig.contentApi?.whereOptimizer),
 			)
-			.addService('contentQueryExecutor', ({ executionContainerFactory }) => new ContentQueryExecutorImpl(executionContainerFactory))
+			.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
+			.addService(
+				'contentGraphQLEngineResolver',
+				({ serverConfig }) => new ContentGraphQLEngineResolver(serverConfig.contentApi?.graphqlEngine, serverConfig.contentApi?.graphqlJsonProjects),
+			)
+			.addService(
+				'contentQueryExecutor',
+				({ executionContainerFactory, graphQlSchemaBuilderFactory, contentGraphQLEngineResolver }) =>
+					new ContentQueryExecutorImpl(executionContainerFactory, graphQlSchemaBuilderFactory, contentGraphQLEngineResolver),
+			)
 			.addService(
 				'systemContainerFactory',
 				({ providers, modificationHandlerFactory, contentQueryExecutor, serverConfig }) =>
@@ -138,12 +148,18 @@ export class MasterContainerFactory {
 				}))
 			.addService(
 				'graphQlSchemaFactory',
-				({ plugins, providers, graphqlSchemaCache, contentPermissionFactory }) => {
+				({ plugins, providers, graphqlSchemaCache, contentPermissionFactory, graphQlSchemaBuilderFactory, contentGraphQLEngineResolver }) => {
 					const contributors = plugins
 						.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ providers }) : null))
 						.filter((it): it is GraphQLSchemaContributor => !!it)
 
-					return new GraphQlSchemaFactory(graphqlSchemaCache, contentPermissionFactory, contributors)
+					return new GraphQlSchemaFactory(
+						graphqlSchemaCache,
+						graphQlSchemaBuilderFactory,
+						contentPermissionFactory,
+						contributors,
+						contentGraphQLEngineResolver,
+					)
 				},
 			)
 			.addService(

@@ -15,7 +15,7 @@ import {
 	GraphQLString,
 	Kind,
 } from 'graphql'
-import { ExecutionContainerFactory, PermissionFactory } from '@contember/engine-content-api'
+import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Client, emptyDatabaseMetadata } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { ForbiddenError } from '@contember/graphql-utils'
@@ -25,12 +25,13 @@ import { AllowAllPermissionFactory, c, createSchema } from '@contember/schema-de
 import { createRequestBodyMiddleware, defaultFormBodyLimit, defaultJsonBodyLimit } from '../../../src/application/requestBody.js'
 import { ContentApiSpecificCache } from '../../../src/content/ContentApiSpecificCache.js'
 import { ContentGraphqlContext } from '../../../src/content/ContentGraphqlContext.js'
+import { ContentGraphQLEngine, ContentGraphQLEngineResolver } from '../../../src/content/ContentGraphQLEngine.js'
 import { ContentQueryHandlerFactory } from '../../../src/content/ContentQueryHandlerFactory.js'
 import { GraphQlSchemaFactory, GraphQLSchemaFactoryResult } from '../../../src/content/GraphQlSchemaFactory.js'
 import { GraphQLSchemaContributor } from '../../../src/content/GraphQLSchemaContributor.js'
 import { ProjectConfig } from '../../../src/project/config.js'
 
-// The snapshots were recorded on the former graphql-js content engine; clients must keep getting the same responses.
+// The snapshots were recorded on main's graphql-js content engine; both engines must keep answering with them.
 
 const ArticleStatus = c.createEnum('draft', 'published')
 
@@ -204,10 +205,19 @@ const reportContributor: GraphQLSchemaContributor = {
 	}),
 }
 
-const schemaFactory = new GraphQlSchemaFactory(new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({}), new PermissionFactory(), [
-	uploadContributor,
-	reportContributor,
-])
+const createSchemaFactory = (engine: ContentGraphQLEngine) =>
+	new GraphQlSchemaFactory(
+		new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({}),
+		new GraphQlSchemaBuilderFactory(),
+		new PermissionFactory(),
+		[uploadContributor, reportContributor],
+		new ContentGraphQLEngineResolver(engine),
+	)
+
+const schemaFactories: Record<ContentGraphQLEngine, GraphQlSchemaFactory> = {
+	'graphql-js': createSchemaFactory('graphql-js'),
+	'graphql-json': createSchemaFactory('graphql-json'),
+}
 
 const createContext = (role: string): ContentGraphqlContext => {
 	const db = new Client(createConnectionMock([]), 'public', {})
@@ -237,8 +247,8 @@ const createContext = (role: string): ContentGraphqlContext => {
 	}
 }
 
-const request = async (role: string, query: string, variables?: Record<string, unknown>, operationName?: string) => {
-	const result = await schemaFactory.create(schema, { projectRoles: [role] }, project)
+const request = async (engine: ContentGraphQLEngine, role: string, query: string, variables?: Record<string, unknown>, operationName?: string) => {
+	const result = await schemaFactories[engine].create(schema, { projectRoles: [role] }, project)
 	const handler = new ContentQueryHandlerFactory(false).create(result.schema)
 	const app = new Koa()
 	app.use(createRequestBodyMiddleware({ json: defaultJsonBodyLimit, form: defaultFormBodyLimit }))
@@ -260,7 +270,7 @@ const request = async (role: string, query: string, variables?: Record<string, u
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ query, variables, operationName }),
 		})
-		return { status: response.status, body: await response.json() }
+		return { status: response.status, text: await response.text() }
 	} finally {
 		await new Promise<void>((resolve, reject) => {
 			server.close(error => error ? reject(error) : resolve())
@@ -340,14 +350,22 @@ const cases: Record<string, [query: string, variables?: Record<string, unknown>,
 	'contribution in a mutation transaction': ['mutation { transaction { ok touchReport { at } } }'],
 }
 
+/** graphql-js still answers as recorded, and graphql-json answers with the same bytes: key order and errors included. */
+const expectSameResponse = async (role: string, query: string, variables?: Record<string, unknown>, operationName?: string) => {
+	const graphqlJs = await request('graphql-js', role, query, variables, operationName)
+	const graphqlJson = await request('graphql-json', role, query, variables, operationName)
+	expect({ status: graphqlJs.status, body: JSON.parse(graphqlJs.text) }).toMatchSnapshot()
+	expect(graphqlJson).toEqual(graphqlJs)
+}
+
 describe('content GraphQL responses match graphql-js', () => {
 	test('introspection', async () => {
-		expect(await request('admin', introspectionQuery)).toMatchSnapshot()
+		await expectSameResponse('admin', introspectionQuery)
 	})
 	for (const role of ['admin', 'reader']) {
 		for (const [name, [query, variables, operationName]] of Object.entries(cases)) {
 			test(`${role}: ${name}`, async () => {
-				expect(await request(role, query, variables, operationName)).toMatchSnapshot()
+				await expectSameResponse(role, query, variables, operationName)
 			})
 		}
 	}

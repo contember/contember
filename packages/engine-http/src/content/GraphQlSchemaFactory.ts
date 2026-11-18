@@ -1,9 +1,12 @@
 import {
 	Authorizator,
+	Context,
 	ContextualPermissions,
 	createGraphQLJsBridge,
 	createJsonIntrospectionExtension,
 	EntityRulesResolver,
+	GraphQlSchemaBuilderFactory,
+	IntrospectionSchemaDefinitionFactory,
 	IntrospectionSchemaFactory,
 	JsonContentSchema,
 	JsonContentSchemaBuilder,
@@ -11,7 +14,9 @@ import {
 	PermissionFactory,
 } from '@contember/engine-content-api'
 import { Acl, Schema } from '@contember/schema'
+import { GraphQLFieldConfig, GraphQLNamedType, GraphQLSchema } from 'graphql'
 import { createHash } from 'node:crypto'
+import { ContentGraphQLEngineResolver, ContentGraphQLSchema } from './ContentGraphQLEngine.js'
 import { GraphQLSchemaContributor } from './GraphQLSchemaContributor.js'
 import { Identity } from './Identity.js'
 import { ContentApiSpecificCache } from './ContentApiSpecificCache.js'
@@ -20,7 +25,7 @@ import { ProjectConfig } from '../project/config.js'
 export interface GraphQLSchemaFactoryResult {
 	permissions: Acl.Permissions
 	allPermissions?: Acl.Permissions
-	schema: JsonContentSchema
+	schema: ContentGraphQLSchema
 }
 
 /**
@@ -63,14 +68,17 @@ export class GraphQlSchemaFactory {
 
 	constructor(
 		private readonly cache: ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>,
+		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly permissionFactory: PermissionFactory,
 		private readonly schemaContributors: GraphQLSchemaContributor[],
+		private readonly engineResolver: ContentGraphQLEngineResolver = new ContentGraphQLEngineResolver(),
 	) {}
 
 	public async create(schema: Schema, identity: Identity, project: ProjectConfig): Promise<GraphQLSchemaFactoryResult> {
 		const { permissionsKey, computedPermissions } = this.getPermissionsKey(schema, identity.projectRoles)
 		const contributorsKey = this.schemaContributors.map(it => it.getCacheKey?.({ schema, identity, project }) ?? '').join('\xff')
-		const cacheKey = `${permissionsKey}\xff\xff${contributorsKey}`
+		const engine = this.engineResolver.resolve(project.slug)
+		const cacheKey = `${engine}\xff\xff${permissionsKey}\xff\xff${contributorsKey}`
 
 		const cached = this.cache.get(schema, cacheKey)
 		if (cached) {
@@ -85,7 +93,9 @@ export class GraphQlSchemaFactory {
 		if (inProgress) {
 			return await inProgress
 		}
-		const build = this.build(schema, identity, project, computedPermissions)
+		const build = engine === 'graphql-js'
+			? Promise.resolve(this.buildGraphQLJs(schema, identity, project, computedPermissions))
+			: this.buildGraphQLJson(schema, identity, project, computedPermissions)
 		building.set(cacheKey, build)
 		try {
 			return this.cache.set(schema, cacheKey, await build)
@@ -94,7 +104,68 @@ export class GraphQlSchemaFactory {
 		}
 	}
 
-	private async build(
+	/** The graphql-js schema, built as before graphql-json existed. */
+	private buildGraphQLJs(
+		schema: Schema,
+		identity: Identity,
+		project: ProjectConfig,
+		computedPermissions: ContextualPermissions | undefined,
+	): GraphQLSchemaFactoryResult {
+		const { root: permissions, all: allPermissions } = computedPermissions ?? this.permissionFactory.createContextual(schema, identity.projectRoles)
+
+		const customPrimary = schema.acl.customPrimary ?? false
+		const refreshMaterializedView = this.permissionFactory.isRefreshMaterializedViewAllowed(schema, identity.projectRoles)
+		// Types are shaped by the nested set, so a field granted only through a relation still exists
+		// on the shared type; the root query and mutation fields are gated on the root set alone.
+		const authorizator = new Authorizator(allPermissions, customPrimary, refreshMaterializedView)
+		const rootAuthorizator = new Authorizator(permissions, customPrimary, refreshMaterializedView)
+		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator, rootAuthorizator)
+		const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(
+			new IntrospectionSchemaFactory(
+				schema.model,
+				new EntityRulesResolver(schema.validation, schema.model),
+				authorizator,
+			),
+		)
+		const introspectionSchema = introspectionSchemaFactory.createConfig()
+
+		const otherSchemas = this.schemaContributors
+			.map(it => it.createSchema({ schema, identity, project }))
+			.filter(<T>(it: T | undefined): it is T => it !== undefined)
+
+		const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()
+		const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>()
+		const types: GraphQLNamedType[] = []
+
+		for (const schema of [introspectionSchema, ...otherSchemas]) {
+			if (schema instanceof GraphQLSchema) {
+				for (const [field, config] of Object.entries(schema.getQueryType()?.toConfig().fields ?? {})) {
+					queries.set(field, config)
+				}
+				for (const [field, config] of Object.entries(schema.getQueryType()?.toConfig().fields ?? {})) {
+					mutations.set(field, config)
+				}
+			} else {
+				for (const [field, config] of Object.entries(schema.query?.toConfig().fields ?? {})) {
+					queries.set(field, config)
+				}
+				for (const [field, config] of Object.entries(schema.mutation?.toConfig().fields ?? {})) {
+					mutations.set(field, config)
+				}
+				types.push(...(schema.types ?? []))
+			}
+		}
+
+		const graphQlSchema = dataSchemaBuilder.build({
+			mutations,
+			queries,
+			types,
+		})
+
+		return { schema: { engine: 'graphql-js', schema: graphQlSchema }, permissions, allPermissions }
+	}
+
+	private async buildGraphQLJson(
 		schema: Schema,
 		identity: Identity,
 		project: ProjectConfig,
@@ -125,7 +196,7 @@ export class GraphQlSchemaFactory {
 		]))
 		generation.built.push(new WeakRef(jsonSchema))
 		this.generationOf.set(jsonSchema, generation)
-		return { schema: jsonSchema, permissions, allPermissions }
+		return { schema: { engine: 'graphql-json', schema: jsonSchema }, permissions, allPermissions }
 	}
 
 	private getGeneration(schema: Schema): SharedGeneration {

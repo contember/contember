@@ -1,6 +1,13 @@
 import { execute, validate } from '@contember/graphql-json'
-import { JsonContentSchema } from '@contember/engine-content-api'
-import { createDbQueriesListener, createGraphQLQueryHandler, GraphQLExecutor, GraphQLListener, GraphQLQueryHandler } from '../graphql/index.js'
+import {
+	createDbQueriesListener,
+	createGraphQLJsExecutor,
+	createGraphQLQueryHandler,
+	GraphQLExecutor,
+	GraphQLListener,
+	GraphQLQueryHandler,
+} from '../graphql/index.js'
+import { ContentGraphQLSchema } from './ContentGraphQLEngine.js'
 import { ContentGraphqlContext } from './ContentGraphqlContext.js'
 import { createTriggeredActionsListener } from './triggeredActionsListener.js'
 
@@ -9,7 +16,7 @@ export type ContentQueryHandler = GraphQLQueryHandler<ContentGraphqlContext>
 export class ContentQueryHandlerFactory {
 	constructor(private readonly debug: boolean) {}
 
-	public create(graphQlSchema: JsonContentSchema): ContentQueryHandler {
+	public create(graphQlSchema: ContentGraphQLSchema): ContentQueryHandler {
 		const listeners: GraphQLListener<ContentGraphqlContext>[] = []
 		listeners.push(createDbQueriesListener(context => context.db, this.debug))
 		listeners.push(createTriggeredActionsListener())
@@ -21,7 +28,11 @@ export class ContentQueryHandlerFactory {
 		})
 	}
 
-	private createExecutor({ schema, resolvers, scalars }: JsonContentSchema): GraphQLExecutor<ContentGraphqlContext> {
+	private createExecutor(graphQlSchema: ContentGraphQLSchema): GraphQLExecutor<ContentGraphqlContext> {
+		if (graphQlSchema.engine === 'graphql-js') {
+			return createGraphQLJsExecutor(graphQlSchema.schema)
+		}
+		const { schema, resolvers, scalars } = graphQlSchema.schema
 		return {
 			// the builder output is validated as a graphql-js schema in tests; there is no runtime schema validation
 			validateSchema: () => [],

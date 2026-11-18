@@ -1,10 +1,11 @@
-import { expect, test } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { parse } from 'graphql'
 import { TypeKind, validate } from '@contember/graphql-json'
-import { PermissionFactory } from '@contember/engine-content-api'
+import { GraphQlSchemaBuilderFactory, JsonContentSchema, PermissionFactory } from '@contember/engine-content-api'
 import { Acl, Model, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { ContentApiSpecificCache } from '../../../src/content/ContentApiSpecificCache.js'
+import { ContentGraphQLEngine, ContentGraphQLEngineResolver } from '../../../src/content/ContentGraphQLEngine.js'
 import { GraphQlSchemaFactory, GraphQLSchemaFactoryResult } from '../../../src/content/GraphQlSchemaFactory.js'
 import { GraphQLSchemaContributor } from '../../../src/content/GraphQLSchemaContributor.js'
 import { ProjectConfig } from '../../../src/project/config.js'
@@ -48,45 +49,130 @@ const project: ProjectConfig = {
 	db: { host: 'localhost', port: 5432, user: 'test', password: 'test', database: 'test' },
 }
 
-const createFactory = (contributors: GraphQLSchemaContributor[] = []) =>
-	new GraphQlSchemaFactory(new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({}), new PermissionFactory(), contributors)
+const createFactory = (
+	contributors: GraphQLSchemaContributor[] = [],
+	engineResolver = new ContentGraphQLEngineResolver('graphql-json'),
+	cache = new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({}),
+) => new GraphQlSchemaFactory(cache, new GraphQlSchemaBuilderFactory(), new PermissionFactory(), contributors, engineResolver)
 
-const create = (factory: GraphQlSchemaFactory, projectRoles: string[]) => factory.create(schema, { projectRoles }, project)
+const create = (factory: GraphQlSchemaFactory, projectRoles: string[], forProject = project) => factory.create(schema, { projectRoles }, forProject)
 
 const mutationFields = ({ schema }: GraphQLSchemaFactoryResult): Record<string, unknown> => {
-	const mutation = schema.schema.m ? schema.schema.t[schema.schema.m] : undefined
+	if (schema.engine === 'graphql-js') {
+		return schema.schema.getMutationType()?.getFields() ?? {}
+	}
+	const json = schema.schema.schema
+	const mutation = json.m ? json.t[json.m] : undefined
 	return mutation?.[0] === TypeKind.OBJECT ? mutation[1] : {}
 }
 
-test('role combinations with identical permissions share one schema', async () => {
-	const factory = createFactory()
+const jsonSchemaOf = ({ schema }: GraphQLSchemaFactoryResult): JsonContentSchema => {
+	if (schema.engine !== 'graphql-json') {
+		throw new Error(`expected a graphql-json schema, got ${schema.engine}`)
+	}
+	return schema.schema
+}
 
-	expect(await create(factory, ['editor'])).toBe(await create(factory, ['admin']))
+test('the content API runs on graphql-js unless configured otherwise', async () => {
+	const factory = new GraphQlSchemaFactory(
+		new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({}),
+		new GraphQlSchemaBuilderFactory(),
+		new PermissionFactory(),
+		[],
+	)
+
+	expect((await create(factory, ['admin'])).schema.engine).toBe('graphql-js')
 })
 
-test('a role without content permissions does not split the cache', async () => {
-	const factory = createFactory()
+// Both projects share the content schema and the roles, so this also checks that the engine is part of the cache key.
+test('a listed project runs on graphql-json, the other projects on the default engine', async () => {
+	const factory = createFactory([], new ContentGraphQLEngineResolver('graphql-js', ['switched']))
+	const switched = await create(factory, ['admin'], { ...project, slug: 'switched' })
+	const other = await create(factory, ['admin'])
 
-	expect(await create(factory, ['admin', 'newsletter'])).toBe(await create(factory, ['admin']))
+	expect(switched.schema.engine).toBe('graphql-json')
+	expect(other.schema.engine).toBe('graphql-js')
+	expect(mutationFields(switched).createArticle).toBeDefined()
+	expect(mutationFields(other).createArticle).toBeDefined()
 })
 
-test('role combinations with different permissions get their own schema', async () => {
-	const factory = createFactory()
-	const admin = await create(factory, ['admin'])
-	const reader = await create(factory, ['reader'])
+test('the default engine applies to every project that is not listed', async () => {
+	const factory = createFactory([], new ContentGraphQLEngineResolver('graphql-json', ['switched']))
 
-	expect(reader).not.toBe(admin)
-	expect(mutationFields(admin).createArticle).toBeDefined()
-	expect(mutationFields(reader).createArticle).toBeUndefined()
+	expect((await create(factory, ['admin'])).schema.engine).toBe('graphql-json')
+	expect((await create(factory, ['admin'], { ...project, slug: 'switched' })).schema.engine).toBe('graphql-json')
 })
 
-test('a contributor cache key separates role combinations with identical permissions', async () => {
-	const factory = createFactory([{
-		getCacheKey: ({ identity }) => identity.projectRoles.includes('editor') ? 'editor' : 'other',
-		createSchema: () => undefined,
-	}])
+const engines: ContentGraphQLEngine[] = ['graphql-js', 'graphql-json']
 
-	expect(await create(factory, ['editor'])).not.toBe(await create(factory, ['admin']))
+describe.each(engines)('on %s', engine => {
+	const createEngineFactory = (contributors: GraphQLSchemaContributor[] = []) => createFactory(contributors, new ContentGraphQLEngineResolver(engine))
+
+	test('role combinations with identical permissions share one schema', async () => {
+		const factory = createEngineFactory()
+
+		expect(await create(factory, ['editor'])).toBe(await create(factory, ['admin']))
+	})
+
+	test('a role without content permissions does not split the cache', async () => {
+		const factory = createEngineFactory()
+
+		expect(await create(factory, ['admin', 'newsletter'])).toBe(await create(factory, ['admin']))
+	})
+
+	test('role combinations with different permissions get their own schema', async () => {
+		const factory = createEngineFactory()
+		const admin = await create(factory, ['admin'])
+		const reader = await create(factory, ['reader'])
+
+		expect(reader).not.toBe(admin)
+		expect(mutationFields(admin).createArticle).toBeDefined()
+		expect(mutationFields(reader).createArticle).toBeUndefined()
+	})
+
+	test('a contributor cache key separates role combinations with identical permissions', async () => {
+		const factory = createEngineFactory([{
+			getCacheKey: ({ identity }) => identity.projectRoles.includes('editor') ? 'editor' : 'other',
+			createSchema: () => undefined,
+		}])
+
+		expect(await create(factory, ['editor'])).not.toBe(await create(factory, ['admin']))
+	})
+
+	test('a role without the refresh permission cannot refresh a materialized view another role may refresh', async () => {
+		const factory = createEngineFactory()
+
+		expect(await hasRefreshMutation(factory, ['reader'])).toBe(false)
+		expect(await hasRefreshMutation(factory, ['refresher'])).toBe(true)
+		expect(await hasRefreshMutation(factory, ['reader'])).toBe(false)
+	})
+
+	test('the refresh permission is inherited', async () => {
+		expect(await hasRefreshMutation(createEngineFactory(), ['inheritedRefresher'])).toBe(true)
+	})
+
+	test('concurrent requests of one role combination build it once', async () => {
+		const factory = createEngineFactory()
+		const [editor, admin] = await Promise.all([create(factory, ['editor']), create(factory, ['admin'])])
+
+		expect(editor).toBe(admin)
+	})
+
+	test('a failed build is not cached', async () => {
+		let fail = true
+		const factory = createEngineFactory([{
+			createSchema: () => {
+				if (fail) {
+					throw new Error('contributor failed')
+				}
+				return undefined
+			},
+		}])
+
+		await expect(create(factory, ['admin'])).rejects.toThrow('contributor failed')
+		fail = false
+		expect(mutationFields(await create(factory, ['admin'])).createArticle).toBeDefined()
+	})
 })
 
 const stats: Model.Entity = {
@@ -120,27 +206,15 @@ const materializedViewSchema: Schema = {
 const hasRefreshMutation = async (factory: GraphQlSchemaFactory, projectRoles: string[]) =>
 	mutationFields(await factory.create(materializedViewSchema, { projectRoles }, project)).refreshMaterializedView !== undefined
 
-test('a role without the refresh permission cannot refresh a materialized view another role may refresh', async () => {
-	const factory = createFactory()
-
-	expect(await hasRefreshMutation(factory, ['reader'])).toBe(false)
-	expect(await hasRefreshMutation(factory, ['refresher'])).toBe(true)
-	expect(await hasRefreshMutation(factory, ['reader'])).toBe(false)
-})
-
-test('the refresh permission is inherited', async () => {
-	expect(await hasRefreshMutation(createFactory(), ['inheritedRefresher'])).toBe(true)
-})
-
 test('a Json column accepts an object literal next to the introspection schema', async () => {
-	const { schema: result } = await create(createFactory(), ['admin'])
+	const result = jsonSchemaOf(await create(createFactory(), ['admin']))
 	const document = parse('mutation { createArticle(data: { data: { message: "hello", tags: ["a"] } }) { ok } }')
 	expect(validate(result.schema, document, { scalars: result.scalars }).map(it => it.message)).toEqual([])
 })
 
 test('role schemas of one project schema share the types their permissions do not change', async () => {
 	const factory = createFactory()
-	const jsonSchema = async (roles: string[]) => (await create(factory, roles)).schema.schema
+	const jsonSchema = async (roles: string[]) => jsonSchemaOf(await create(factory, roles)).schema
 	const admin = await jsonSchema(['admin'])
 	const reader = await jsonSchema(['reader'])
 
@@ -181,30 +255,22 @@ const manyRolesSchema: Schema = {
 
 /** Keeps one interned type and only a weak reference to the cached schema, so the cache alone decides its lifetime. */
 const buildAndForget = async (factory: GraphQlSchemaFactory, schema: Schema, role: string, typeName: string) => {
-	const { schema: built } = await factory.create(schema, { projectRoles: [role] }, project)
+	const built = jsonSchemaOf(await factory.create(schema, { projectRoles: [role] }, project))
 	return { built: new WeakRef(built), type: built.schema.t[typeName] }
 }
 
 test('once every schema of a project schema is evicted, the data they shared is not retained', async () => {
-	const factory = new GraphQlSchemaFactory(
-		new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({ ttlSeconds: 0.01 }),
-		new PermissionFactory(),
-		[],
-	)
+	const factory = createFactory([], undefined, new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({ ttlSeconds: 0.01 }))
 	const evicted = await buildAndForget(factory, schema, 'admin', 'Article')
 	await new Promise(resolve => setTimeout(resolve, 50))
 	expect(await isCollected(evicted.built)).toBe(true)
 
 	// the interner of the evicted schema is gone, so the rebuilt schema does not reuse its types
-	expect((await factory.create(schema, { projectRoles: ['admin'] }, project)).schema.schema.t.Article).not.toBe(evicted.type)
+	expect(jsonSchemaOf(await factory.create(schema, { projectRoles: ['admin'] }, project)).schema.t.Article).not.toBe(evicted.type)
 })
 
 test('once most schemas of a generation are evicted, new schemas no longer share its interned data', async () => {
-	const factory = new GraphQlSchemaFactory(
-		new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({ maxEntries: 1 }),
-		new PermissionFactory(),
-		[],
-	)
+	const factory = createFactory([], undefined, new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({ maxEntries: 1 }))
 	const first = await buildAndForget(factory, manyRolesSchema, 'role0', 'Article0')
 	await buildAndForget(factory, manyRolesSchema, 'role1', 'Article1')
 	expect(await isCollected(first.built)).toBe(true)
@@ -214,30 +280,7 @@ test('once most schemas of a generation are evicted, new schemas no longer share
 		await collectGarbage()
 	}
 
-	expect((await factory.create(manyRolesSchema, { projectRoles: ['role0'] }, project)).schema.schema.t.Article0).not.toBe(first.type)
-})
-
-test('concurrent requests of one role combination build it once', async () => {
-	const factory = createFactory()
-	const [editor, admin] = await Promise.all([create(factory, ['editor']), create(factory, ['admin'])])
-
-	expect(editor).toBe(admin)
-})
-
-test('a failed build is not cached', async () => {
-	let fail = true
-	const factory = createFactory([{
-		createSchema: () => {
-			if (fail) {
-				throw new Error('contributor failed')
-			}
-			return undefined
-		},
-	}])
-
-	await expect(create(factory, ['admin'])).rejects.toThrow('contributor failed')
-	fail = false
-	expect(mutationFields(await create(factory, ['admin'])).createArticle).toBeDefined()
+	expect(jsonSchemaOf(await factory.create(manyRolesSchema, { projectRoles: ['role0'] }, project)).schema.t.Article0).not.toBe(first.type)
 })
 
 const chainedEntities = (count: number): Model.Schema['entities'] =>

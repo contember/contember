@@ -1,4 +1,10 @@
-import { Authorizator, ExecutionContainerFactory, JsonContentSchemaBuilder } from '@contember/engine-content-api'
+import {
+	Authorizator,
+	ExecutionContainerFactory,
+	GraphQlSchemaBuilderFactory,
+	JsonContentSchema,
+	JsonContentSchemaBuilder,
+} from '@contember/engine-content-api'
 import { execute, validate } from '@contember/graphql-json'
 import {
 	ContentQueryExecutor,
@@ -8,12 +14,18 @@ import {
 } from '@contember/engine-system-api'
 import { logger } from '@contember/logger'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
-import { GraphQLError, parse } from 'graphql'
+import { ExecutionResult, graphql, GraphQLError, parse } from 'graphql'
+import { ContentGraphQLEngineResolver, ContentGraphQLSchema } from '../content/ContentGraphQLEngine.js'
 import { ContentGraphqlContext } from '../content/ContentGraphqlContext.js'
 import { extractOriginalError } from '../graphql/index.js'
 
 export class ContentQueryExecutorImpl implements ContentQueryExecutor {
-	constructor(private readonly executionContainerFactory: ExecutionContainerFactory) {}
+	constructor(
+		private readonly executionContainerFactory: ExecutionContainerFactory,
+		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
+		private readonly engineResolver: ContentGraphQLEngineResolver = new ContentGraphQLEngineResolver(),
+	) {
+	}
 
 	public async execute(
 		{ db, schema, schemaMeta, databaseMetadata, stage, project, identity }: ContentQueryExecutorContext,
@@ -21,7 +33,9 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 	): Promise<ContentQueryExecutorResult> {
 		const permissions = new AllowAllPermissionFactory().create(schema.model, true)
 		const authorizator = new Authorizator(permissions, true, false)
-		const dataSchema = new JsonContentSchemaBuilder(schema.model, authorizator, authorizator).build()
+		const dataSchema: ContentGraphQLSchema = this.engineResolver.resolve(project.slug) === 'graphql-js'
+			? { engine: 'graphql-js', schema: this.graphqlSchemaBuilderFactory.create(schema.model, authorizator, authorizator).build() }
+			: { engine: 'graphql-json', schema: new JsonContentSchemaBuilder(schema.model, authorizator, authorizator).build() }
 
 		const identityId = identity.id
 
@@ -53,19 +67,14 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 		}
 
 		try {
-			const document = parse(query)
-			const validationErrors = validate(dataSchema.schema, document, { scalars: dataSchema.scalars })
-			if (validationErrors.length) {
-				return { ok: false, errors: validationErrors.map(formatErrorMessage) }
-			}
-			const result = await execute({
-				schema: dataSchema.schema,
-				document,
-				resolvers: dataSchema.resolvers,
-				scalars: dataSchema.scalars,
-				variableValues: variables,
-				contextValue: ctx,
-			})
+			const result = dataSchema.engine === 'graphql-js'
+				? await graphql({
+					schema: dataSchema.schema,
+					source: query,
+					variableValues: variables,
+					contextValue: ctx,
+				})
+				: await this.executeGraphQLJson(dataSchema.schema, query, variables, ctx)
 			if (result.errors?.length) {
 				return { ok: false, errors: result.errors.map(formatErrorMessage) }
 			}
@@ -73,6 +82,27 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 		} catch (e) {
 			return { ok: false, errors: [formatErrorMessage(e)] }
 		}
+	}
+
+	private async executeGraphQLJson(
+		dataSchema: JsonContentSchema,
+		query: string,
+		variables: Record<string, unknown> | undefined,
+		ctx: ContentGraphqlContext,
+	): Promise<Pick<ExecutionResult, 'data' | 'errors'>> {
+		const document = parse(query)
+		const validationErrors = validate(dataSchema.schema, document, { scalars: dataSchema.scalars })
+		if (validationErrors.length) {
+			return { errors: validationErrors }
+		}
+		return await execute({
+			schema: dataSchema.schema,
+			document,
+			resolvers: dataSchema.resolvers,
+			scalars: dataSchema.scalars,
+			variableValues: variables,
+			contextValue: ctx,
+		})
 	}
 }
 

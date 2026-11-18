@@ -62,7 +62,7 @@ export class MutationProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.create, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				return context.timer(`GraphQL.mutation.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.mutation.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
@@ -100,7 +100,7 @@ export class MutationProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.delete, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				return context.timer(`GraphQL.mutation.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.mutation.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
@@ -141,7 +141,7 @@ export class MutationProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.update, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				return context.timer(`GraphQL.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
@@ -191,7 +191,7 @@ export class MutationProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.upsert, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				return context.timer(`GraphQL.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}

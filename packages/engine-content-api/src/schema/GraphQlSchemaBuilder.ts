@@ -66,7 +66,7 @@ export class GraphQlSchemaBuilder {
 				resolve: async (parent, args, context: Context, info) => {
 					return context.timer(
 						`GraphQL.query.${info.fieldName}`,
-						() => context.executionContainer.readResolver.resolveTransaction(context.executionContainer.queryAstFactory.create(info)),
+						async () => context.executionContainer.readResolver.resolveTransaction(context.executionContainer.queryAstFactory.create(info)),
 					)
 				},
 			})
@@ -115,7 +115,7 @@ export class GraphQlSchemaBuilder {
 				) => {
 					return context.timer(
 						`GraphQL.mutation.${info.fieldName}`,
-						() =>
+						async () =>
 							context.executionContainer.mutationResolver.resolveTransaction(
 								context.executionContainer.queryAstFactory.create(info, transactionQueryAstFilter),
 								{

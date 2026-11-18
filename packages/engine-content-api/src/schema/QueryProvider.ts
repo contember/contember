@@ -52,7 +52,7 @@ export class QueryProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
 			resolve: (parent, args, context, info) => {
-				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.query.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
@@ -85,7 +85,7 @@ export class QueryProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
 			resolve: (parent, args, context, info) => {
-				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.query.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
@@ -101,7 +101,7 @@ export class QueryProvider {
 			deprecationReason: entity.deprecationReason,
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
 			resolve: (parent, args, context, info) => {
-				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.query.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}

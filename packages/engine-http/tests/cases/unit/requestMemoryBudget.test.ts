@@ -1,69 +1,83 @@
-import { expect, test } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { fetch } from 'bun'
 import { once } from 'node:events'
 import Koa from 'koa'
 import { GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql'
 import { RequestMemoryBudget } from '@contember/database'
 import { createLogger, TestLoggerHandler, withLogger } from '@contember/logger'
-import { createGraphQLJsExecutor, createGraphQLQueryHandler } from '../../../src/graphql/execution.js'
+import { buildSchema, builtInScalars } from '@contember/graphql-json'
+import { createGraphQLJsExecutor, createGraphQLJsonExecutor, createGraphQLQueryHandler, GraphQLExecutor } from '../../../src/graphql/execution.js'
 import { serverConfigSchema } from '../../../src/config/configSchema.js'
 import { readConfig } from '../../../src/config/config.js'
 
-async function request(maxBytes: number, chargeInResolver: boolean, query = '{ body }') {
+type BudgetContext = { budget: RequestMemoryBudget }
+type Engine = 'graphql-js' | 'graphql-json'
+
+const createResolvers = (chargeInResolver: boolean) => ({
+	body: (context: BudgetContext) => {
+		if (chargeInResolver) {
+			context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+			return null
+		}
+		return 'x'.repeat(4096)
+	},
+	swallowed: (context: BudgetContext) => {
+		try {
+			context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+		} catch {}
+		return 'partial'
+	},
+	write: (context: BudgetContext) => {
+		context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+		return 'written'
+	},
+	report: (context: BudgetContext) => {
+		try {
+			context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+		} catch {
+			return 'exhausted'
+		}
+		return 'written'
+	},
+})
+
+const createExecutor = (engine: Engine, chargeInResolver: boolean): GraphQLExecutor<BudgetContext> => {
+	const resolvers = createResolvers(chargeInResolver)
+	if (engine === 'graphql-json') {
+		return createGraphQLJsonExecutor<BudgetContext>({
+			schema: buildSchema('type Query { body: String swallowed: String } type Mutation { write: String! report: String! }'),
+			resolvers: [{
+				Query: { body: (_, args, context) => resolvers.body(context), swallowed: (_, args, context) => resolvers.swallowed(context) },
+				Mutation: { write: (_, args, context) => resolvers.write(context), report: (_, args, context) => resolvers.report(context) },
+			}],
+			scalars: builtInScalars,
+		})
+	}
+	return createGraphQLJsExecutor(
+		new GraphQLSchema({
+			query: new GraphQLObjectType<unknown, BudgetContext>({
+				name: 'Query',
+				fields: {
+					body: { type: GraphQLString, resolve: (_, args, context) => resolvers.body(context) },
+					swallowed: { type: GraphQLString, resolve: (_, args, context) => resolvers.swallowed(context) },
+				},
+			}),
+			mutation: new GraphQLObjectType<unknown, BudgetContext>({
+				name: 'Mutation',
+				fields: {
+					write: { type: new GraphQLNonNull(GraphQLString), resolve: (_, args, context) => resolvers.write(context) },
+					report: { type: new GraphQLNonNull(GraphQLString), resolve: (_, args, context) => resolvers.report(context) },
+				},
+			}),
+		}),
+	)
+}
+
+async function request(engine: Engine, maxBytes: number, chargeInResolver: boolean, query = '{ body }') {
 	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes })
 	const responses: unknown[] = []
-	const handler = createGraphQLQueryHandler<{ budget: RequestMemoryBudget }>({
-		executor: createGraphQLJsExecutor(
-			new GraphQLSchema({
-				query: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
-					name: 'Query',
-					fields: {
-						body: {
-							type: GraphQLString,
-							resolve: (_, args, context) => {
-								if (chargeInResolver) {
-									context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-									return null
-								}
-								return 'x'.repeat(4096)
-							},
-						},
-						swallowed: {
-							type: GraphQLString,
-							resolve: (_, args, context) => {
-								try {
-									context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-								} catch {}
-								return 'partial'
-							},
-						},
-					},
-				}),
-				mutation: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
-					name: 'Mutation',
-					fields: {
-						write: {
-							type: new GraphQLNonNull(GraphQLString),
-							resolve: (_, args, context) => {
-								context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-								return 'written'
-							},
-						},
-						report: {
-							type: new GraphQLNonNull(GraphQLString),
-							resolve: (_, args, context) => {
-								try {
-									context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-								} catch {
-									return 'exhausted'
-								}
-								return 'written'
-							},
-						},
-					},
-				}),
-			}),
-		),
+	const handler = createGraphQLQueryHandler<BudgetContext>({
+		executor: createExecutor(engine, chargeInResolver),
 		listeners: [{ onResponse: ({ response }) => void responses.push(response) }],
 		getMemoryBudget: context => context.budget,
 	})
@@ -91,43 +105,45 @@ async function request(maxBytes: number, chargeInResolver: boolean, query = '{ b
 	}
 }
 
-test('budget failure inside a nullable resolver returns one resource error with its path and no partial data', async () => {
-	const { status, body, responses } = await request(1024, true)
-	expect(status).toBe(422)
-	expect(body.data).toBeNull()
-	expect(body.errors).toEqual([
-		expect.objectContaining({ message: 'Request memory budget exceeded', path: ['body'], extensions: { code: 'RESOURCE_EXHAUSTED' } }),
-	])
-	// Response listeners (debug query log, triggered actions) see the rejected response.
-	expect(responses).toEqual([expect.objectContaining({ data: null })])
-})
-
-test('a query whose resolver swallowed the budget failure is still rejected as a whole', async () => {
-	const { status, body } = await request(1024, true, '{ swallowed }')
-	expect(status).toBe(422)
-	expect(body).toEqual({
-		data: null,
-		errors: [{ message: 'Request memory budget exceeded', extensions: { code: 'RESOURCE_EXHAUSTED' } }],
+describe.each<Engine>(['graphql-js', 'graphql-json'])('on %s', engine => {
+	test('budget failure inside a nullable resolver returns one resource error with its path and no partial data', async () => {
+		const { status, body, responses } = await request(engine, 1024, true)
+		expect(status).toBe(422)
+		expect(body.data).toBeNull()
+		expect(body.errors).toEqual([
+			expect.objectContaining({ message: 'Request memory budget exceeded', path: ['body'], extensions: { code: 'RESOURCE_EXHAUSTED' } }),
+		])
+		// Response listeners (debug query log, triggered actions) see the rejected response.
+		expect(responses).toEqual([expect.objectContaining({ data: null })])
 	})
-})
 
-test('a mutation that reports budget exhaustion in its own result keeps its data', async () => {
-	const { status, body } = await request(1024, true, 'mutation { report }')
-	expect({ status, body }).toEqual({ status: 200, body: { data: { report: 'exhausted' } } })
-})
+	test('a query whose resolver swallowed the budget failure is still rejected as a whole', async () => {
+		const { status, body } = await request(engine, 1024, true, '{ swallowed }')
+		expect(status).toBe(422)
+		expect(body).toEqual({
+			data: null,
+			errors: [{ message: 'Request memory budget exceeded', extensions: { code: 'RESOURCE_EXHAUSTED' } }],
+		})
+	})
 
-test('budget failure thrown by a mutation field is a resource error with its path, not an internal error', async () => {
-	const response = await request(1024, true, 'mutation { write }')
-	expect(response.status).toBe(422)
-	expect(response.body.data).toBeNull()
-	expect(response.body.errors).toEqual([
-		expect.objectContaining({ message: 'Request memory budget exceeded', path: ['write'], extensions: { code: 'RESOURCE_EXHAUSTED' } }),
-	])
-})
+	test('a mutation that reports budget exhaustion in its own result keeps its data', async () => {
+		const { status, body } = await request(engine, 1024, true, 'mutation { report }')
+		expect({ status, body }).toEqual({ status: 200, body: { data: { report: 'exhausted' } } })
+	})
 
-test('response of a request within its budget is preserved', async () => {
-	const { status, body } = await request(32768, false)
-	expect({ status, body }).toEqual({ status: 200, body: { data: { body: 'x'.repeat(4096) } } })
+	test('budget failure thrown by a mutation field is a resource error with its path, not an internal error', async () => {
+		const response = await request(engine, 1024, true, 'mutation { write }')
+		expect(response.status).toBe(422)
+		expect(response.body.data).toBeNull()
+		expect(response.body.errors).toEqual([
+			expect.objectContaining({ message: 'Request memory budget exceeded', path: ['write'], extensions: { code: 'RESOURCE_EXHAUSTED' } }),
+		])
+	})
+
+	test('response of a request within its budget is preserved', async () => {
+		const { status, body } = await request(engine, 32768, false)
+		expect({ status, body }).toEqual({ status: 200, body: { data: { body: 'x'.repeat(4096) } } })
+	})
 })
 
 test('memory budget configuration rejects invalid or reversed thresholds', () => {

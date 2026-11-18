@@ -1,7 +1,7 @@
-import { execute, validate } from '@contember/graphql-json'
 import {
 	createDbQueriesListener,
 	createGraphQLJsExecutor,
+	createGraphQLJsonExecutor,
 	createGraphQLQueryHandler,
 	GraphQLExecutor,
 	GraphQLListener,
@@ -29,24 +29,6 @@ export class ContentQueryHandlerFactory {
 	}
 
 	private createExecutor(graphQlSchema: ContentGraphQLSchema): GraphQLExecutor<ContentGraphqlContext> {
-		if (graphQlSchema.engine === 'graphql-js') {
-			return createGraphQLJsExecutor(graphQlSchema.schema)
-		}
-		const { schema, resolvers, scalars } = graphQlSchema.schema
-		return {
-			// the builder output is validated as a graphql-js schema in tests; there is no runtime schema validation
-			validateSchema: () => [],
-			validate: document => validate(schema, document, { scalars }),
-			execute: async ({ document, operationName, variableValues, contextValue }) =>
-				await execute({
-					schema,
-					document,
-					resolvers,
-					scalars,
-					operationName: operationName ?? undefined,
-					variableValues,
-					contextValue,
-				}),
-		}
+		return graphQlSchema.engine === 'graphql-js' ? createGraphQLJsExecutor(graphQlSchema.schema) : createGraphQLJsonExecutor(graphQlSchema.schema)
 	}
 }

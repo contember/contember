@@ -5,7 +5,7 @@ import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
 import { EgressError, EgressPolicy } from '@contember/engine-common'
 import { parseByteSize } from '../application/requestBody.js'
-import { contentRequestLogMaxRequestsCeiling, ContentRequestLogOptions } from '../content/ContentRequestLog.js'
+import { contentRequestLogMaxRequestsCeiling, contentRequestLogMaxUntilDays, ContentRequestLogOptions } from '../content/ContentRequestLog.js'
 
 const dbConfigRequired = {
 	host: Typesafe.string,
@@ -189,33 +189,46 @@ const projectSlugList = (val: unknown, path: PropertyKey[] = []): string[] | und
 	return raw.map(it => it.trim()).filter(Boolean)
 }
 
-const contentRequestLogSchema = Typesafe.partial({
-	projects: projectSlugList,
-	file: (input: unknown, path: PropertyKey[] = []): string | undefined =>
-		input === undefined || input === '' ? undefined : Typesafe.string(input, path),
+const contentRequestLogProjectsSchema = Typesafe.partial({ projects: projectSlugList })
+
+const contentRequestLogSchema = Typesafe.object({
+	file: Typesafe.string,
 	maxRequests: positiveInteger,
-	durationSeconds: positiveInteger,
+	until: Typesafe.string,
 })
 
-/** Off unless projects are listed; then the destination and the cap are required. */
+const requestLogEnv = { file: 'FILE', maxRequests: 'MAX_REQUESTS', until: 'UNTIL' }
+
+/**
+ * Off unless projects are listed; only then are the other options read, so empty variables of an unused log are fine.
+ * `until` is absolute, so that no restart or cluster worker extends the recording.
+ */
 const contentRequestLog = (input: unknown, path: PropertyKey[] = []): ContentRequestLogOptions | undefined => {
 	if (input === undefined) {
 		return undefined
 	}
-	const { projects, file, maxRequests, durationSeconds } = contentRequestLogSchema(input, path)
+	const { projects } = contentRequestLogProjectsSchema(input, path)
 	if (!projects?.length) {
 		return undefined
 	}
-	if (file === undefined) {
-		return Typesafe.fail([...path, 'file'], 'is required when projects are listed (CONTEMBER_CONTENT_API_REQUEST_LOG_FILE)')
+	for (const [key, env] of Object.entries(requestLogEnv)) {
+		const value = Typesafe.valueAt(input, [key])
+		if (value === undefined || value === '') {
+			return Typesafe.fail([...path, key], `is required when projects are listed (CONTEMBER_CONTENT_API_REQUEST_LOG_${env})`)
+		}
 	}
-	if (maxRequests === undefined) {
-		return Typesafe.fail([...path, 'maxRequests'], 'is required when projects are listed (CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS)')
-	}
+	const { file, maxRequests, until } = contentRequestLogSchema(input, path)
 	if (maxRequests > contentRequestLogMaxRequestsCeiling) {
 		return Typesafe.fail([...path, 'maxRequests'], `must be at most ${contentRequestLogMaxRequestsCeiling}`)
 	}
-	return { projects, file, maxRequests, durationSeconds }
+	const untilTime = /(Z|[+-]\d{2}:\d{2})$/.test(until) ? Date.parse(until) : Number.NaN
+	if (Number.isNaN(untilTime)) {
+		return Typesafe.fail([...path, 'until'], 'must be an ISO timestamp with a time zone, e.g. 2026-01-02T18:00:00Z')
+	}
+	if (untilTime > Date.now() + contentRequestLogMaxUntilDays * 24 * 3600 * 1000) {
+		return Typesafe.fail([...path, 'until'], `must be at most ${contentRequestLogMaxUntilDays} days ahead`)
+	}
+	return { projects, file, maxRequests, until: new Date(untilTime).toISOString() }
 }
 
 export const serverConfigSchema = Typesafe.partial({

@@ -15,7 +15,7 @@ The log records every query with its variables, and variables carry the data cli
 - Delete it as soon as the check is done.
 :::
 
-The log is off by default. It records only the projects it lists, stops at a hard cap and can also stop after a set time.
+The log is off by default. It records only the projects it lists, until a set time and at most a set number of requests.
 
 ## Configuration
 
@@ -23,7 +23,7 @@ The log is off by default. It records only the projects it lists, stops at a har
 CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS=blog
 CONTEMBER_CONTENT_API_REQUEST_LOG_FILE=/var/lib/contember/request-log/blog.jsonl
 CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS=5000
-CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS=3600
+CONTEMBER_CONTENT_API_REQUEST_LOG_UNTIL=2026-01-02T18:00:00Z
 ```
 
 or in the server config:
@@ -35,32 +35,34 @@ server:
       projects: [blog]
       file: /var/lib/contember/request-log/blog.jsonl
       maxRequests: 5000
-      durationSeconds: 3600
+      until: 2026-01-02T18:00:00Z
 ```
 
 | Option | Meaning |
 |---|---|
 | `projects` | Slugs of the projects to record, as a list or a comma-separated string. There is no wildcard. Without projects, the log is off. A slug matches that project in every project group. |
 | `file` | The file the Engine appends to, one JSON object per line. A new file is readable by its owner only. Required when projects are listed. |
-| `maxRequests` | The hard cap: the number of requests recorded per project by one Engine process, at most 100 000. Required when projects are listed. |
-| `durationSeconds` | Optional. Recording stops this many seconds after the Engine process started. |
+| `maxRequests` | The number of requests recorded per project by one Engine process, at most 100 000. Required when projects are listed. |
+| `until` | An ISO timestamp with a time zone. Nothing is recorded after it. It may lie at most 7 days ahead when the Engine starts. Required when projects are listed. |
 
-The cap and the time apply to each Engine process. A cluster of workers can record up to the number of workers times `maxRequests`, and a restart starts both again and appends to the same file. To stop recording, remove the configuration and restart the Engine.
+`until` is the hard bound: it holds for every Engine process and after any restart, so a forgotten configuration stops recording by itself. `maxRequests` counts per process: a cluster of workers can record up to the number of workers times `maxRequests`, and a restarted process counts from zero again and appends to the same file. To stop recording earlier, remove the configuration and restart the Engine.
 
 ## Recorded entries
 
 ```json
-{"time":"2026-01-02T03:04:05.000Z","project":"blog","stage":"live","roles":["editor"],"operationName":"Articles","query":"query Articles($limit: Int) { listArticle(limit: $limit) { id } }","variables":{"limit":10},"status":200}
+{"time":"2026-01-02T03:04:05.000Z","projectGroup":null,"project":"blog","stage":"live","roles":["editor"],"method":"POST","operationName":"Articles","query":"query Articles($limit: Int) { listArticle(limit: $limit) { id } }","variables":{"limit":10},"status":200}
 ```
 
 | Field | Meaning |
 |---|---|
 | `time` | When the request finished. |
+| `projectGroup` | The project group of the request, or `null` when the Engine serves a single one. |
 | `project`, `stage` | The project and stage of the request URL. |
 | `roles` | The effective project roles of the identity. The identity itself and the variables of its memberships are not recorded, so a replay with other membership variables can return other rows. |
-| `operationName`, `query`, `variables` | The GraphQL request as the client sent it. |
-| `status` | The HTTP status of the response; a failed request is recorded too. |
+| `method` | `POST` or `GET`. |
+| `operationName`, `query`, `variables` | The GraphQL request as the client sent it: from the body of a `POST`, from the query string of a `GET`. In a `GET` request, and in a form-encoded `POST`, `variables` is the raw string the client sent. |
+| `status` | The HTTP status of the GraphQL response; a failed request is recorded too. It is taken before `X-Contember-Force-Ok` turns an error status into `200`, so it can differ from what such a client received. |
 
 Only requests that reach GraphQL execution are recorded. A request refused before it, for example without authentication, for an unknown stage or answered with `304 Not Modified`, is not.
 
-If the file cannot be written, the Engine logs an error and stops recording; requests are not affected.
+If the file cannot be written, the Engine logs an error and stops recording; requests are not affected. On shutdown the Engine waits at most 5 seconds for the file to be flushed.

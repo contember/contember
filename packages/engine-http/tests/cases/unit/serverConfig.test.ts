@@ -222,44 +222,78 @@ test('requestBodySize: a malformed size fails instead of disabling the limit', (
 
 const requestLog = (val: unknown): unknown => serverConfigSchema({ contentApi: { requestLog: val } }).contentApi?.requestLog
 
+const inOneDay = () => new Date(Date.now() + 24 * 3600 * 1000).toISOString()
+
 test('content request log: off when nothing is configured', async () => {
 	const { serverConfig } = await readConfig()
 	expect(serverConfig.contentApi?.requestLog).toBeUndefined()
 })
 
 test('content request log: off without listed projects, even with a destination', () => {
-	expect(requestLog({ file: '/var/log/requests.jsonl', maxRequests: 100 })).toBeUndefined()
-	expect(requestLog({ projects: '', file: '/var/log/requests.jsonl', maxRequests: 100 })).toBeUndefined()
+	expect(requestLog({ file: '/var/log/requests.jsonl', maxRequests: 100, until: inOneDay() })).toBeUndefined()
+	expect(requestLog({ projects: '', file: '/var/log/requests.jsonl', maxRequests: 100, until: inOneDay() })).toBeUndefined()
+})
+
+test('content request log: empty variables of an unused log do not stop startup', async () => {
+	const keys = ['PROJECTS', 'FILE', 'MAX_REQUESTS', 'UNTIL'].map(it => `CONTEMBER_CONTENT_API_REQUEST_LOG_${it}`)
+	for (const key of keys) {
+		process.env[key] = ''
+	}
+	try {
+		const { serverConfig } = await readConfig()
+		expect(serverConfig.contentApi?.requestLog).toBeUndefined()
+	} finally {
+		for (const key of keys) {
+			delete process.env[key]
+		}
+	}
 })
 
 test('content request log: read from CONTEMBER_CONTENT_API_REQUEST_LOG_*', async () => {
+	const until = inOneDay()
 	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS = 'blog, shop'
 	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_FILE = '/var/log/requests.jsonl'
 	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS = '500'
-	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS = '3600'
+	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_UNTIL = until
 	try {
 		const { serverConfig } = await readConfig()
 		expect(serverConfig.contentApi?.requestLog).toEqual({
 			projects: ['blog', 'shop'],
 			file: '/var/log/requests.jsonl',
 			maxRequests: 500,
-			durationSeconds: 3600,
+			until,
 		})
 	} finally {
 		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS
 		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_FILE
 		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS
-		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS
+		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_UNTIL
 	}
 })
 
-test('content request log: listed projects require a destination and a cap', () => {
-	expect(() => requestLog({ projects: ['blog'], maxRequests: 100 })).toThrow(/file/)
-	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl' })).toThrow(/maxRequests/)
+test('content request log: listed projects require a destination, a cap and an end', () => {
+	const complete = { projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 100, until: inOneDay() }
+	expect(() => requestLog({ ...complete, file: undefined })).toThrow(/file/)
+	expect(() => requestLog({ ...complete, file: '' })).toThrow(/file/)
+	expect(() => requestLog({ ...complete, maxRequests: undefined })).toThrow(/maxRequests/)
+	expect(() => requestLog({ ...complete, until: undefined })).toThrow(/until/)
 })
 
 test('content request log: the cap is positive and bounded', () => {
-	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 0 })).toThrow()
-	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 100_001 })).toThrow(/at most 100000/)
-	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 10, durationSeconds: 0 })).toThrow()
+	const complete = { projects: ['blog'], file: '/var/log/requests.jsonl', until: inOneDay() }
+	expect(() => requestLog({ ...complete, maxRequests: 0 })).toThrow()
+	expect(() => requestLog({ ...complete, maxRequests: 100_001 })).toThrow(/at most 100000/)
+})
+
+test('content request log: `until` is an ISO timestamp with a time zone, at most 7 days ahead', () => {
+	const complete = { projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 100 }
+	expect(() => requestLog({ ...complete, until: 'tomorrow' })).toThrow(/ISO timestamp/)
+	expect(() => requestLog({ ...complete, until: '2026-01-02T18:00:00' })).toThrow(/time zone/)
+	expect(() => requestLog({ ...complete, until: new Date(Date.now() + 8 * 24 * 3600 * 1000).toISOString() })).toThrow(/7 days/)
+	// a past end is accepted: the forgotten configuration just records nothing
+	expect(requestLog({ ...complete, until: '2020-01-01T00:00:00+02:00' })).toEqual({
+		...complete,
+		projects: ['blog'],
+		until: '2019-12-31T22:00:00.000Z',
+	})
 })

@@ -118,7 +118,7 @@ export const configTemplate: any = {
 				projects: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS%',
 				file: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_FILE%',
 				maxRequests: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS::number%',
-				durationSeconds: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS::number%',
+				until: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_UNTIL%',
 			},
 			whereOptimizer: {
 				disable: '%?env.CONTEMBER_CONTENT_API_WHERE_OPTIMIZER_DISABLE::bool%',

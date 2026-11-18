@@ -13,21 +13,42 @@ afterEach(async () => {
 	await Promise.all(directories.splice(0).map(it => rm(it, { recursive: true, force: true })))
 })
 
-const createLog = async (options: Partial<ContentRequestLogOptions> = {}, now?: () => number) => {
+const now = Date.parse('2026-01-02T03:04:05Z')
+
+const createLog = async (options: Partial<ContentRequestLogOptions> = {}, clock: () => number = () => now) => {
 	const directory = await mkdtemp(join(tmpdir(), 'content-request-log-'))
 	directories.push(directory)
 	const file = join(directory, 'requests.jsonl')
 	const loggerHandler = new TestLoggerHandler()
-	const log = new ContentRequestLog({ projects: ['test'], file, maxRequests: 10, ...options }, createLogger(loggerHandler), now)
+	const log = new ContentRequestLog(
+		{ projects: ['test'], file, maxRequests: 10, until: '2026-01-03T00:00:00.000Z', ...options },
+		createLogger(loggerHandler),
+		clock,
+	)
 	return { log, file, loggerHandler }
 }
 
 const readEntries = async (file: string): Promise<unknown[]> => (await readFile(file, 'utf8')).split('\n').filter(Boolean).map(it => JSON.parse(it))
 
-const entry = (project: string) => ({ project, stage: 'live', roles: ['editor'], request: { query: '{ marker }' }, status: 200 })
+const entry = (project: string) => ({
+	projectGroup: undefined,
+	project,
+	stage: 'live',
+	roles: ['editor'],
+	method: 'POST',
+	request: { query: '{ marker }' },
+	status: 200,
+})
+
+const waitFor = async (condition: () => boolean) => {
+	for (let attempt = 0; attempt < 100 && !condition(); attempt++) {
+		await new Promise(resolve => setTimeout(resolve, 10))
+	}
+	expect(condition()).toBe(true)
+}
 
 test('the controller records a request of a listed project with its stage, roles, request and status', async () => {
-	const { log, file } = await createLog({}, () => Date.parse('2026-01-02T03:04:05Z'))
+	const { log, file } = await createLog()
 	const harness = createContentControllerHarness('graphql-js', { roles: ['editor'], requestLog: log })
 	try {
 		await harness.request('query Marker { marker }', {}, { note: 'client data' })
@@ -37,17 +58,10 @@ test('the controller records a request of a listed project with its stage, roles
 	}
 	await log.close()
 
+	const recorded = { time: '2026-01-02T03:04:05.000Z', projectGroup: null, project: 'test', stage: 'live', roles: ['editor'], method: 'POST' }
 	expect(await readEntries(file)).toEqual([
-		{
-			time: '2026-01-02T03:04:05.000Z',
-			project: 'test',
-			stage: 'live',
-			roles: ['editor'],
-			query: 'query Marker { marker }',
-			variables: { note: 'client data' },
-			status: 200,
-		},
-		{ time: '2026-01-02T03:04:05.000Z', project: 'test', stage: 'live', roles: ['editor'], query: 'mutation { unknown }', status: 400 },
+		{ ...recorded, query: 'query Marker { marker }', variables: { note: 'client data' }, status: 200 },
+		{ ...recorded, query: 'mutation { unknown }', status: 400 },
 	])
 })
 
@@ -78,13 +92,21 @@ test('recording stops at the cap of each project', async () => {
 	expect(loggerHandler.messages.map(it => it.message)).toContain('Content API request log reached its cap for a project')
 })
 
-test('recording stops once the duration has passed', async () => {
-	let now = 1_000_000
-	const { log, file } = await createLog({ durationSeconds: 60 }, () => now)
+test('nothing is recorded after `until`, also by a log created later, as after a restart', async () => {
+	let clock = Date.parse('2026-01-02T23:59:59Z')
+	const { log, file } = await createLog({}, () => clock)
 	log.record(entry('test'))
-	now += 60_000
+	clock = Date.parse('2026-01-03T00:00:00Z')
 	log.record(entry('test'))
 	await log.close()
+
+	const restarted = new ContentRequestLog(
+		{ projects: ['test'], file, maxRequests: 10, until: '2026-01-03T00:00:00.000Z' },
+		createLogger(new TestLoggerHandler()),
+		() => clock,
+	)
+	restarted.record(entry('test'))
+	await restarted.close()
 
 	expect(await readEntries(file)).toHaveLength(1)
 })
@@ -97,17 +119,23 @@ test('the log file is readable by its owner only', async () => {
 	expect((await stat(file)).mode & 0o777).toBe(0o600)
 })
 
-test('a destination that cannot be written stops the log instead of failing requests', async () => {
-	const { log, file, loggerHandler } = await createLog()
+test('a destination that cannot be written stops the log, and the request still succeeds', async () => {
+	const { file, loggerHandler } = await createLog()
 	const unwritable = new ContentRequestLog(
-		{ projects: ['test'], file: join(file, 'missing-directory', 'requests.jsonl'), maxRequests: 10 },
+		{ projects: ['test'], file: join(file, 'missing-directory', 'requests.jsonl'), maxRequests: 10, until: '2026-01-03T00:00:00.000Z' },
 		createLogger(loggerHandler),
+		() => now,
 	)
-	unwritable.record(entry('test'))
-	await new Promise(resolve => setTimeout(resolve, 50))
+	const harness = createContentControllerHarness('graphql-js', { requestLog: unwritable })
+	try {
+		const { koa } = await harness.request('{ marker }')
+		expect(koa.status).toBe(200)
+		expect(koa.body).toBe('{"data":{"marker":"replica"}}')
+	} finally {
+		await harness.close()
+	}
 
-	expect(unwritable.accepts('test')).toBe(false)
+	await waitFor(() => !unwritable.accepts('test'))
 	expect(loggerHandler.messages.map(it => it.message)).toContainEqual(expect.stringContaining('Content API request log failed and is stopped'))
 	await unwritable.close()
-	await log.close()
 })

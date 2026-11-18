@@ -220,9 +220,11 @@ export class ContentApiControllerFactory {
 			})
 
 			this.requestLog?.record({
+				projectGroup: projectGroup.slug,
 				project: project.slug,
 				stage: stage.slug,
 				roles: projectRoles,
+				method: koa.request.method,
 				// what the GraphQL handler executed: the POST body, or the query string of a GET
 				request: koa.request.method === 'POST' ? koa.request.body : koa.request.query,
 				status: koa.response.status,

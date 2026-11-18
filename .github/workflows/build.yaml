@@ -114,6 +114,10 @@ jobs:
     strategy:
       matrix:
         postgres: [ 14, 15, 16, 17, 18 ]
+        # one leg runs the content API on graphql-json; the others on the default graphql-js
+        include:
+          - postgres: 18
+            engine: graphql-json
     services:
       mailhog:
         image: mailhog/mailhog
@@ -168,6 +172,7 @@ jobs:
           CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
           CONTEMBER_PANEL_ENABLED: 'true'
           CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER: 'true'
+          CONTEMBER_CONTENT_API_GRAPHQL_ENGINE: ${{ matrix.engine }}
           TENANT_MAILER_HOST: 'localhost'
           TENANT_MAILER_PORT: '1025'
           TENANT_MAILER_FROM: 'contember@localhost'

@@ -1,10 +1,10 @@
 import { Schema } from '@contember/schema'
-import { validateSqlFragment, ValidationError } from '@contember/schema-utils'
+import { isColumn, isValidColumnType, validateSqlFragment, ValidationError } from '@contember/schema-utils'
 import { deepEqual } from '@contember/utilities'
 
 /**
- * Validates the raw SQL that going from `before` to `after` adds: new or changed view bodies, predicates of
- * new indexes and expressions of new or changed check constraints. Callers apply it only to SQL about to be executed, so SQL of executed migrations never blocks a deploy.
+ * Validates the raw SQL that going from `before` to `after` adds: new or changed view bodies, check expressions and column types, and predicates of new indexes.
+ * Callers apply it only to SQL about to be executed, so executed migrations never block a deploy, and never filter it by `skippedErrors`.
  */
 export const validateAddedSql = (before: Schema, after: Schema): ValidationError[] => {
 	const errors: ValidationError[] = []
@@ -23,6 +23,22 @@ export const validateAddedSql = (before: Schema, after: Schema): ValidationError
 			const error = validateSqlFragment(index.where, 'expression')
 			if (error) {
 				errors.push({ code: 'MODEL_INVALID_INDEX', path: ['entities', entity.name, 'indexes'], message: `Index predicate (where) ${error}.` })
+			}
+		}
+		for (const field of Object.values(entity.fields)) {
+			if (!isColumn(field)) {
+				continue
+			}
+			const previousField = previous?.fields[field.name]
+			if (previousField && isColumn(previousField) && previousField.columnType === field.columnType) {
+				continue
+			}
+			if (!isValidColumnType(field.columnType)) {
+				errors.push({
+					code: 'MODEL_INVALID_COLUMN_TYPE',
+					path: ['entities', entity.name, 'fields', field.name],
+					message: `Column type ${JSON.stringify(field.columnType)} is not a valid column type.`,
+				})
 			}
 		}
 		for (const check of entity.checks ?? []) {

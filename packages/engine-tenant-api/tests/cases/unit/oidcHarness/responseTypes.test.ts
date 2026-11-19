@@ -138,6 +138,36 @@ describe('OIDC sign-in per stored response type', () => {
 		})
 	})
 
+	describe('an ID token from the authorization endpoint is bound to the code and access token beside it', () => {
+		/** Two authorizations of one sign-in; the callback combines the ID token of the first with `parameter` of the second. */
+		const signInWithSwapped = async (responseType: ResponseType, parameter: 'code' | 'access_token') => {
+			const provider = new OIDCProvider(null, null)
+			const configuration = configurationFor(idp, { responseType })
+			const init = await startSignIn(provider, configuration)
+			const first = await idp.authorize(init.authUrl)
+			const second = await idp.authorize(init.authUrl)
+			return await provider.processResponse(configuration, {
+				parameters: { ...first.parameters, [parameter]: second.parameters[parameter] },
+				redirectUrl: REDIRECT_URL,
+				sessionData: init.sessionData,
+			})
+		}
+
+		test('code id_token with another code: refused on c_hash', async () => {
+			const promise = signInWithSwapped('code id_token', 'code')
+
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow('c_hash mismatch')
+		})
+
+		test('id_token token with another access token: refused on at_hash', async () => {
+			const promise = signInWithSwapped('id_token token', 'access_token')
+
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow('at_hash mismatch')
+		})
+	})
+
 	describe('response modes and callback shapes', () => {
 		test('form_post: the parameters arrive in a form and are passed on as parameters', async () => {
 			const { init, authorization, response } = await signIn(new OIDCProvider(null, null), configurationFor(idp), idp, { responseMode: 'form_post' })

@@ -39,22 +39,24 @@ const target = (href: string): string => {
 	return `${url.hostname}:${url.port}${url.pathname}`
 }
 
+/** Allow-listed by address; Linux routes all of 127.0.0.0/8 to the loopback interface. */
+const ALLOWED_HOST = '127.0.0.2'
+
 /**
- * Every outbound request of the OIDC provider goes to an IdP-chosen URL, so every one of them must pass the egress
- * guard. The fake IdP is reachable as `localhost` (allow-listed) and as `127.0.0.1` (a non-public address the guard
- * refuses); moving a single endpoint to `127.0.0.1` shows whether the request to it is guarded.
+ * The fake IdP is served as `127.0.0.2` (allow-listed) and also answers as `localhost`, which passes the URL check
+ * and is refused only when the guard's lookup resolves it, so moving one endpoint there shows its request is guarded.
  */
 describe('OIDCProvider outbound requests and the egress guard', () => {
 	let idp: FakeIdp
 	const guards: RecordingEgressGuard[] = []
 	const guarded = () => {
-		const guard = new RecordingEgressGuard(new EgressPolicy({ allowHttp: true, allowlist: ['localhost'] }))
+		const guard = new RecordingEgressGuard(new EgressPolicy({ allowHttp: true, allowlist: [ALLOWED_HOST] }))
 		guards.push(guard)
 		return guard
 	}
 
 	beforeAll(async () => {
-		idp = await FakeIdp.start()
+		idp = await FakeIdp.start({ hostname: ALLOWED_HOST })
 	})
 	afterAll(async () => {
 		for (const guard of guards) {
@@ -118,21 +120,32 @@ describe('OIDCProvider outbound requests and the egress guard', () => {
 		step: (provider: OIDCProvider) => Promise<unknown>,
 		errorClass: typeof EgressError | typeof IDPValidationError = EgressError,
 	) => {
-		idp.endpointHosts = { [endpoint]: '127.0.0.1' }
+		idp.endpointHosts = { [endpoint]: 'localhost' }
 		const provider = new OIDCProvider(guarded(), null)
 
 		const promise = step(provider)
 
 		await expect(promise).rejects.toBeInstanceOf(errorClass)
-		await expect(promise).rejects.toThrow('non-public address')
+		await expect(promise).rejects.toThrow('localhost resolves to the non-public address')
 		expect(idp.requestsTo(endpoint)).toEqual([])
 	}
 
 	test('discovery', async () => {
-		await expect(
-			startSignIn(new OIDCProvider(guarded(), null), configuration({ url: idp.baseUrl.replace('localhost', '127.0.0.1') })),
-		).rejects.toBeInstanceOf(EgressError)
+		const promise = startSignIn(new OIDCProvider(guarded(), null), configuration({ url: idp.baseUrl.replace(ALLOWED_HOST, 'localhost') }))
+
+		await expect(promise).rejects.toBeInstanceOf(EgressError)
+		await expect(promise).rejects.toThrow('localhost resolves to the non-public address')
 		expect(idp.requests).toEqual([])
+	})
+
+	test('an IP-literal endpoint is refused by the URL check, before any lookup', async () => {
+		idp.endpointHosts = { token: '127.0.0.1' }
+
+		const promise = signIn(new OIDCProvider(guarded(), null), configuration(), idp)
+
+		await expect(promise).rejects.toBeInstanceOf(EgressError)
+		await expect(promise).rejects.toThrow('127.0.0.1 resolves to the non-public address 127.0.0.1')
+		expect(idp.requestsTo('token')).toEqual([])
 	})
 
 	test('token endpoint, authorization code grant', async () => {

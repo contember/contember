@@ -1,15 +1,10 @@
 import { createHash, randomBytes } from 'node:crypto'
 import http from 'node:http'
-import https from 'node:https'
 import { decodeProtectedHeader, exportJWK, generateKeyPair, JWK, JWTPayload, SignJWT } from 'jose'
 
 /**
- * A fake OpenID Connect provider for tests: discovery, JWKS, authorization, token, userinfo, introspection and
- * end-session endpoints, backed by an in-memory store. It speaks plain HTTP(S) on a random port, so the code under
- * test talks to it exactly as it would to a real IdP. Every request is recorded in {@link FakeIdp.requests}.
- *
- * It is deliberately independent of `openid-client`: the tests that use it pin the behaviour of the tenant IdP
- * login, and must keep meaning the same thing when the library underneath is replaced.
+ * A fake OpenID Connect provider over real HTTP. It does not use `openid-client`, so the tests built on it keep
+ * meaning the same thing when the library under the tenant IdP login is replaced.
  */
 
 export type FakeIdpEndpoint = 'discovery' | 'jwks' | 'authorization' | 'token' | 'userinfo' | 'introspection' | 'end_session'
@@ -35,15 +30,8 @@ export interface FakeIdpOptions {
 	readonly idTokenIssuer?: (baseUrl: string) => string
 	/** Extra claims in every ID token, e.g. a `tid`. */
 	readonly idTokenClaims?: Readonly<Record<string, unknown>>
-	/** Host name the advertised URLs use. Default `localhost`. */
+	/** Host the advertised URLs use. Default `localhost`. */
 	readonly hostname?: string
-	/** Serve HTTPS with this key and certificate instead of HTTP. */
-	readonly tls?: { readonly key: string; readonly cert: string }
-	/**
-	 * Origin the advertised URLs use instead of `protocol://hostname:port`, for an IdP reached through a connection
-	 * the test redirects (e.g. `https://login.microsoftonline.com`).
-	 */
-	readonly publicOrigin?: string
 }
 
 export type FakeIdpOverride =
@@ -145,7 +133,6 @@ export class FakeIdp {
 	private readonly server: http.Server
 	private readonly basePath: string
 	private readonly hostname: string
-	private readonly protocol: 'http' | 'https'
 	private port = 0
 	private readonly overrides = new Map<FakeIdpEndpoint, FakeIdpOverride>()
 	private readonly codes = new Map<string, AuthorizationGrant>()
@@ -159,13 +146,12 @@ export class FakeIdp {
 	) {
 		this.basePath = options.basePath ?? ''
 		this.hostname = options.hostname ?? 'localhost'
-		this.protocol = options.tls ? 'https' : 'http'
 		const handler: http.RequestListener = (req, res) => {
 			this.handle(req, res).catch(e => {
 				res.writeHead(500, { 'content-type': 'text/plain' }).end(e instanceof Error ? e.message : String(e))
 			})
 		}
-		this.server = options.tls ? https.createServer({ key: options.tls.key, cert: options.tls.cert }, handler) : http.createServer(handler)
+		this.server = http.createServer(handler)
 	}
 
 	static async start(options: FakeIdpOptions = {}): Promise<FakeIdp> {
@@ -229,13 +215,9 @@ export class FakeIdp {
 		return `${this.urlOn(this.endpointHosts[endpoint] ?? this.hostname)}${ENDPOINT_PATHS[endpoint]}`
 	}
 
-	/** Answer every request to `endpoint` with `override` until {@link reset} or {@link clearOverride}. */
+	/** Answer every request to `endpoint` with `override` until {@link reset}. */
 	override(endpoint: FakeIdpEndpoint, override: FakeIdpOverride): void {
 		this.overrides.set(endpoint, override)
-	}
-
-	clearOverride(endpoint: FakeIdpEndpoint): void {
-		this.overrides.delete(endpoint)
 	}
 
 	/** Revoke every issued token and code: the user's session at the IdP has ended. */
@@ -308,21 +290,13 @@ export class FakeIdp {
 		)
 	}
 
-	/** The port the server listens on. */
-	get listeningPort(): number {
-		return this.port
-	}
-
 	private urlOn(host: string): string {
-		if (this.options.publicOrigin !== undefined && host === this.hostname) {
-			return `${this.options.publicOrigin}${this.basePath}`
-		}
-		return `${this.protocol}://${host}:${this.port}${this.basePath}`
+		return `http://${host}:${this.port}${this.basePath}`
 	}
 
 	/**
 	 * A GET of `url` sent to this server whatever its host, so a test never reaches the real host an advertised URL
-	 * names. Plain `node:http(s)`: the test environment's global `fetch` is a browser polyfill that follows redirects.
+	 * names. Plain `node:http`: the test environment's global `fetch` is a browser polyfill that follows redirects.
 	 */
 	private getFromSelf(url: string): Promise<{ status: number; location: string | undefined; body: string }> {
 		const target = new URL(url)
@@ -331,11 +305,9 @@ export class FakeIdp {
 			port: this.port,
 			path: `${target.pathname}${target.search}`,
 			headers: { host: target.host },
-			servername: target.hostname,
-			rejectUnauthorized: false,
 		}
 		return new Promise((resolve, reject) => {
-			const request = (this.protocol === 'https' ? https : http).get(options, res => {
+			const request = http.get(options, res => {
 				readBody(res).then(body => resolve({ status: res.statusCode ?? 0, location: res.headers.location, body }), reject)
 			})
 			request.on('error', reject)
@@ -350,7 +322,7 @@ export class FakeIdp {
 	}
 
 	private async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
-		const url = new URL(req.url ?? '/', `${this.protocol}://${req.headers.host ?? 'unknown'}`)
+		const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'unknown'}`)
 		const body = await readBody(req)
 		const isForm = (req.headers['content-type'] ?? '').startsWith('application/x-www-form-urlencoded')
 		const form = isForm ? Object.fromEntries(new URLSearchParams(body)) : {}

@@ -9,13 +9,11 @@ import { FakeIdp, FakeIdpOverride } from './FakeIdp.js'
 import { configurationFor, REDIRECT_URL, sessionDataOf, signIn, startSignIn } from './harness.js'
 
 /**
- * Pins which IdP failures end a session (`revoked`) and which propagate as transient errors (the caller keeps the
- * session: IdP downtime must not log everyone out), and how sign-in failures map onto the tenant API's error classes.
- * The openid-client error classes appear here on purpose: they are what `revalidateOIDC` and `handleOIDCResponse`
- * branch on today.
+ * Which IdP failures revoke a session and which propagate as transient (IdP downtime must not log everyone out).
+ * The openid-client error classes are named on purpose: `revalidateOIDC` and `handleOIDCResponse` branch on them.
  */
 
-const TIMEOUT_MS = 300
+const TIMEOUT_MS = 1000
 
 const respond = (status: number, body?: string | object, headers?: Record<string, string>): FakeIdpOverride => ({
 	kind: 'respond',
@@ -139,8 +137,10 @@ describe('OIDC failure classification', () => {
 
 		test('no stored access token: revoked without a request', async () => {
 			const { provider } = await signedIn('userinfo')
+			const before = idp.requests.length
 
 			expect(await provider.revalidate(configuration('userinfo'), { tokens: {} })).toEqual({ status: 'revoked', reason: 'no_access_token' })
+			expect(idp.requests).toHaveLength(before)
 		})
 
 		const transient: [string, FakeIdpOverride, string][] = [
@@ -169,8 +169,18 @@ describe('OIDC failure classification', () => {
 
 		test('no stored token: revoked without a request', async () => {
 			const { provider } = await signedIn('introspection')
+			const before = idp.requests.length
 
 			expect(await provider.revalidate(configuration('introspection'), { tokens: {} })).toEqual({ status: 'revoked', reason: 'no_token' })
+			expect(idp.requests).toHaveLength(before)
+		})
+
+		// the error code decides before the method does, so this 4xx revokes although the code comment calls introspection 4xx transient
+		test.each(['invalid_grant', 'invalid_token', 'expired_token'])('400 %s: revoked with that reason', async error => {
+			const { provider, session } = await signedIn('introspection')
+			idp.override('introspection', respond(400, { error }))
+
+			expect(await provider.revalidate(configuration('introspection'), session)).toEqual({ status: 'revoked', reason: error })
 		})
 
 		test.each<[string, FakeIdpOverride, string]>([
@@ -187,6 +197,19 @@ describe('OIDC failure classification', () => {
 			await expect(promise).rejects.toThrow(message)
 		})
 	})
+
+	test.each<['userinfo' | 'introspection']>([['userinfo'], ['introspection']])(
+		'%s endpoint that never answers: thrown as an RPError, session kept',
+		async method => {
+			const { provider, session } = await signedIn(method)
+			idp.override(method, { kind: 'hang' })
+
+			const promise = provider.revalidate(configuration(method), session)
+
+			await expect(promise).rejects.toBeInstanceOf(errors.RPError)
+			await expect(promise).rejects.toThrow(`outgoing request timed out after ${TIMEOUT_MS}ms`)
+		},
+	)
 
 	describe('sign-in', () => {
 		const signInWith = async (overrides: Partial<OIDCConfiguration> = {}) =>

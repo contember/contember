@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test'
-import { createEgressGuard } from '@contember/engine-common'
+import { EgressGuard, EgressPolicy } from '@contember/engine-common'
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { FakeIdp, FakeIdpOptions } from './FakeIdp.js'
@@ -87,13 +87,16 @@ describe('OIDC issuer quirks', () => {
 	test('a back-channel logout token is checked against the advertised issuer, trailing slash included', async () => {
 		const idp = await start({ issuer: base => `${base}/` })
 		// without a guard, jose fetches the JWKS with the global fetch, which the test preload replaces with happy-dom's
-		const guard = createEgressGuard({ guard: true, allowHttp: true, allowlist: ['localhost'] })
-		const provider = new OIDCProvider(guard, null)
+		const guard = new EgressGuard(new EgressPolicy({ allowHttp: true, allowlist: ['localhost'] }))
+		try {
+			const provider = new OIDCProvider(guard, null)
 
-		expect(await provider.validateLogoutToken(configurationFor(idp), await idp.signLogoutToken())).toEqual({ sid: 'idp-session-1', sub: 'user-1' })
-		await expect(provider.validateLogoutToken(configurationFor(idp), await idp.signLogoutToken({ iss: idp.baseUrl }))).rejects.toThrow(
-			'unexpected "iss" claim value',
-		)
-		guard?.dispose()
+			expect(await provider.validateLogoutToken(configurationFor(idp), await idp.signLogoutToken())).toEqual({ sid: 'idp-session-1', sub: 'user-1' })
+			const mismatched = provider.validateLogoutToken(configurationFor(idp), await idp.signLogoutToken({ iss: idp.baseUrl }))
+			await expect(mismatched).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(mismatched).rejects.toThrow('unexpected "iss" claim value')
+		} finally {
+			guard.dispose()
+		}
 	})
 })

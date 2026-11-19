@@ -188,4 +188,18 @@ describe('OIDC session capture and revalidation', () => {
 		})
 		expect(idp.requestsTo('userinfo').at(-1)?.headers.authorization).toBe(`Bearer ${String(session.tokens?.access_token)}`)
 	})
+
+	describe('RP-initiated logout URL', () => {
+		test('without an end_session_endpoint in discovery: null, so the caller logs out locally only', async () => {
+			idp.omittedEndpoints = ['end_session']
+
+			expect(await new OIDCProvider(null, null).buildLogoutUrl(configurationFor(idp), { idToken: 'id-token' })).toBeNull()
+		})
+
+		test('without an ID token or a post-logout redirect: the client id only', async () => {
+			const url = await new OIDCProvider(null, null).buildLogoutUrl(configurationFor(idp), {})
+
+			expect(url).toBe(`${idp.endpointUrl('end_session')}?client_id=${idp.client.clientId}`)
+		})
+	})
 })

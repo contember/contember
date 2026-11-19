@@ -27,7 +27,8 @@ SOFTWARE.
  */
 
 // Collects the SQL of engine and content migrations. The output reproduces node-pg-migrate 5 byte for byte for the
-// operations and options below, because not-yet-run migrations on existing databases must execute the same SQL.
+// operations and options below, because not-yet-run migrations on existing databases must execute the same SQL. It differs
+// only for a name containing `"`, which node-pg-migrate did not escape.
 
 export type Name = string | { schema?: string; name: string }
 
@@ -81,7 +82,7 @@ export interface FunctionParam {
 	type: string
 }
 
-const quote = (identifier: string): string => `"${identifier}"`
+const quote = (identifier: string): string => `"${identifier.replace(/"/g, '""')}"`
 
 const literal = (name: Name): string => typeof name === 'object' ? (name.schema ? `${quote(name.schema)}.` : '') + quote(name.name) : quote(name)
 

@@ -280,6 +280,21 @@ describe('migration builder SQL', () => {
 })
 
 describe('migration builder edge cases', () => {
+	test('a double quote in a table, schema or column name is doubled', () => {
+		const payload = 'x" (id int); DROP TABLE "article"; --'
+		expect(sqlOf(b => {
+			b.createTable({ schema: payload, name: payload }, { [payload]: { type: 'text' } })
+			b.renameColumn('article', 'title', payload)
+		})).toEqual([
+			lines(
+				'CREATE TABLE "x"" (id int); DROP TABLE ""article""; --"."x"" (id int); DROP TABLE ""article""; --" (',
+				'  "x"" (id int); DROP TABLE ""article""; --" text',
+				');',
+			),
+			'ALTER TABLE "article" RENAME "title" TO "x"" (id int); DROP TABLE ""article""; --";',
+		])
+	})
+
 	test('sql does not double a trailing semicolon', () => {
 		expect(sqlOf(b => {
 			b.sql('SELECT 1;')

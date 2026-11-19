@@ -382,6 +382,15 @@ describe('migration builder edge cases', () => {
 		])
 	})
 
+	test('sequence options with SQL in them are rejected', () => {
+		const payload = 'ALWAYS AS IDENTITY, ADD x int; DROP TABLE "t"; --'
+		expect(() => sqlOf(b => b.addColumn('t', { id: { type: 'integer', sequenceGenerated: { precedence: 'ALWAYS', owner: payload } } })))
+			.toThrow('Invalid sequence owner')
+		expect(() => sqlOf(b => b.addColumn('t', { id: { type: 'integer', sequenceGenerated: { precedence: 'ALWAYS', type: payload } } })))
+			.toThrow('Invalid sequence type')
+		expect(() => sqlOf(b => b.alterColumn('t', 'id', { sequenceGenerated: { precedence: 'ALWAYS', owner: 't.id' } }))).not.toThrow()
+	})
+
 	test('an empty index name or domain check falls back like node-pg-migrate', () => {
 		expect(sqlOf(b => {
 			b.createIndex({ schema: 's', name: 't' }, ['a', 'b'], { name: '' })

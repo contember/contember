@@ -155,8 +155,30 @@ const formatLines = (lines: readonly string[], prefix = '  ', separator = ','): 
 		.join(`${separator}\n`)
 		.replace(/^/gm, prefix)
 
-// Sequence options arrive unparsed from migration JSON, so every option node-pg-migrate rendered is kept.
+const SEQUENCE_PRECEDENCES: readonly string[] = ['ALWAYS', 'BY DEFAULT']
+
+// Sequence options arrive unparsed from migration JSON and go into the SQL as is, so each one must have its declared shape.
+export const assertValidSequenceOptions = (sequence: SequenceOptions): void => {
+	const { precedence, type, increment, minvalue, maxvalue, start, cache, owner } = sequence
+	if (!SEQUENCE_PRECEDENCES.includes(precedence)) {
+		throw new Error(`Invalid sequence precedence ${JSON.stringify(precedence)}: expected ALWAYS or BY DEFAULT`)
+	}
+	for (const [name, value] of Object.entries({ increment, minvalue, maxvalue, start, cache })) {
+		if (value !== undefined && value !== null && value !== false && !Number.isInteger(value)) {
+			throw new Error(`Invalid sequence option ${name} ${JSON.stringify(value)}: expected an integer`)
+		}
+	}
+	if (type !== undefined && !/^[a-zA-Z_][a-zA-Z0-9_ ]*$/.test(type)) {
+		throw new Error(`Invalid sequence type ${JSON.stringify(type)}: expected a type name`)
+	}
+	if (owner && !/^[_a-zA-Z][_a-zA-Z0-9$]*(\.[_a-zA-Z][_a-zA-Z0-9$]*){1,2}$/.test(owner)) {
+		throw new Error(`Invalid sequence owner ${JSON.stringify(owner)}: expected table.column`)
+	}
+}
+
+// Every option node-pg-migrate rendered is kept.
 const sequenceClause = (sequence: SequenceOptions): string => {
+	assertValidSequenceOptions(sequence)
 	const { type, increment, minvalue, maxvalue, start, cache, cycle, owner } = sequence
 	const clauses: string[] = []
 	if (type) {

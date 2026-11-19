@@ -19,6 +19,18 @@ namespace EnumSchema {
 	}
 }
 
+namespace SequenceSchema {
+	export class Article {
+		position = c.intColumn().notNull().sequence({ precedence: 'ALWAYS' })
+	}
+}
+
+namespace NullableIntSchema {
+	export class Article {
+		position = c.intColumn()
+	}
+}
+
 namespace ManyHasManySchema {
 	export class Post {
 		title = c.stringColumn()
@@ -158,5 +170,62 @@ describe('identifiers', () => {
 				+ '"category_id" uuid NOT NULL REFERENCES "c""(""id""); DROP TABLE ""post""; --"("id") ON DELETE CASCADE ); '
 				+ 'ALTER TABLE "post_categories" ADD PRIMARY KEY ("post_id", "category_id");',
 		)
+	})
+})
+
+describe('sequence options', () => {
+	const sequenceColumn = (sequence: Record<string, unknown>) => ({
+		name: 'position',
+		columnName: 'position',
+		type: Model.ColumnType.Int,
+		columnType: 'integer',
+		nullable: false,
+		sequence,
+	})
+
+	test('a sequence precedence with SQL in it is rejected', () => {
+		const field = sequenceColumn({ precedence: 'ALWAYS AS IDENTITY, ADD x int; DROP TABLE "article"; --' })
+		expect(() => testGenerateSql(articleSchema, [{ modification: 'createColumn', entityName: 'Article', field }], ''))
+			.toThrow('Invalid sequence precedence "ALWAYS AS IDENTITY, ADD x int; DROP TABLE \\"article\\"; --": expected ALWAYS or BY DEFAULT')
+	})
+
+	test('a sequence start with SQL in it is rejected', () => {
+		const field = sequenceColumn({ precedence: 'ALWAYS', start: '1); DROP TABLE "article"; --' })
+		expect(() => testGenerateSql(articleSchema, [{ modification: 'createColumn', entityName: 'Article', field }], ''))
+			.toThrow('Invalid sequence option start')
+	})
+
+	test('an updated sequence precedence or start with SQL in it is rejected', () => {
+		const schema = createSchema(SequenceSchema)
+		const update = (sequence: Record<string, unknown>, valueMigrationStrategy?: string): Migration.Modification[] => [
+			{
+				modification: 'updateColumnDefinition',
+				entityName: 'Article',
+				fieldName: 'position',
+				definition: sequenceColumn(sequence),
+				valueMigrationStrategy,
+			},
+		]
+		expect(() => testGenerateSql(schema, update({ precedence: 'BY DEFAULT; DROP TABLE "article"; --' }), '')).toThrow('Invalid sequence precedence')
+		expect(() => testGenerateSql(createSchema(NullableIntSchema), update({ precedence: 'ALWAYS', start: '1; DROP TABLE "article"; --' }, 'update'), ''))
+			.toThrow('Invalid sequence option start')
+	})
+
+	test('the model validator reports an invalid sequence', () => {
+		const migrator = new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+		const field = sequenceColumn({ precedence: 'ALWAYS; --', start: 1.5 })
+		const schema = migrator.applyModifications(articleSchema, [{ modification: 'createColumn', entityName: 'Article', field }], VERSION_LATEST)
+		expect(new ModelValidator(schema.model).validate()).toStrictEqual([
+			{
+				code: 'MODEL_INVALID_COLUMN_DEFINITION',
+				message: 'Invalid sequence precedence "ALWAYS; --": expected ALWAYS or BY DEFAULT',
+				path: ['entities', 'Article', 'position'],
+			},
+			{
+				code: 'MODEL_INVALID_COLUMN_DEFINITION',
+				message: 'Invalid sequence start "1.5": expected an integer',
+				path: ['entities', 'Article', 'position'],
+			},
+		])
 	})
 })

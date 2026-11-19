@@ -216,6 +216,12 @@ export class ModelValidator {
 			if (field.sequence && field.nullable) {
 				errors.add('MODEL_INVALID_COLUMN_DEFINITION', 'Column with sequence cannot be nullable.')
 			}
+			if (field.sequence && field.sequence.precedence !== 'ALWAYS' && field.sequence.precedence !== 'BY DEFAULT') {
+				errors.add('MODEL_INVALID_COLUMN_DEFINITION', `Invalid sequence precedence "${field.sequence.precedence}": expected ALWAYS or BY DEFAULT`)
+			}
+			if (field.sequence?.start !== undefined && !Number.isInteger(field.sequence.start)) {
+				errors.add('MODEL_INVALID_COLUMN_DEFINITION', `Invalid sequence start "${field.sequence.start}": expected an integer`)
+			}
 			this.validateColumnJsonSchema(field, errors)
 		}
 	}

@@ -173,9 +173,7 @@ export class ProjectMigrator {
 			sqlErrors.push(...validateAddedSql(snapshotSchema, next))
 			snapshotSchema = next
 		}
-		// A snapshot does not map its modifications to migrations, so any covered migration's skip applies.
-		const coveredSkippedErrors = sortedCovers.flatMap(it => it.type === 'schema' ? it.skippedErrors ?? [] : [])
-		this.assertNoSqlErrors(latestVersion, SchemaValidator.filterSkipped(sqlErrors, coveredSkippedErrors))
+		this.assertNoSqlErrors(latestVersion, sqlErrors)
 
 		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
 		let schema = emptySchema
@@ -308,7 +306,8 @@ export class ProjectMigrator {
 					sqlErrors.push(...validateAddedSql(previousSchema, next))
 					previousSchema = next
 				}
-				this.assertNoSqlErrors(migration.version, SchemaValidator.filterSkipped(sqlErrors, skippedErrors))
+				// Never filtered by skippedErrors: the migration that adds the SQL would carry its own waiver.
+				this.assertNoSqlErrors(migration.version, sqlErrors)
 				const latestModification = described[described.length - 1]
 				schema = latestModification.schema
 				const errors = SchemaValidator.validate(schema, skippedErrors)

@@ -3,6 +3,7 @@ import { c, createSchema } from '@contember/schema-definition'
 import {
 	calculateMigrationChecksum,
 	createCheckConstraintModification,
+	createColumnModification,
 	createViewModification,
 	MigrationDescriber,
 	ModificationHandlerFactory,
@@ -12,7 +13,7 @@ import {
 	VERSION_CORRECT_PRIMARY_COLUMN_NAME,
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
-import { Schema } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { Connection, DatabaseMetadataResolver } from '@contember/database'
 import { ConnectionMock } from '@contember/database-tester'
 import crypto from 'node:crypto'
@@ -198,33 +199,49 @@ test('a multi-statement view migration about to be executed is rejected before a
 	await expect(result).rejects.toThrow('entities.ArticleView: [MODEL_INVALID_VIEW] View SQL must be a single SQL statement.')
 })
 
-test('a skippedErrors entry lets a fresh database replay a migration with a multi-statement view', async () => {
+test('a skippedErrors entry does not waive the SQL check of a migration about to be executed', async () => {
 	const skipping: SchemaMigrationInput = {
 		...multiStatementViewMigration,
 		skippedErrors: [{ code: 'MODEL_INVALID_VIEW', path: 'entities.ArticleView' }],
 	}
-	expect(calculateMigrationChecksum(skipping)).toBe(calculateMigrationChecksum(multiStatementViewMigration))
-	const savedMigrations = await migrate({ executed: [], migrationsToExecute: [skipping, indexMigration] })
-	expect(savedMigrations).toHaveLength(2)
+	const result = migrate({ executed: [], migrationsToExecute: [skipping] })
+	await expect(result).rejects.toBeInstanceOf(InvalidSchemaError)
+	await expect(result).rejects.toThrow('[MODEL_INVALID_VIEW]')
 })
 
-test('a skippedErrors entry of a covered migration lets a snapshot with a multi-statement view bootstrap', async () => {
-	const bootstrap = (covered: SchemaMigrationInput) => {
-		const connection = new RecordingConnection()
-		const result = createMigrator({ schema: emptySchema, meta: {} }, []).migrateFromSnapshot({
-			db: createDb(connection),
-			project: { slug: 'test', systemSchema: 'system' },
-			stages: [],
-			snapshot: { formatVersion, modifications: [...covered.modifications] },
-			covers: [covered],
-		})
-		return { result, connection }
-	}
-	await expect(bootstrap(multiStatementViewMigration).result).rejects.toBeInstanceOf(InvalidSchemaError)
+test('a skippedErrors entry of a covered migration does not waive the SQL check of a snapshot', async () => {
+	const covered: SchemaMigrationInput = { ...multiStatementViewMigration, skippedErrors: [{ code: 'MODEL_INVALID_VIEW' }] }
+	const connection = new RecordingConnection()
+	const result = createMigrator({ schema: emptySchema, meta: {} }, []).migrateFromSnapshot({
+		db: createDb(connection),
+		project: { slug: 'test', systemSchema: 'system' },
+		stages: [],
+		snapshot: { formatVersion, modifications: [...covered.modifications] },
+		covers: [covered],
+	})
+	await expect(result).rejects.toBeInstanceOf(InvalidSchemaError)
+	expect(savedMigrationsOf(connection)).toHaveLength(0)
+})
 
-	const skipping = bootstrap({ ...multiStatementViewMigration, skippedErrors: [{ code: 'MODEL_INVALID_VIEW' }] })
-	await skipping.result
-	expect(savedMigrationsOf(skipping.connection)).toHaveLength(1)
+test('a column type carrying SQL is rejected, also with a skippedErrors entry', async () => {
+	const columnTypeMigration = (columnType: string): SchemaMigrationInput => ({
+		type: 'schema',
+		version: '2026-01-01-100000',
+		name: '2026-01-01-100000-column',
+		formatVersion,
+		modifications: [
+			...differ.diffSchemas(emptySchema, createSchema(Base)),
+			createColumnModification.createModification({
+				entityName: 'Article',
+				field: { name: 'injected', columnName: 'injected', nullable: true, type: Model.ColumnType.String, columnType },
+			}),
+		],
+		skippedErrors: [{ code: 'MODEL_INVALID_COLUMN_TYPE' }],
+	})
+	for (const columnType of ['text; DROP TABLE other_schema.t; --', "varchar; UPDATE other_schema.t SET v = 'x'; --"]) {
+		const result = migrate({ executed: [], migrationsToExecute: [columnTypeMigration(columnType)] })
+		await expect(result).rejects.toThrow('entities.Article.fields.injected: [MODEL_INVALID_COLUMN_TYPE]')
+	}
 })
 
 test('a check expression with a statement terminator is rejected even when the migration removes it again', async () => {

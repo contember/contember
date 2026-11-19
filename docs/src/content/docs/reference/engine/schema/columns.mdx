@@ -392,6 +392,8 @@ config = c.jsonColumn().columnType('json')
 ```
 In this example, the config property is a JSON column that is defined with the column type json in the database. This means that the config column will be of type json in the database, rather than the default jsonb type.
 
+The column type is written into the migration SQL as it is. It must be a type name, optionally with parameters, a quoted collation and `[]` (`varchar(255)`, `numeric(10, 2)`, `VARCHAR(255) COLLATE "de_DE"`, `text[]`). A migration that adds or changes a column type in any other form, for example one containing `;`, is rejected with `MODEL_INVALID_COLUMN_TYPE`, and the check cannot be skipped with `skippedErrors`.
+
 ### Validating JSON columns with a JSON Schema
 
 The `schema` method (available only on `jsonColumn()`) lets you attach a [JSON Schema](https://json-schema.org/) to a JSON column. The schema is stored as metadata in the Contember schema and the value provided on every `create` / `update` mutation is validated against it. Validation errors are reported the same way as the built-in field validation rules.

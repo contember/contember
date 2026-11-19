@@ -1,6 +1,7 @@
 import * as Typesafe from '@contember/typesafe'
 import { Model } from '@contember/schema'
 import { ParseError } from '@contember/typesafe'
+import { isValidColumnType } from '../validation/columnType.js'
 
 const orderBySchema = Typesafe.array(Typesafe.object({
 	path: Typesafe.array(Typesafe.string),
@@ -140,7 +141,7 @@ const columnSchema = Typesafe.intersection(
 		name: Typesafe.string,
 		columnName: Typesafe.string,
 		columnType: Typesafe.transform(Typesafe.string, (it, raw, path) => {
-			if (!it.replaceAll(/\s+/g, '').match(/^[\w_]+(?:\(\w+(?:,\w+)*\))?\w*(?:"[^"]+")?(\[])*$/)) {
+			if (!isValidColumnType(it)) {
 				throw ParseError.format(it, path, 'valid column type')
 			}
 			return it

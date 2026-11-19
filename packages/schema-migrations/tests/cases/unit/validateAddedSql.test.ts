@@ -63,6 +63,27 @@ namespace QuotedSemicolonCheck {
 	}
 }
 
+namespace InjectedColumnType {
+	export class Article {
+		title = c.stringColumn()
+		c1 = c.stringColumn().columnType('text; DROP TABLE other_schema.t; --')
+	}
+}
+
+namespace ChangedInjectedColumnType {
+	export class Article {
+		title = c.stringColumn().columnType("varchar; UPDATE other_schema.t SET v = 'x'; --")
+	}
+}
+
+namespace CustomColumnTypes {
+	export class Article {
+		title = c.stringColumn().columnType('VARCHAR(255) COLLATE "de_DE"')
+		price = c.stringColumn().columnType('numeric(10, 2)')
+		tags = c.stringColumn().columnType('character varying(255)[]')
+	}
+}
+
 const base = createSchema(Base)
 const multiStatementView = createSchema(MultiStatementView)
 
@@ -96,6 +117,26 @@ test('an unchanged check is not checked again and a quoted semicolon is accepted
 	const terminated = createSchema(TerminatedCheck)
 	expect(validateAddedSql(terminated, terminated)).toStrictEqual([])
 	expect(validateAddedSql(base, createSchema(QuotedSemicolonCheck))).toStrictEqual([])
+})
+
+test('a new column with SQL in its column type is rejected', () => {
+	expect(validateAddedSql(base, createSchema(InjectedColumnType))).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_COLUMN_TYPE',
+			path: ['entities', 'Article', 'fields', 'c1'],
+			message: 'Column type "text; DROP TABLE other_schema.t; --" is not a valid column type.',
+		},
+	])
+})
+
+test('a changed column type is checked again, an unchanged one is not', () => {
+	const changed = createSchema(ChangedInjectedColumnType)
+	expect(validateAddedSql(base, changed).map(it => it.code)).toStrictEqual(['MODEL_INVALID_COLUMN_TYPE'])
+	expect(validateAddedSql(changed, changed)).toStrictEqual([])
+})
+
+test('valid custom column types pass', () => {
+	expect(validateAddedSql(base, createSchema(CustomColumnTypes))).toStrictEqual([])
 })
 
 test('the differ rejects added invalid SQL but keeps diffing a schema that already contains it', () => {

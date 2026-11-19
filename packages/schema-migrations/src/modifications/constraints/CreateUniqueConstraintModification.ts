@@ -2,7 +2,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
-import { wrapIdentifier } from '../../utils/dbHelpers.js'
+import { indexMethodClause, wrapIdentifier } from '../../utils/dbHelpers.js'
 import { getUniqueConstraintColumns } from './utils.js'
 import { deepEqual } from '@contember/utilities'
 
@@ -29,7 +29,7 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 
 		if ('index' in this.data.unique && this.data.unique.index) {
 			const nulls = this.data.unique.nulls === 'not distinct' ? ' NULLS NOT DISTINCT' : ''
-			const methodClause = this.data.unique.method ? ` USING ${this.data.unique.method}` : ''
+			const methodClause = indexMethodClause(this.data.unique.method)
 			builder.sql(`CREATE UNIQUE INDEX ON ${tableNameId}${methodClause} (${columnNameIds.join(', ')})${nulls}`)
 		} else {
 			let checkModifier = ''

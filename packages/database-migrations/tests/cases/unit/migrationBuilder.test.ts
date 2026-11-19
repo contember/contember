@@ -280,6 +280,21 @@ describe('migration builder SQL', () => {
 })
 
 describe('migration builder edge cases', () => {
+	test('a double quote in a table, schema or column name is doubled', () => {
+		const payload = 'x" (id int); DROP TABLE "article"; --'
+		expect(sqlOf(b => {
+			b.createTable({ schema: payload, name: payload }, { [payload]: { type: 'text' } })
+			b.renameColumn('article', 'title', payload)
+		})).toEqual([
+			lines(
+				'CREATE TABLE "x"" (id int); DROP TABLE ""article""; --"."x"" (id int); DROP TABLE ""article""; --" (',
+				'  "x"" (id int); DROP TABLE ""article""; --" text',
+				');',
+			),
+			'ALTER TABLE "article" RENAME "title" TO "x"" (id int); DROP TABLE ""article""; --";',
+		])
+	})
+
 	test('sql does not double a trailing semicolon', () => {
 		expect(sqlOf(b => {
 			b.sql('SELECT 1;')
@@ -365,6 +380,15 @@ describe('migration builder edge cases', () => {
 				'  ADD "id" integer NOT NULL GENERATED ALWAYS AS IDENTITY (AS integer INCREMENT BY 2 NO MINVALUE MAXVALUE 99 START WITH 5 CACHE 3 NO CYCLE OWNED BY NONE);',
 			),
 		])
+	})
+
+	test('sequence options with SQL in them are rejected', () => {
+		const payload = 'ALWAYS AS IDENTITY, ADD x int; DROP TABLE "t"; --'
+		expect(() => sqlOf(b => b.addColumn('t', { id: { type: 'integer', sequenceGenerated: { precedence: 'ALWAYS', owner: payload } } })))
+			.toThrow('Invalid sequence owner')
+		expect(() => sqlOf(b => b.addColumn('t', { id: { type: 'integer', sequenceGenerated: { precedence: 'ALWAYS', type: payload } } })))
+			.toThrow('Invalid sequence type')
+		expect(() => sqlOf(b => b.alterColumn('t', 'id', { sequenceGenerated: { precedence: 'ALWAYS', owner: 't.id' } }))).not.toThrow()
 	})
 
 	test('an empty index name or domain check falls back like node-pg-migrate', () => {

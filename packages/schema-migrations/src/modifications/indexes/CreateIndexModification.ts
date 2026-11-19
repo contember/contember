@@ -2,7 +2,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
-import { wrapIdentifier } from '../../utils/dbHelpers.js'
+import { indexMethodClause, indexOpClassSuffix, wrapIdentifier } from '../../utils/dbHelpers.js'
 import { getIndexColumns } from './utils.js'
 import { deepEqual } from '@contember/utilities'
 
@@ -25,19 +25,18 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 		// Each key column may carry its own operator class (falling back to the global opClass),
 		// sort direction (ASC is the default and omitted) and NULLS placement. Postgres expects
 		// the parts in this order: column [opclass] [ASC|DESC] [NULLS {FIRST|LAST}].
-		// The opclass is emitted verbatim (validated to an identifier shape in ModelValidator). Migrations
+		// The opclass is emitted verbatim (checked to an identifier shape by indexOpClassSuffix). Migrations
 		// run with search_path set to the stage schema, so the value must already carry any needed schema
 		// qualifier: an extension's class as "public.gin_trgm_ops", a built-in one (in pg_catalog) as
 		// plain "text_pattern_ops".
 		const columnNameIds = index.fields.map((field, i) => {
 			const options = index.columnOptions?.[field]
-			const opClass = options?.opClass ?? index.opClass
-			const opClassSuffix = opClass ? ` ${opClass}` : ''
+			const opClassSuffix = indexOpClassSuffix(options?.opClass ?? index.opClass)
 			const orderSuffix = options?.order === 'desc' ? ' DESC' : ''
 			const nullsSuffix = options?.nulls === 'first' ? ' NULLS FIRST' : options?.nulls === 'last' ? ' NULLS LAST' : ''
 			return wrapIdentifier(columns[i]) + opClassSuffix + orderSuffix + nullsSuffix
 		})
-		const methodClause = index.method ? ` USING ${index.method}` : ''
+		const methodClause = indexMethodClause(index.method)
 
 		const includeClause = index.include?.length
 			? ` INCLUDE (${getIndexColumns({ fields: index.include, entity, model: this.schema.model }).map(wrapIdentifier).join(', ')})`

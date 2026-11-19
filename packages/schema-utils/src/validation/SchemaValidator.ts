@@ -30,7 +30,7 @@ export class SchemaValidator {
 	}
 
 	/** Drops the errors a migration's `skippedErrors` declares, matched by code and, when given, by path. */
-	public static filterSkipped(errors: ValidationError[], skippedErrors: readonly SchemaValidatorSkippedErrors[]): ValidationError[] {
+	private static filterSkipped(errors: ValidationError[], skippedErrors: readonly SchemaValidatorSkippedErrors[]): ValidationError[] {
 		if (skippedErrors.length === 0) {
 			return errors
 		}

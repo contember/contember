@@ -43,6 +43,10 @@ mutation {
 
 The deprecated top-level `deployTokenHash` argument is still accepted but `options.deployTokenHash` is preferred for new code.
 
+:::caution[The deploy token has full database access]
+The deploy token (an API key with the project `deployer` role) runs schema migrations. A migration carries raw SQL (view bodies, index predicates, check expressions, column types), which the engine runs with the project's database credentials. Treat the token as full access to the project's database, and, when the project shares a database with the tenant (`db.useTenantDb`) or with other projects, to everything in that database.
+:::
+
 Errors:
 
 | Code | Cause |

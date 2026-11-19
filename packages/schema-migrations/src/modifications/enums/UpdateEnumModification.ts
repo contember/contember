@@ -3,7 +3,8 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import { deepEqual } from '@contember/utilities'
-import { createCheck, getConstraintName } from './enumUtils.js'
+import { createCheck, getConstraintName, getConstraintNameSql } from './enumUtils.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { getColumnSqlType } from '../utils/columnUtils.js'
 
 export class UpdateEnumModificationHandler implements ModificationHandler<UpdateEnumModificationData> {
@@ -12,11 +13,11 @@ export class UpdateEnumModificationHandler implements ModificationHandler<Update
 	public createSql(builder: MigrationBuilder): void {
 		if (!this.requiresNewDomain()) {
 			builder.sql(`
-				ALTER DOMAIN "${this.data.enumName}"
-				DROP CONSTRAINT ${getConstraintName(this.data.enumName)}`)
+				ALTER DOMAIN ${wrapIdentifier(this.data.enumName)}
+				DROP CONSTRAINT ${getConstraintNameSql(this.data.enumName)}`)
 			builder.sql(`
-				ALTER DOMAIN "${this.data.enumName}"
-				ADD CONSTRAINT ${getConstraintName(this.data.enumName)} CHECK (${createCheck(this.data.values)})`)
+				ALTER DOMAIN ${wrapIdentifier(this.data.enumName)}
+				ADD CONSTRAINT ${getConstraintNameSql(this.data.enumName)} CHECK (${createCheck(this.data.values)})`)
 		} else {
 			/**
 			 * Because postgres does not support altering domain constrains

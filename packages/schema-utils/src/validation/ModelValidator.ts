@@ -2,15 +2,14 @@ import { Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { acceptEveryFieldVisitor, getTargetEntity, isColumn, isInverseRelation, isOwningRelation } from '../model/index.js'
 import { collectUnsupportedJsonSchemaKeywords, SUPPORTED_JSON_SCHEMA_KEYWORDS } from '../json-schema/index.js'
+import { INDEX_METHODS, isValidIndexMethod, isValidIndexOpClass } from './indexSql.js'
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
-// An index operator class is an identifier, optionally schema-qualified (e.g. "public.gin_trgm_ops").
 // lowercase ASCII so the quoted DDL name equals the unquoted spelling, and length equals byte length
 const CHECK_NAME_PATTERN = /^[a-z_][a-z0-9_]*$/
 const POSTGRES_IDENTIFIER_MAX_BYTES = 63
 // suffixes of the names PostgreSQL generates for primary, unique, foreign key, exclusion and (since 18) not-null constraints
 const RESERVED_CHECK_NAME_SUFFIX = /_(pkey|key|fkey|excl|not_null)$/
-const INDEX_OPCLASS_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9$]*(\.[_a-zA-Z][_a-zA-Z0-9$]*)?$/
 const RESERVED_WORDS = ['and', 'or', 'not']
 
 export class ModelValidator {
@@ -141,10 +140,13 @@ export class ModelValidator {
 					}
 				}
 			}
+			if (index.method !== undefined && !isValidIndexMethod(index.method)) {
+				errors.add('MODEL_INVALID_INDEX', `Invalid index method "${index.method}": expected one of ${INDEX_METHODS.join(', ')}`)
+			}
 			// opClass is emitted verbatim into CREATE INDEX, so constrain it to an identifier (optionally
 			// schema-qualified) — both to block SQL injection and to catch typos early with a clear message.
 			for (const opClass of [index.opClass, ...Object.values(index.columnOptions ?? {}).map(it => it.opClass)]) {
-				if (opClass !== undefined && !INDEX_OPCLASS_PATTERN.test(opClass)) {
+				if (opClass !== undefined && !isValidIndexOpClass(opClass)) {
 					errors.add(
 						'MODEL_INVALID_INDEX',
 						`Invalid index operator class "${opClass}": expected an identifier, optionally schema-qualified (e.g. "public.gin_trgm_ops")`,
@@ -163,6 +165,9 @@ export class ModelValidator {
 		for (const constraint of entity.unique) {
 			if (entity.view?.materialized && !constraint.index) {
 				errors.add('MODEL_INVALID_CONSTRAINT', 'For materialized views, Unique must be defined as an index. Please set index: true.')
+			}
+			if (constraint.index && constraint.method !== undefined && !isValidIndexMethod(constraint.method)) {
+				errors.add('MODEL_INVALID_CONSTRAINT', `Invalid index method "${constraint.method}": expected one of ${INDEX_METHODS.join(', ')}`)
 			}
 			for (const field of constraint.fields) {
 				const fieldDef = entity.fields[field]

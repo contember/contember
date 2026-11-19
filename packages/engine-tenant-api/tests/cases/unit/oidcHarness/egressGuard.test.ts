@@ -39,7 +39,7 @@ const target = (href: string): string => {
 	return `${url.hostname}:${url.port}${url.pathname}`
 }
 
-/** Allow-listed by address; Linux routes all of 127.0.0.0/8 to the loopback interface. */
+/** Allow-listed by address. Linux routes all of 127.0.0.0/8 to loopback; macOS needs `ifconfig lo0 alias 127.0.0.2`. */
 const ALLOWED_HOST = '127.0.0.2'
 
 /**

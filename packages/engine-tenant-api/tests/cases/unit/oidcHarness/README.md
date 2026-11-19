@@ -8,10 +8,9 @@ The tests here drive `OIDCProvider` through its public methods only (`initAuth`,
 |---|---|
 | `responseTypes.test.ts` | every stored `responseType` with and without `strictResponseType`: authorization URL, response mode, which endpoints the callback calls, the normalized response; escalated response types; `form_post`; the URL callback form |
 | `clientAuthentication.test.ts` | the default `client_secret_basic` (and its exact encoding), `client_secret_post`, `client_secret_jwt`, `none`, on the token and introspection endpoints |
-| `egressGuard.test.ts` | every outbound request passes the egress guard (discovery, token, ID-token and logout-token JWKS, userinfo, refresh, introspection): the fake is served as the allow-listed `127.0.0.2`, and an endpoint moved to `localhost` must be refused by the guard's lookup (Linux: all of 127.0.0.0/8 is loopback) |
+| `egressGuard.test.ts` | every outbound request passes the egress guard (discovery, token, ID-token and logout-token JWKS, userinfo, refresh, introspection): the fake is served as the allow-listed `127.0.0.2`, and an endpoint moved to `localhost` must be refused by the guard's lookup. Linux only out of the box, where all of 127.0.0.0/8 is loopback; on macOS add the address first (`sudo ifconfig lo0 alias 127.0.0.2`) |
 | `errorClassification.test.ts` | which IdP failures revoke a session and which propagate as transient, and the sign-in error classes |
-| `sessionRevalidation.test.ts` (logout) | the RP-initiated logout URL, and `null` without an `end_session_endpoint` |
-| `sessionRevalidation.test.ts` | the session captured at sign-in and what a refresh or userinfo revalidation stores |
+| `sessionRevalidation.test.ts` | the session captured at sign-in, what a refresh or userinfo revalidation stores, and the RP-initiated logout URL (`null` without an `end_session_endpoint`) |
 | `issuerQuirks.test.ts` | realm paths, trailing slashes, an issuer unrelated to the discovery URL, a `{tenantid}` template outside Microsoft |
 
 Behaviour an upgrade is likely to change, each pinned by a test:

@@ -41,7 +41,7 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const seedExpression = formatSeedExpression({
 			model: this.schema.model,
 			entity,
-			columnType,
+			column: newColumn,
 			fillValue: this.data.fillValue,
 			copyValue: this.data.copyValue,
 		})

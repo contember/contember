@@ -2,7 +2,7 @@ import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { JSONValue, Model } from '@contember/schema'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { getColumnName, validateSqlFragment } from '@contember/schema-utils'
-import { formatColumnValue } from '../utils/columnUtils.js'
+import { formatColumnValue, getColumnSqlType } from '../utils/columnUtils.js'
 
 export const fillSeed = ({ builder, entity, columnName, nullable, type, seedExpression }: {
 	entity: Model.Entity
@@ -27,16 +27,16 @@ export const fillSeed = ({ builder, entity, columnName, nullable, type, seedExpr
 	}
 }
 
-export const formatSeedExpression = ({ model, entity, columnType, fillValue, copyValue }: {
+export const formatSeedExpression = ({ model, entity, column, fillValue, copyValue }: {
 	model: Model.Schema
 	entity: Model.Entity
-	columnType: string
+	column: Pick<Model.AnyColumn, 'type' | 'columnType' | 'list'>
 	fillValue?: JSONValue
 	copyValue?: string
 }): string | null => {
 	if (fillValue !== undefined) {
 		// A `{ literal: true, value }` is emitted as raw SQL; migration JSON carries it past validateAddedSql, so check what is emitted.
-		const sql = formatColumnValue(fillValue, columnType)
+		const sql = formatColumnValue(fillValue, column)
 		const error = validateSqlFragment(sql, 'expression')
 		if (error) {
 			throw new Error(`Invalid fill value for ${entity.name}: SQL ${error}`)
@@ -44,7 +44,7 @@ export const formatSeedExpression = ({ model, entity, columnType, fillValue, cop
 		return sql
 	} else if (copyValue !== undefined) {
 		const copyFrom = getColumnName(model, entity, copyValue)
-		return `${wrapIdentifier(copyFrom)}::${columnType}`
+		return `${wrapIdentifier(copyFrom)}::${getColumnSqlType(column)}`
 	}
 	return null
 }

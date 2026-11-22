@@ -23,7 +23,7 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 		const seedExpression = formatSeedExpression({
 			model: this.schema.model,
 			entity,
-			columnType,
+			column: column,
 			fillValue: this.data.fillValue,
 			copyValue: this.data.copyValue,
 		})

@@ -8,15 +8,29 @@ export const getColumnSqlType = (column: Pick<Model.AnyColumn, 'type' | 'columnT
 		: column.columnType)
 	+ (column.list ? '[]' : '')
 
-const jsonSqlTypes = new Set(['json', 'jsonb'])
+type ColumnTypeInfo = Pick<Model.AnyColumn, 'type' | 'columnType' | 'list'>
 
 /**
- * SQL for a fill value or column default of a column of the given SQL type.
- * An object or array for a json/jsonb column is JSON data, not a PostgreSQL array, so it becomes a JSON literal.
+ * SQL for a fill value or column default of the given column.
+ * A JSON column takes JSON data: an object, array, number or boolean becomes a JSON literal, not a PostgreSQL array or a bare scalar.
  */
-export const formatColumnValue = (value: JSONValue, columnSqlType: string): string => {
-	if (jsonSqlTypes.has(columnSqlType.toLowerCase()) && typeof value === 'object' && value !== null && !isPgLiteral(value)) {
-		return `${escapeValue(JSON.stringify(value))}::${columnSqlType}`
+export const formatColumnValue = (value: JSONValue, column: ColumnTypeInfo): string => {
+	if (column.type !== Model.ColumnType.Json || value === null || isPgLiteral(value)) {
+		return escapeValue(value).toString()
 	}
-	return escapeValue(value).toString()
+	if (column.list && Array.isArray(value)) {
+		return `ARRAY[${value.map(it => formatJsonElement(it, column.columnType)).join(',')}]::${getColumnSqlType(column)}`
+	}
+	// PostgreSQL has always read a string here as JSON text; it stays uncast so its SQL does not change.
+	if (typeof value === 'string') {
+		return escapeValue(value).toString()
+	}
+	return formatJsonElement(value, column.columnType)
+}
+
+const formatJsonElement = (value: JSONValue, jsonSqlType: string): string => {
+	if (value === null || isPgLiteral(value)) {
+		return escapeValue(value).toString()
+	}
+	return `${escapeValue(typeof value === 'string' ? value : JSON.stringify(value))}::${jsonSqlType}`
 }

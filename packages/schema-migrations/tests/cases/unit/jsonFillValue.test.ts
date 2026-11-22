@@ -17,6 +17,20 @@ namespace LogWithMeta {
 	}
 }
 
+namespace LogWithTags {
+	export class Log {
+		message = c.stringColumn()
+		tags = c.jsonColumn().list()
+	}
+}
+
+namespace LogWithTagsDefault {
+	export class Log {
+		message = c.stringColumn()
+		tags = c.jsonColumn().list().default([{ a: 1 }])
+	}
+}
+
 namespace LogWithObjectTitle {
 	export class Log {
 		message = c.stringColumn().default({ a: 1 })
@@ -25,12 +39,15 @@ namespace LogWithObjectTitle {
 
 const logSchema = createSchema(LogSchema)
 
-const createColumn = (columnType: string, type: Model.ColumnType, fillValue: JSONValue): Migration.Modification[] => [{
+const createColumn = (columnType: string, type: Model.ColumnType, fillValue: JSONValue, list = false): Migration.Modification[] => [{
 	modification: 'createColumn',
 	entityName: 'Log',
-	field: { name: 'meta', columnName: 'meta', type, columnType, nullable: false },
+	field: { name: 'meta', columnName: 'meta', type, columnType, nullable: false, ...(list ? { list } : {}) },
 	fillValue,
 }]
+
+const fillSql = (columnSqlType: string, sql: string) =>
+	`ALTER TABLE "log" ADD "meta" ${columnSqlType}; UPDATE "log" SET "meta" = ${sql}; SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED; ALTER TABLE "log" ALTER "meta" SET NOT NULL;`
 
 describe('fill value of a json column', () => {
 	test.each<[string, string, JSONValue, string]>([
@@ -38,12 +55,26 @@ describe('fill value of a json column', () => {
 		['an object', 'jsonb', { a: [1, 'x$pga$'] }, '$pgb${"a":[1,"x$pga$"]}$pgb$::jsonb'],
 		['an array', 'jsonb', [1, { b: null }], '$pga$[1,{"b":null}]$pga$::jsonb'],
 		['an object in a json column', 'json', { a: 1 }, '$pga${"a":1}$pga$::json'],
+		['an object in an uppercase JSONB column', 'JSONB', { a: 1 }, '$pga${"a":1}$pga$::JSONB'],
+		['a number', 'jsonb', 0, '$pga$0$pga$::jsonb'],
+		['a boolean', 'jsonb', true, '$pga$true$pga$::jsonb'],
 	])('%s is a JSON literal', (_, columnType, fillValue, sql) => {
-		testGenerateSql(
-			logSchema,
-			createColumn(columnType, Model.ColumnType.Json, fillValue),
-			`ALTER TABLE "log" ADD "meta" ${columnType}; UPDATE "log" SET "meta" = ${sql}; SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED; ALTER TABLE "log" ALTER "meta" SET NOT NULL;`,
-		)
+		testGenerateSql(logSchema, createColumn(columnType, Model.ColumnType.Json, fillValue), fillSql(columnType, sql))
+	})
+
+	test('a string is JSON text, as before', () => {
+		testGenerateSql(logSchema, createColumn('jsonb', Model.ColumnType.Json, '{"a":1}'), fillSql('jsonb', '$pga${"a":1}$pga$'))
+	})
+
+	test.each<[string, JSONValue, string]>([
+		['JSON values', [{ a: 1 }, 'x', 2, null], 'ARRAY[$pga${"a":1}$pga$::jsonb,$pga$x$pga$::jsonb,$pga$2$pga$::jsonb,NULL]::jsonb[]'],
+		['an empty array', [], 'ARRAY[]::jsonb[]'],
+	])('a list json column takes an array of %s', (_, fillValue, sql) => {
+		testGenerateSql(logSchema, createColumn('jsonb', Model.ColumnType.Json, fillValue, true), fillSql('jsonb[]', sql))
+	})
+
+	test('a changed default of a list json column passes validation', () => {
+		expect(validateAddedSql(createSchema(LogWithTags), createSchema(LogWithTagsDefault))).toStrictEqual([])
 	})
 
 	test('a raw SQL literal stays raw SQL', () => {

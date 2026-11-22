@@ -1,7 +1,7 @@
-import { JSONValue, Schema } from '@contember/schema'
+import { JSONValue, Model, Schema } from '@contember/schema'
 import { isColumn, isValidColumnType, validateSqlFragment, ValidationError } from '@contember/schema-utils'
 import { deepEqual } from '@contember/utilities'
-import { formatColumnValue, getColumnSqlType } from './modifications/utils/columnUtils.js'
+import { formatColumnValue } from './modifications/utils/columnUtils.js'
 
 /**
  * Validates the raw SQL that going from `before` to `after` adds: new or changed view bodies, check expressions, column types and the SQL of column defaults, and predicates of new indexes.
@@ -34,7 +34,7 @@ export const validateAddedSql = (before: Schema, after: Schema): ValidationError
 			const previousColumn = previousField && isColumn(previousField) ? previousField : undefined
 			// A default becomes the fill value of the new column; a `{ literal: true, value }` in it is emitted as raw SQL.
 			if (field.default !== undefined && (!previousColumn || !deepEqual(previousColumn.default, field.default))) {
-				const error = validateColumnDefault(field.default, getColumnSqlType(field))
+				const error = validateColumnDefault(field.default, field)
 				if (error) {
 					errors.push({ code: 'MODEL_INVALID_COLUMN_DEFINITION', path: ['entities', entity.name, 'fields', field.name], message: error })
 				}
@@ -64,10 +64,10 @@ export const validateAddedSql = (before: Schema, after: Schema): ValidationError
 	return errors
 }
 
-const validateColumnDefault = (value: JSONValue, columnSqlType: string): string | undefined => {
+const validateColumnDefault = (value: JSONValue, column: Model.AnyColumn): string | undefined => {
 	let sql: string
 	try {
-		sql = formatColumnValue(value, columnSqlType)
+		sql = formatColumnValue(value, column)
 	} catch (e) {
 		if (e instanceof Error) {
 			return `Column default cannot be emitted as SQL: ${e.message}.`

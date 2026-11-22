@@ -1,7 +1,7 @@
 import { Migration, RunMigration } from './Migration.js'
 import { MigrationBuilder } from './MigrationBuilder.js'
 
-export { escapeValue } from './MigrationBuilder.js'
+export { escapeValue, isPgLiteral } from './MigrationBuilder.js'
 
 export function createMigrationBuilder(): MigrationBuilder {
 	return new MigrationBuilder()

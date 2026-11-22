@@ -454,19 +454,33 @@ describe('escapeValue', () => {
 		expect(escapeValue([payload])).toBe(`ARRAY[$pga$${payload}$pga$]`)
 	})
 
-	test('literal objects pass through and other objects become empty', () => {
-		// Migration JSON (fill values, column defaults) reaches escapeValue unparsed.
-		expect([
-			escapeValue({ literal: true, value: 'now()' }),
-			escapeValue({ literal: true, value: 3 }),
-			escapeValue({ literal: false, value: 'x' }),
-			escapeValue({}),
+	test('a string ending in a prefix of the tag does not close its own quote', () => {
+		expect([escapeValue('x$pga'), escapeValue('$pga'), escapeValue('x$pg'), escapeValue('x$')]).toEqual([
+			'$pgb$x$pga$pgb$',
+			'$pgb$$pga$pgb$',
+			'$pga$x$pg$pga$',
+			'$pga$x$$pga$',
 		])
-			.toEqual([
-				'now()',
-				3,
-				'',
-				'',
-			])
+		expect(escapeValue(['x$pga'])).toBe('ARRAY[$pgb$x$pga$pgb$]')
+	})
+
+	test('literal objects pass through', () => {
+		// Migration JSON (fill values, column defaults) reaches escapeValue unparsed.
+		expect([escapeValue({ literal: true, value: 'now()' }), escapeValue({ literal: true, value: 3 })]).toEqual(['now()', 3])
+	})
+
+	test.each<[string, unknown]>([
+		['NaN', NaN],
+		['Infinity', Infinity],
+		['-Infinity', -Infinity],
+		['undefined', undefined],
+		['a bigint', 1n],
+		['an empty object', {}],
+		['a plain object', { a: 1 }],
+		['an object with literal: false', { literal: false, value: 'x' }],
+		['NaN inside an array', [1, NaN]],
+		['an object inside an array', [{}]],
+	])('%s is rejected', (_, value) => {
+		expect(() => escapeValue(value)).toThrow('Cannot escape')
 	})
 })

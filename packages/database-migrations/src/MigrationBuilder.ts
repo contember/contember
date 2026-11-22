@@ -108,6 +108,20 @@ const nextDollarTag = function*(): Generator<string> {
 // Inner arrays stay bare `[..]` (valid inside ARRAY[..]) so the emitted SQL matches what earlier versions generated.
 const escapeArrayBody = (values: unknown[]): string => `[${values.map(it => Array.isArray(it) ? escapeArrayBody(it) : escapeValue(it)).join(',')}]`
 
+// node-pg-migrate's PgLiteral shape; migration JSON (e.g. a fill value or column default) can carry it.
+export const isPgLiteral = (value: unknown): value is { literal: true; value: unknown } =>
+	typeof value === 'object' && value !== null && 'literal' in value && value.literal === true && 'value' in value
+
+const describeUnescapable = (value: unknown): string => {
+	if (typeof value === 'number') {
+		return String(value)
+	}
+	if (typeof value === 'object') {
+		return 'an object'
+	}
+	return typeof value === 'undefined' ? 'undefined' : `a ${typeof value}`
+}
+
 export const escapeValue = (value: unknown): string | number => {
 	if (value === null) {
 		return 'NULL'
@@ -116,23 +130,23 @@ export const escapeValue = (value: unknown): string | number => {
 		return value.toString()
 	}
 	if (typeof value === 'string') {
+		// The closing tag follows the value, so a value ending in `$pga` would form `$pga$` with it.
 		for (const tag of nextDollarTag()) {
-			if (!value.includes(tag)) {
+			if (!`${value}$`.includes(tag)) {
 				return `${tag}${value}${tag}`
 			}
 		}
 	}
-	if (typeof value === 'number') {
+	if (typeof value === 'number' && Number.isFinite(value)) {
 		return value
 	}
 	if (Array.isArray(value)) {
 		return `ARRAY${escapeArrayBody(value)}`
 	}
-	// node-pg-migrate's PgLiteral shape; migration JSON (e.g. a fill value or column default) can carry it.
-	if (typeof value === 'object' && 'literal' in value && value.literal === true && 'value' in value) {
+	if (isPgLiteral(value)) {
 		return typeof value.value === 'number' ? value.value : `${value.value}`
 	}
-	return ''
+	throw new Error(`Cannot escape ${describeUnescapable(value)} as an SQL value`)
 }
 
 const typeAdapters: Record<string, string> = {

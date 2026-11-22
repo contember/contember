@@ -1,9 +1,10 @@
 import { Schema } from '@contember/schema'
 import { isColumn, isValidColumnType, validateSqlFragment, ValidationError } from '@contember/schema-utils'
 import { deepEqual } from '@contember/utilities'
+import { validateLiteralSql } from './utils/literalSql.js'
 
 /**
- * Validates the raw SQL that going from `before` to `after` adds: new or changed view bodies, check expressions and column types, and predicates of new indexes.
+ * Validates the raw SQL that going from `before` to `after` adds: new or changed view bodies, check expressions, column types and raw SQL literals in column defaults, and predicates of new indexes.
  * Callers apply it only to SQL about to be executed, so executed migrations never block a deploy, and never filter it by `skippedErrors`.
  */
 export const validateAddedSql = (before: Schema, after: Schema): ValidationError[] => {
@@ -30,10 +31,18 @@ export const validateAddedSql = (before: Schema, after: Schema): ValidationError
 				continue
 			}
 			const previousField = previous?.fields[field.name]
-			if (previousField && isColumn(previousField) && previousField.columnType === field.columnType) {
-				continue
+			const previousColumn = previousField && isColumn(previousField) ? previousField : undefined
+			if (!previousColumn || !deepEqual(previousColumn.default, field.default)) {
+				const error = validateLiteralSql(field.default)
+				if (error) {
+					errors.push({
+						code: 'MODEL_INVALID_COLUMN_DEFINITION',
+						path: ['entities', entity.name, 'fields', field.name],
+						message: `Column default ${error}.`,
+					})
+				}
 			}
-			if (!isValidColumnType(field.columnType)) {
+			if (previousColumn?.columnType !== field.columnType && !isValidColumnType(field.columnType)) {
 				errors.push({
 					code: 'MODEL_INVALID_COLUMN_TYPE',
 					path: ['entities', entity.name, 'fields', field.name],

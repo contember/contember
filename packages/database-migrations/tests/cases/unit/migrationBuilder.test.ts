@@ -445,6 +445,15 @@ describe('escapeValue', () => {
 		])
 	})
 
+	test('nested arrays use bare brackets inside the outer ARRAY', () => {
+		expect(escapeValue([['a', 'b'], ['c', 'd']])).toBe('ARRAY[[$pga$a$pga$,$pga$b$pga$],[$pga$c$pga$,$pga$d$pga$]]')
+	})
+
+	test('ARRAY inside an array string element stays inside its dollar quotes', () => {
+		const payload = '$pgARRAYa$]; DROP TABLE article; SELECT array[$pgARRAYa$'
+		expect(escapeValue([payload])).toBe(`ARRAY[$pga$${payload}$pga$]`)
+	})
+
 	test('literal objects pass through and other objects become empty', () => {
 		// Migration JSON (fill values, column defaults) reaches escapeValue unparsed.
 		expect([

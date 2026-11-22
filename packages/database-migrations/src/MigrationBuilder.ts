@@ -105,6 +105,9 @@ const nextDollarTag = function*(): Generator<string> {
 	}
 }
 
+// Inner arrays stay bare `[..]` (valid inside ARRAY[..]) so the emitted SQL matches what earlier versions generated.
+const escapeArrayBody = (values: unknown[]): string => `[${values.map(it => Array.isArray(it) ? escapeArrayBody(it) : escapeValue(it)).join(',')}]`
+
 export const escapeValue = (value: unknown): string | number => {
 	if (value === null) {
 		return 'NULL'
@@ -123,7 +126,7 @@ export const escapeValue = (value: unknown): string | number => {
 		return value
 	}
 	if (Array.isArray(value)) {
-		return `ARRAY[${value.map(escapeValue).join(',').replace(/ARRAY/g, '')}]`
+		return `ARRAY${escapeArrayBody(value)}`
 	}
 	// node-pg-migrate's PgLiteral shape; migration JSON (e.g. a fill value or column default) can carry it.
 	if (typeof value === 'object' && 'literal' in value && value.literal === true && 'value' in value) {

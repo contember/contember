@@ -1,7 +1,7 @@
 import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { JSONValue, Model } from '@contember/schema'
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
-import { getColumnName } from '@contember/schema-utils'
+import { getColumnName, validateSqlFragment } from '@contember/schema-utils'
 
 export const fillSeed = ({ builder, entity, columnName, nullable, type, seedExpression }: {
 	entity: Model.Entity
@@ -34,7 +34,13 @@ export const formatSeedExpression = ({ model, entity, columnType, fillValue, cop
 	copyValue?: string
 }): string | null => {
 	if (fillValue !== undefined) {
-		return escapeValue(fillValue).toString()
+		// A `{ literal: true, value }` is emitted as raw SQL; migration JSON carries it past validateAddedSql, so check what is emitted.
+		const sql = escapeValue(fillValue).toString()
+		const error = validateSqlFragment(sql, 'expression')
+		if (error) {
+			throw new Error(`Invalid fill value for ${entity.name}: SQL ${error}`)
+		}
+		return sql
 	} else if (copyValue !== undefined) {
 		const copyFrom = getColumnName(model, entity, copyValue)
 		return `${wrapIdentifier(copyFrom)}::${columnType}`

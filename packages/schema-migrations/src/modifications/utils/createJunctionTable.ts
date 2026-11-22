@@ -22,13 +22,13 @@ export const createJunctionTableSql = (
 			[relation.joiningTable.joiningColumn.columnName]: {
 				type: getPrimaryColumnType(entity),
 				notNull: true,
-				references: `"${entity.tableName}"("${entity.primaryColumn}")`,
+				references: `${wrapIdentifier(entity.tableName)}(${wrapIdentifier(entity.primaryColumn)})`,
 				onDelete: 'CASCADE',
 			},
 			[relation.joiningTable.inverseJoiningColumn.columnName]: {
 				type: getPrimaryColumnType(targetEntity),
 				notNull: true,
-				references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
+				references: `${wrapIdentifier(targetEntity.tableName)}(${wrapIdentifier(targetEntity.primaryColumn)})`,
 				onDelete: 'CASCADE',
 			},
 		},

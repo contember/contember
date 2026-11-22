@@ -1,4 +1,4 @@
-import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
+import { assertValidSequenceOptions, escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { JSONValue, Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
@@ -18,6 +18,10 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		}
 		const oldColumn = entity.fields[this.data.fieldName] as Model.AnyColumn
 		const newColumn = this.data.definition
+		// SET GENERATED and the in-place fill write the precedence and start outside the builder.
+		if (newColumn.sequence) {
+			assertValidSequenceOptions(newColumn.sequence)
+		}
 
 		const hasNewSequence = !oldColumn.sequence && newColumn.sequence
 		const oldColumnType = getColumnSqlType(oldColumn)

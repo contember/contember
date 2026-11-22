@@ -12,7 +12,7 @@ In Contember, migrations can be manually adjusted or fixed when needed. When wor
 
 The `createColumn` modification enables the addition of a new column to an entity. When creating a column that does not allow null values, you can utilize the following options:
 
-- **fillValue**: Specifies a value that will be used to fill the column during the migration run. This value is distinct from the default value used at runtime. If a new column with a default value is added, the default value will also be used as the fillValue in the generated JSON migration.
+- **fillValue**: Specifies a value that will be used to fill the column during the migration run. This value is distinct from the default value used at runtime. If a new column with a default value is added, the default value will also be used as the fillValue in the generated JSON migration. For a `json` or `jsonb` column, an object or array is written as a JSON value. An object for any other column type, or a number that is not finite, is rejected.
 
 - **copyValue**: Indicates the name of another column from which the value will be copied to the newly created column.
 

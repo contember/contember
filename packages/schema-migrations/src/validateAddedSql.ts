@@ -1,7 +1,7 @@
-import { escapeValue } from '@contember/database-migrations'
-import { Schema } from '@contember/schema'
+import { JSONValue, Schema } from '@contember/schema'
 import { isColumn, isValidColumnType, validateSqlFragment, ValidationError } from '@contember/schema-utils'
 import { deepEqual } from '@contember/utilities'
+import { formatColumnValue, getColumnSqlType } from './modifications/utils/columnUtils.js'
 
 /**
  * Validates the raw SQL that going from `before` to `after` adds: new or changed view bodies, check expressions, column types and the SQL of column defaults, and predicates of new indexes.
@@ -34,13 +34,9 @@ export const validateAddedSql = (before: Schema, after: Schema): ValidationError
 			const previousColumn = previousField && isColumn(previousField) ? previousField : undefined
 			// A default becomes the fill value of the new column; a `{ literal: true, value }` in it is emitted as raw SQL.
 			if (field.default !== undefined && (!previousColumn || !deepEqual(previousColumn.default, field.default))) {
-				const error = validateSqlFragment(escapeValue(field.default).toString(), 'expression')
+				const error = validateColumnDefault(field.default, getColumnSqlType(field))
 				if (error) {
-					errors.push({
-						code: 'MODEL_INVALID_COLUMN_DEFINITION',
-						path: ['entities', entity.name, 'fields', field.name],
-						message: `Column default SQL ${error}.`,
-					})
+					errors.push({ code: 'MODEL_INVALID_COLUMN_DEFINITION', path: ['entities', entity.name, 'fields', field.name], message: error })
 				}
 			}
 			if (previousColumn?.columnType !== field.columnType && !isValidColumnType(field.columnType)) {
@@ -66,4 +62,18 @@ export const validateAddedSql = (before: Schema, after: Schema): ValidationError
 		}
 	}
 	return errors
+}
+
+const validateColumnDefault = (value: JSONValue, columnSqlType: string): string | undefined => {
+	let sql: string
+	try {
+		sql = formatColumnValue(value, columnSqlType)
+	} catch (e) {
+		if (e instanceof Error) {
+			return `Column default cannot be emitted as SQL: ${e.message}.`
+		}
+		throw e
+	}
+	const error = validateSqlFragment(sql, 'expression')
+	return error ? `Column default SQL ${error}.` : undefined
 }

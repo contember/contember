@@ -32,22 +32,22 @@ const fillTitle = (fillValue: JSONValue, valueMigrationStrategy?: 'using'): Migr
 describe('fill value', () => {
 	test('a literal that ends the statement is rejected', () => {
 		expect(() => testGenerateSql(articleSchema, createColumn({ literal: true, value: 'now(); DROP TABLE "article"; --' }), ''))
-			.toThrow('Invalid fill value for Article: raw SQL literal must not contain ";"')
+			.toThrow('Invalid fill value for Article: SQL must not contain ";"')
 	})
 
 	test('a literal inside an array is checked', () => {
 		expect(() => testGenerateSql(articleSchema, createColumn([{ literal: true, value: '1]; DROP TABLE "article"; --' }]), ''))
-			.toThrow('raw SQL literal must not contain ";"')
+			.toThrow('SQL must not contain ";"')
 	})
 
 	test('a literal ending in a line comment cannot drop the WHERE of the fill', () => {
 		expect(() => testGenerateSql(articleSchema, fillTitle({ literal: true, value: "'x' --" }), ''))
-			.toThrow('Invalid fill value for Article: raw SQL literal must not end with a line comment')
+			.toThrow('Invalid fill value for Article: SQL must not end with a line comment')
 	})
 
 	test('an unterminated string in a literal is rejected', () => {
 		expect(() => testGenerateSql(articleSchema, fillTitle({ literal: true, value: "'x" }, 'using'), ''))
-			.toThrow('Invalid fill value for Article: raw SQL literal contains an unterminated string literal')
+			.toThrow('Invalid fill value for Article: SQL contains an unterminated string literal')
 	})
 
 	test.each<[string, JSONValue, string]>([
@@ -92,6 +92,14 @@ namespace NowDefault {
 	}
 }
 
+namespace PlainDefaults {
+	export class Article {
+		title = c.stringColumn().default('a; b --')
+		position = c.intColumn().default(-1)
+		published = c.boolColumn().default(false)
+	}
+}
+
 namespace InjectedTitleDefault {
 	export class Article {
 		title = c.stringColumn().default({ literal: true, value: '\'x\'); DELETE FROM "article"; --' })
@@ -105,7 +113,7 @@ describe('column default', () => {
 		expect(validateAddedSql(articleSchema, injected)).toStrictEqual([{
 			code: 'MODEL_INVALID_COLUMN_DEFINITION',
 			path: ['entities', 'Article', 'fields', 'publishedAt'],
-			message: 'Column default raw SQL literal must not contain ";".',
+			message: 'Column default SQL must not contain ";".',
 		}])
 	})
 
@@ -114,8 +122,9 @@ describe('column default', () => {
 		expect(validateAddedSql(injected, injected)).toStrictEqual([])
 	})
 
-	test('a plain literal default passes', () => {
+	test('a plain literal default and plain values with a semicolon or dashes pass', () => {
 		expect(validateAddedSql(articleSchema, createSchema(NowDefault))).toStrictEqual([])
+		expect(validateAddedSql(articleSchema, createSchema(PlainDefaults))).toStrictEqual([])
 	})
 
 	test('the differ refuses to generate a migration for a literal default that ends the statement', () => {

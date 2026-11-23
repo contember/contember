@@ -1110,6 +1110,10 @@
         "react": "catalog:",
         "react-dom": "catalog:",
       },
+      "devDependencies": {
+        "@contember/graphql-client": "workspace:*",
+        "@testing-library/react": "catalog:",
+      },
     },
     "packages/react-uploader": {
       "name": "@contember/react-uploader",

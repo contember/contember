@@ -92,7 +92,12 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 			</ConfigSection>
 
 			<ConfigSection title={dict.tenant.configView.emailChange}>
-				<SettingsTable rows={[['requireVerification', formatConfigValue(config.emailChange.requireVerification)]]} />
+				<SettingsTable
+					rows={[
+						['requireVerification', formatConfigValue(config.emailChange.requireVerification)],
+						['requireReauthentication', formatConfigValue(config.emailChange.requireReauthentication)],
+					]}
+				/>
 			</ConfigSection>
 
 			<ConfigSection title={dict.tenant.configView.password}>
@@ -106,6 +111,7 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 						['pattern', formatConfigValue(config.password.pattern)],
 						['checkBlacklist', formatConfigValue(config.password.checkBlacklist)],
 						['checkHibp', formatConfigValue(config.password.checkHibp)],
+						['revokeSessionsOnChange', formatConfigValue(config.password.revokeSessionsOnChange)],
 					]}
 				/>
 			</ConfigSection>
@@ -116,6 +122,7 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 						['enabled', formatConfigValue(config.passwordless.enabled)],
 						['url', formatConfigValue(config.passwordless.url)],
 						['expiration', formatConfigValue(config.passwordless.expiration)],
+						['uniformResponse', formatConfigValue(config.passwordless.uniformResponse)],
 					]}
 				/>
 			</ConfigSection>

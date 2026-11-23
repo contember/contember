@@ -115,8 +115,8 @@ export interface TenantRateLimitWindowState {
 /** The tenant-wide configuration returned by `Query.configuration` — the read side of {@link TenantGlobalConfig}. */
 export interface TenantConfigState {
 	signup: { requireEmailVerification: boolean }
-	emailChange: { requireVerification: boolean }
-	passwordless: { enabled: ConfigPolicy; url: string | null; expiration: string }
+	emailChange: { requireVerification: boolean; requireReauthentication: boolean }
+	passwordless: { enabled: ConfigPolicy; url: string | null; expiration: string; uniformResponse: boolean }
 	password: {
 		minLength: number
 		requireUppercase: number
@@ -126,6 +126,7 @@ export interface TenantConfigState {
 		pattern: string | null
 		checkBlacklist: boolean
 		checkHibp: boolean
+		revokeSessionsOnChange: boolean
 	}
 	login: {
 		baseBackoff: string
@@ -317,11 +318,15 @@ export class TenantProjectClient {
 		const config = result.configuration
 		return {
 			signup: { requireEmailVerification: config.signup.requireEmailVerification },
-			emailChange: { requireVerification: config.emailChange.requireVerification },
+			emailChange: {
+				requireVerification: config.emailChange.requireVerification,
+				requireReauthentication: config.emailChange.requireReauthentication,
+			},
 			passwordless: {
 				enabled: config.passwordless.enabled,
 				url: config.passwordless.url ?? null,
 				expiration: config.passwordless.expiration,
+				uniformResponse: config.passwordless.uniformResponse,
 			},
 			password: {
 				minLength: config.password.minLength,
@@ -332,6 +337,7 @@ export class TenantProjectClient {
 				pattern: config.password.pattern ?? null,
 				checkBlacklist: config.password.checkBlacklist,
 				checkHibp: config.password.checkHibp,
+				revokeSessionsOnChange: config.password.revokeSessionsOnChange,
 			},
 			login: {
 				baseBackoff: config.login.baseBackoff,

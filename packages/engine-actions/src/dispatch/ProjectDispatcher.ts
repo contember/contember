@@ -66,6 +66,10 @@ export class ProjectDispatcherFactory {
 			},
 		}
 	}
+
+	public removeProjectMetrics(projectSlug: string): void {
+		this.metrics.removeProject(projectSlug)
+	}
 }
 
 export class ProjectDispatcher implements Runnable {

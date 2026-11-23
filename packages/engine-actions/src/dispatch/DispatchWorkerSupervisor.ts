@@ -76,9 +76,15 @@ export class DispatchWorkerSupervisor implements Runnable {
 				'project_updated',
 				async () => {
 					logger.debug('Project config change detected, reloading dispatch workers')
+					const previousSlugs = [...running.keys()]
 					await endProjectWorkers()
 					try {
-						await startWorkers(true)
+						const existingSlugs = await startWorkers(true)
+						for (const slug of previousSlugs) {
+							if (!existingSlugs.has(slug)) {
+								this.projectDispatcherFactory.removeProjectMetrics(slug)
+							}
+						}
 					} catch (e) {
 						logger.error(e, { message: 'Dispatch workers reload failed, terminating' })
 						await endAll()
@@ -96,7 +102,7 @@ export class DispatchWorkerSupervisor implements Runnable {
 		})
 		const fetchProjects = async () => await tenantContainer.projectManager.getProjects(tenantContainer.databaseContext)
 
-		const startWorkers = async (isReloading: boolean) => {
+		const startWorkers = async (isReloading: boolean): Promise<Set<string>> => {
 			try {
 				const projects = await fetchProjects()
 				for (const project of projects) {
@@ -105,6 +111,7 @@ export class DispatchWorkerSupervisor implements Runnable {
 						await refreshProjectWorker(container, isReloading)
 					}
 				}
+				return new Set(projects.map(it => it.slug))
 			} catch (e) {
 				await endAll()
 				throw e

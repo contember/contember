@@ -73,8 +73,11 @@ via `getMasterContainerHook`, labelled by `contember_project`:
 - `contember_actions_delivery_attempts_failed_total` — failed webhook attempts (incl. retries)
 - `contember_actions_events_failed_total` — terminal failures (retries exhausted or unknown target)
 - `contember_actions_worker_heartbeat_timestamp_seconds` — gauge set each loop iteration; staleness ⇒ stuck/dead worker
-  (series removed by the supervised worker from `ProjectDispatcherFactory.create` when it ends, also mid restart backoff after a crash)
+  (series removed by the supervised worker from `ProjectDispatcherFactory.create` when it ends, also mid restart backoff after a crash;
+  only by the worker that wrote it last, so an ending worker keeps its replacement's series)
 - `contember_actions_worker_crashed_total` — dispatch-loop crashes (each auto-restarted by the supervisor)
+
+A project missing from the tenant after a `project_updated` reload loses all its series (`ActionsMetrics.removeProject`).
 
 Backlog is *estimated* as a trend: `enqueued − succeeded − failed` (rate comparison; the absolute value
 drifts across restarts and ignores manual retry/stop — query `actions_event` for an exact depth).

@@ -137,11 +137,13 @@ export interface TenantConfigState {
 		defaultTokenExpiration: string
 		maxTokenExpiration: string | null
 		mfaGraceDuration: string
+		mfaChangeRequiresReauthentication: boolean
 		anomalyDetection: {
 			enabled: boolean
 			historySize: number
 			emailThreshold: number
 			stepUpThreshold: number
+			missingSignalIsNew: boolean
 		}
 	}
 	captcha: {
@@ -348,11 +350,13 @@ export class TenantProjectClient {
 				defaultTokenExpiration: config.login.defaultTokenExpiration,
 				maxTokenExpiration: config.login.maxTokenExpiration ?? null,
 				mfaGraceDuration: config.login.mfaGraceDuration,
+				mfaChangeRequiresReauthentication: config.login.mfaChangeRequiresReauthentication,
 				anomalyDetection: {
 					enabled: config.login.anomalyDetection.enabled,
 					historySize: config.login.anomalyDetection.historySize,
 					emailThreshold: config.login.anomalyDetection.emailThreshold,
 					stepUpThreshold: config.login.anomalyDetection.stepUpThreshold,
+					missingSignalIsNew: config.login.anomalyDetection.missingSignalIsNew,
 				},
 			},
 			captcha: {

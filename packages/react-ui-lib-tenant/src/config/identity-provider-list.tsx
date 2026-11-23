@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useState } from 'react'
-import { Button, Loader, Table, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from '@contember/react-ui-lib-base'
+import { Button, Loader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from '@contember/react-ui-lib-base'
 import { useIdentityProvidersQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
 import { dict } from '../dict.js'
 import { formatConfigValue, ManagedByCliNote, renderConfigQueryState } from './common.js'
@@ -11,6 +11,17 @@ export interface IdentityProviderListController {
 
 export interface IdentityProviderListProps {
 	controller?: { current?: IdentityProviderListController }
+}
+
+/** Only the built-in `oidc` handler acts on `strictResponseType` (apple and facebook accept and ignore it); absent means off. */
+const formatStrictResponseType = (type: string, configuration: unknown): string => {
+	if (type !== 'oidc') {
+		return dict.tenant.identityProviderList.notApplicable
+	}
+	const value = typeof configuration === 'object' && configuration !== null && 'strictResponseType' in configuration
+		? configuration.strictResponseType
+		: undefined
+	return formatConfigValue(value === true)
 }
 
 /**
@@ -30,17 +41,6 @@ export interface IdentityProviderListProps {
  * <IdentityProviderList />
  * ```
  */
-/** `strictResponseType` exists on the built-in `oidc` handler only; when absent it is off. */
-const formatStrictResponseType = (type: string, configuration: unknown): string => {
-	if (type !== 'oidc') {
-		return dict.tenant.identityProviderList.notApplicable
-	}
-	const value = typeof configuration === 'object' && configuration !== null && 'strictResponseType' in configuration
-		? configuration.strictResponseType
-		: undefined
-	return formatConfigValue(value === true)
-}
-
 export const IdentityProviderList = ({ controller }: IdentityProviderListProps) => {
 	const [query, { refresh }] = useTenantQueryLoader(useIdentityProvidersQuery(), {})
 	const [expanded, setExpanded] = useState<string | null>(null)
@@ -80,47 +80,49 @@ export const IdentityProviderList = ({ controller }: IdentityProviderListProps) 
 							<TableHead>{dict.tenant.identityProviderList.configuration}</TableHead>
 						</TableRow>
 					</TableHeader>
-					{providers.length === 0 && (
-						<TableRow>
-							<TableCell colSpan={7}>{dict.tenant.identityProviderList.noResults}</TableCell>
-						</TableRow>
-					)}
-					{providers.map(provider => (
-						<React.Fragment key={provider.slug}>
+					<TableBody>
+						{providers.length === 0 && (
 							<TableRow>
-								<TableCell className="font-medium">{provider.slug}</TableCell>
-								<TableCell className="font-mono text-xs">{provider.type}</TableCell>
-								<TableCell>
-									{provider.disabledAt
-										? <span className="text-destructive">{dict.tenant.configView.disabled}</span>
-										: <span>{dict.tenant.configView.enabled}</span>}
-								</TableCell>
-								<TableCell>{formatConfigValue(provider.options.autoSignUp)}</TableCell>
-								<TableCell>{formatConfigValue(provider.options.exclusive)}</TableCell>
-								<TableCell>{formatStrictResponseType(provider.type, provider.configuration)}</TableCell>
-								<TableCell>
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => setExpanded(expanded === provider.slug ? null : provider.slug)}
-									>
-										{expanded === provider.slug
-											? dict.tenant.identityProviderList.hideConfiguration
-											: dict.tenant.identityProviderList.showConfiguration}
-									</Button>
-								</TableCell>
+								<TableCell colSpan={7}>{dict.tenant.identityProviderList.noResults}</TableCell>
 							</TableRow>
-							{expanded === provider.slug && (
+						)}
+						{providers.map(provider => (
+							<React.Fragment key={provider.slug}>
 								<TableRow>
-									<TableCell colSpan={7}>
-										<pre className="overflow-x-auto text-xs bg-gray-50 p-3 rounded">
-										{JSON.stringify(provider.configuration, null, 2)}
-										</pre>
+									<TableCell className="font-medium">{provider.slug}</TableCell>
+									<TableCell className="font-mono text-xs">{provider.type}</TableCell>
+									<TableCell>
+										{provider.disabledAt
+											? <span className="text-destructive">{dict.tenant.configView.disabled}</span>
+											: <span>{dict.tenant.configView.enabled}</span>}
+									</TableCell>
+									<TableCell>{formatConfigValue(provider.options.autoSignUp)}</TableCell>
+									<TableCell>{formatConfigValue(provider.options.exclusive)}</TableCell>
+									<TableCell>{formatStrictResponseType(provider.type, provider.configuration)}</TableCell>
+									<TableCell>
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() => setExpanded(expanded === provider.slug ? null : provider.slug)}
+										>
+											{expanded === provider.slug
+												? dict.tenant.identityProviderList.hideConfiguration
+												: dict.tenant.identityProviderList.showConfiguration}
+										</Button>
 									</TableCell>
 								</TableRow>
-							)}
-						</React.Fragment>
-					))}
+								{expanded === provider.slug && (
+									<TableRow>
+										<TableCell colSpan={7}>
+											<pre className="overflow-x-auto text-xs bg-gray-50 p-3 rounded">
+										{JSON.stringify(provider.configuration, null, 2)}
+											</pre>
+										</TableCell>
+									</TableRow>
+								)}
+							</React.Fragment>
+						))}
+					</TableBody>
 				</Table>
 			</TableWrapper>
 			<p className="text-sm text-gray-500">{dict.tenant.identityProviderList.secretsNote}</p>

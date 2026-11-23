@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { Loader, Table, TableCell, TableHead, TableHeader, TableRow } from '@contember/react-ui-lib-base'
+import { Loader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@contember/react-ui-lib-base'
 import { useConfigurationQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
 import { dict } from '../dict.js'
 import { ConfigSection, formatConfigValue, ManagedByCliNote, renderConfigQueryState } from './common.js'
@@ -32,12 +32,14 @@ const SettingsTable = ({ rows }: { rows: readonly (readonly [string, ReactNode])
 				<TableHead>{dict.tenant.configView.value}</TableHead>
 			</TableRow>
 		</TableHeader>
-		{rows.map(([label, value]) => (
-			<TableRow key={label}>
-				<TableCell className="font-medium">{label}</TableCell>
-				<TableCell>{value}</TableCell>
-			</TableRow>
-		))}
+		<TableBody>
+			{rows.map(([label, value]) => (
+				<TableRow key={label}>
+					<TableCell className="font-medium">{label}</TableCell>
+					<TableCell>{value}</TableCell>
+				</TableRow>
+			))}
+		</TableBody>
 	</Table>
 )
 
@@ -175,13 +177,15 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 							<TableHead>{dict.tenant.configView.window}</TableHead>
 						</TableRow>
 					</TableHeader>
-					{rateLimitKeys.map(key => (
-						<TableRow key={key}>
-							<TableCell className="font-medium">{key}</TableCell>
-							<TableCell>{formatConfigValue(config.rateLimits[key].limit)}</TableCell>
-							<TableCell>{formatConfigValue(config.rateLimits[key].window)}</TableCell>
-						</TableRow>
-					))}
+					<TableBody>
+						{rateLimitKeys.map(key => (
+							<TableRow key={key}>
+								<TableCell className="font-medium">{key}</TableCell>
+								<TableCell>{formatConfigValue(config.rateLimits[key].limit)}</TableCell>
+								<TableCell>{formatConfigValue(config.rateLimits[key].window)}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
 				</Table>
 			</ConfigSection>
 		</div>

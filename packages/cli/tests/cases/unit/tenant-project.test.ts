@@ -556,9 +556,18 @@ describe('TenantConfigShowCommand ("tenant config show")', () => {
 		responder = () => ({
 			configuration: {
 				signup: { requireEmailVerification: true },
-				emailChange: { requireVerification: false },
-				passwordless: { enabled: 'optIn', expiration: 'PT15M' },
-				password: { minLength: 8, requireUppercase: 0, requireLowercase: 0, requireDigit: 0, requireSpecial: 0, checkBlacklist: true, checkHibp: false },
+				emailChange: { requireVerification: false, requireReauthentication: true },
+				passwordless: { enabled: 'optIn', expiration: 'PT15M', uniformResponse: true },
+				password: {
+					minLength: 8,
+					requireUppercase: 0,
+					requireLowercase: 0,
+					requireDigit: 0,
+					requireSpecial: 0,
+					checkBlacklist: true,
+					checkHibp: false,
+					revokeSessionsOnChange: true,
+				},
 				login: {
 					baseBackoff: 'PT1S',
 					maxBackoff: 'PT1H',
@@ -585,7 +594,9 @@ describe('TenantConfigShowCommand ("tenant config show")', () => {
 		await new TenantConfigShowCommand(createTenantClientProvider()).run(['--json'], output)
 
 		const parsed = JSON.parse(stdout.text)
-		expect(parsed.passwordless).toEqual({ enabled: 'optIn', url: null, expiration: 'PT15M' })
+		expect(parsed.passwordless).toEqual({ enabled: 'optIn', url: null, expiration: 'PT15M', uniformResponse: true })
+		expect(parsed.emailChange).toEqual({ requireVerification: false, requireReauthentication: true })
+		expect(parsed.password.revokeSessionsOnChange).toBe(true)
 		expect(parsed.password.pattern).toBeNull()
 		expect(parsed.login.maxTokenExpiration).toBeNull()
 		expect(parsed.captcha).toEqual({

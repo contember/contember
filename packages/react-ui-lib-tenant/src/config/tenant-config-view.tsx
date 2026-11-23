@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { Loader, Table, TableCell, TableHead, TableHeader, TableRow } from '@contember/react-ui-lib-base'
+import { Loader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@contember/react-ui-lib-base'
 import { useConfigurationQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
 import { dict } from '../dict.js'
 import { ConfigSection, formatConfigValue, ManagedByCliNote, renderConfigQueryState } from './common.js'
@@ -32,12 +32,14 @@ const SettingsTable = ({ rows }: { rows: readonly (readonly [string, ReactNode])
 				<TableHead>{dict.tenant.configView.value}</TableHead>
 			</TableRow>
 		</TableHeader>
-		{rows.map(([label, value]) => (
-			<TableRow key={label}>
-				<TableCell className="font-medium">{label}</TableCell>
-				<TableCell>{value}</TableCell>
-			</TableRow>
-		))}
+		<TableBody>
+			{rows.map(([label, value]) => (
+				<TableRow key={label}>
+					<TableCell className="font-medium">{label}</TableCell>
+					<TableCell>{value}</TableCell>
+				</TableRow>
+			))}
+		</TableBody>
 	</Table>
 )
 
@@ -92,7 +94,12 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 			</ConfigSection>
 
 			<ConfigSection title={dict.tenant.configView.emailChange}>
-				<SettingsTable rows={[['requireVerification', formatConfigValue(config.emailChange.requireVerification)]]} />
+				<SettingsTable
+					rows={[
+						['requireVerification', formatConfigValue(config.emailChange.requireVerification)],
+						['requireReauthentication', formatConfigValue(config.emailChange.requireReauthentication)],
+					]}
+				/>
 			</ConfigSection>
 
 			<ConfigSection title={dict.tenant.configView.password}>
@@ -106,6 +113,7 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 						['pattern', formatConfigValue(config.password.pattern)],
 						['checkBlacklist', formatConfigValue(config.password.checkBlacklist)],
 						['checkHibp', formatConfigValue(config.password.checkHibp)],
+						['revokeSessionsOnChange', formatConfigValue(config.password.revokeSessionsOnChange)],
 					]}
 				/>
 			</ConfigSection>
@@ -116,6 +124,7 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 						['enabled', formatConfigValue(config.passwordless.enabled)],
 						['url', formatConfigValue(config.passwordless.url)],
 						['expiration', formatConfigValue(config.passwordless.expiration)],
+						['uniformResponse', formatConfigValue(config.passwordless.uniformResponse)],
 					]}
 				/>
 			</ConfigSection>
@@ -168,13 +177,15 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 							<TableHead>{dict.tenant.configView.window}</TableHead>
 						</TableRow>
 					</TableHeader>
-					{rateLimitKeys.map(key => (
-						<TableRow key={key}>
-							<TableCell className="font-medium">{key}</TableCell>
-							<TableCell>{formatConfigValue(config.rateLimits[key].limit)}</TableCell>
-							<TableCell>{formatConfigValue(config.rateLimits[key].window)}</TableCell>
-						</TableRow>
-					))}
+					<TableBody>
+						{rateLimitKeys.map(key => (
+							<TableRow key={key}>
+								<TableCell className="font-medium">{key}</TableCell>
+								<TableCell>{formatConfigValue(config.rateLimits[key].limit)}</TableCell>
+								<TableCell>{formatConfigValue(config.rateLimits[key].window)}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
 				</Table>
 			</ConfigSection>
 		</div>

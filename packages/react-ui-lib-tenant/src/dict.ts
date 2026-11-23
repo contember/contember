@@ -310,6 +310,9 @@ export const dict = {
 			hideConfiguration: 'Hide configuration',
 			autoSignUp: 'Auto sign-up',
 			exclusive: 'Exclusive',
+			strictResponseType: 'Strict response type',
+			/** A setting the provider's handler type does not have. */
+			notApplicable: '—',
 			noResults: 'No identity providers configured',
 			failedToLoadData: 'Failed to load data',
 			forbidden: 'You do not have permission to view identity providers.',

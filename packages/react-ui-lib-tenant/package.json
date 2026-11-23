@@ -29,6 +29,10 @@
     "ae:build": "api-extractor run --local",
     "ae:test": "api-extractor run"
   },
+  "devDependencies": {
+    "@contember/graphql-client": "workspace:*",
+    "@testing-library/react": "catalog:"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/contember/interface.git",

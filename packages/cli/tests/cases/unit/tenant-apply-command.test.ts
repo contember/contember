@@ -230,6 +230,57 @@ describe('TenantApplyCommand', () => {
 		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: [], warnings: [] })
 	})
 
+	test('sends the session-revocation, re-authentication, uniform-response and strict-response-type options', async () => {
+		const tenantConfig: TenantConfig = {
+			config: {
+				password: { revokeSessionsOnChange: true },
+				emailChange: { requireReauthentication: true },
+				passwordless: { uniformResponse: true },
+			},
+			identityProviders: { sso: { type: 'oidc', configuration: { url: 'https://idp.test', strictResponseType: true } } },
+		}
+		const { command, output } = createCommand({ tenantConfig })
+
+		await command.run(['--json'], output)
+
+		expect(requestedVariables).toEqual([
+			{
+				config: {
+					password: { revokeSessionsOnChange: true },
+					emailChange: { requireReauthentication: true },
+					passwordless: { uniformResponse: true },
+				},
+			},
+			{},
+			{ identityProvider: 'sso', type: 'oidc', configuration: { url: 'https://idp.test', strictResponseType: true } },
+		])
+	})
+
+	test('an explicit false is sent, so the options can be turned off again', async () => {
+		const tenantConfig: TenantConfig = {
+			config: { password: { revokeSessionsOnChange: false }, emailChange: { requireReauthentication: false }, passwordless: { uniformResponse: false } },
+		}
+		const { command, output, stdout } = createCommand({ tenantConfig })
+
+		await command.run(['--json'], output)
+
+		expect(requestedVariables).toEqual([{ config: tenantConfig.config }])
+		expect(JSON.parse(stdout.text).actions).toEqual([{ action: 'configure', target: null }])
+	})
+
+	// the engine keeps the stored value for null on these non-nullable columns, so null must not read as a change
+	test('null on the options leaves them unset and skips configure', async () => {
+		const tenantConfig: TenantConfig = {
+			config: { password: { revokeSessionsOnChange: null }, emailChange: { requireReauthentication: null }, passwordless: { uniformResponse: null } },
+		}
+		const { command, output, stdout } = createCommand({ tenantConfig })
+
+		await command.run(['--json'], output)
+
+		expect(requestedUrls).toEqual([])
+		expect(JSON.parse(stdout.text).actions).toEqual([])
+	})
+
 	test('an unresolvable project is a typed input error', async () => {
 		const { command, output } = createCommand({ withProject: false })
 

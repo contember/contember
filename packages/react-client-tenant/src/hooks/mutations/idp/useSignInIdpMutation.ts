@@ -4,8 +4,8 @@ import { LoginToken, TenantApiOptions } from '../../useTenantApi.js'
 import { createTenantMutation, TenantMutationResponse } from '../../useTenantMutation.js'
 import { ModelType, ParameterRef } from 'graphql-ts-client-api'
 
-// Explicit fields and arguments, not `$$` and the generated defaults: an admin built with this client signs in
-// against older engines too, which have neither `SignInIDPResult.idpResponse` nor the `SignInOptions` input.
+// Explicit fields and arguments, not `$$` and the generated defaults: IDP sign-in must work against older engines too,
+// which have neither `SignInIDPResult.idpResponse` nor the `SignInOptions` input.
 const signInIdpFragment = TenantApi.signInIDPResult$.token.person(TenantApi.person$.id.email.name)
 
 export type SignInIDPMutationResult = ModelType<typeof signInIdpFragment>
@@ -38,9 +38,7 @@ export type SignInIDPMutationVariables = {
 }
 
 // Explicit argument refs make every variable a required key, so `expiration` is passed through as possibly undefined.
-type SignInIDPFetcherVariables = Omit<SignInIDPMutationVariables, 'expiration'> & { expiration: number | undefined }
-
-const useSignInIDPFetcherMutation = createTenantMutation<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode, SignInIDPFetcherVariables>(
+const useSignInIDPFetcherMutation = createTenantMutation(
 	signInIDPMutation,
 	{
 		apiToken: LoginToken,

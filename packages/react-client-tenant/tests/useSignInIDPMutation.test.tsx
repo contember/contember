@@ -111,7 +111,7 @@ describe('useSignInIDPMutation', () => {
 		const { result } = renderHook(() => useSignInIDPMutation(), { wrapper })
 
 		const response = await result.current({
-			identityProvider: 'cloud',
+			identityProvider: 'mock',
 			data: { url: 'http://localhost/?code=abc', redirectUrl: 'http://localhost/' },
 		})
 

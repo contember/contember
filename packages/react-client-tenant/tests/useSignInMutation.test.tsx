@@ -5,17 +5,11 @@ import { useSignInMutation } from '../src/hooks/mutations/auth/useSignInMutation
 import { useCreateSessionTokenMutation } from '../src/hooks/mutations/apiKey/useCreateSessionTokenMutation.js'
 import { createTenantApiWrapper } from './tenantApiMock.js'
 
-// The signIn and createSessionToken contract of tenant APIs released before 2.2, trimmed from the tenant SDL of engines
-// 2.0.12 and 2.1.0-rc.8. 2.0 has no `SignInError.retryAfter`; neither has `backupCode`, `SignInOptions` nor
-// `SignInResult.backupCodes`.
-const olderSignInSdl = (signInErrorExtraFields: string) => `
+// The types signIn and createSessionToken touch, trimmed from the tenant SDL of engines 2.0.12, 2.1.0-rc.8 and the
+// current source; field and argument lists as in that SDL, `Person` reduced to the fields the hooks select.
+const sharedSdl = `
 	type Query {
 		me: Person
-	}
-
-	type Mutation {
-		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
-		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
 	}
 
 	type SignInResponse {
@@ -25,28 +19,7 @@ const olderSignInSdl = (signInErrorExtraFields: string) => `
 		result: SignInResult
 	}
 
-	type SignInError {
-		code: SignInErrorCode!
-		developerMessage: String!
-		endUserMessage: String @deprecated
-		${signInErrorExtraFields}
-	}
-
-	enum SignInErrorCode {
-		UNKNOWN_EMAIL
-		INVALID_PASSWORD
-		PERSON_DISABLED
-		NO_PASSWORD_SET
-		OTP_REQUIRED
-		INVALID_OTP_TOKEN
-	}
-
 	interface CommonSignInResult {
-		token: String!
-		person: Person!
-	}
-
-	type SignInResult implements CommonSignInResult {
 		token: String!
 		person: Person!
 	}
@@ -81,16 +54,63 @@ const olderSignInSdl = (signInErrorExtraFields: string) => `
 	}
 `
 
-const olderEngines = [
-	{ version: '2.0.x', schema: buildSchema(olderSignInSdl('')) },
-	{ version: '2.1.x', schema: buildSchema(olderSignInSdl('retryAfter: Int')) },
-]
-
-// The same operations on a current (2.2) engine.
-const currentSchema = buildSchema(`
-	type Query {
-		me: Person
+const olderMutationSdl = `
+	type Mutation {
+		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
+		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
 	}
+
+	type SignInResult implements CommonSignInResult {
+		token: String!
+		person: Person!
+	}
+`
+
+const v20Schema = buildSchema(`
+	${sharedSdl}
+	${olderMutationSdl}
+
+	type SignInError {
+		code: SignInErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum SignInErrorCode {
+		UNKNOWN_EMAIL
+		INVALID_PASSWORD
+		PERSON_DISABLED
+		NO_PASSWORD_SET
+		OTP_REQUIRED
+		INVALID_OTP_TOKEN
+	}
+`)
+
+const v21Schema = buildSchema(`
+	${sharedSdl}
+	${olderMutationSdl}
+
+	type SignInError {
+		code: SignInErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+		retryAfter: Int
+	}
+
+	enum SignInErrorCode {
+		INVALID_CREDENTIALS
+		UNKNOWN_EMAIL
+		INVALID_PASSWORD
+		PERSON_DISABLED
+		NO_PASSWORD_SET
+		OTP_REQUIRED
+		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
+	}
+`)
+
+const currentSchema = buildSchema(`
+	${sharedSdl}
 
 	type Mutation {
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String, backupCode: String, options: SignInOptions): SignInResponse
@@ -101,46 +121,44 @@ const currentSchema = buildSchema(`
 		trustForwardedClientInfo: Boolean
 	}
 
-	type SignInResponse {
-		ok: Boolean!
-		error: SignInError
-		result: SignInResult
-	}
-
 	type SignInError {
-		code: String!
+		code: SignInErrorCode!
 		developerMessage: String!
+		endUserMessage: String @deprecated
 		retryAfter: Int
+		mfaEnrollment: MfaEnrollment
 	}
 
-	type SignInResult {
+	type MfaEnrollment {
+		otpUri: String!
+		otpSecret: String!
+	}
+
+	enum SignInErrorCode {
+		INVALID_CREDENTIALS
+		UNKNOWN_EMAIL
+		INVALID_PASSWORD
+		PERSON_DISABLED
+		NO_PASSWORD_SET
+		OTP_REQUIRED
+		INVALID_OTP_TOKEN
+		MFA_ENROLLMENT_REQUIRED
+		EMAIL_NOT_VERIFIED
+		RATE_LIMIT_EXCEEDED
+		IDP_REQUIRED
+	}
+
+	type SignInResult implements CommonSignInResult {
 		token: String!
 		person: Person!
 		backupCodes: [String!]
 	}
-
-	type CreateSessionTokenResponse {
-		ok: Boolean!
-		error: CreateSessionTokenError
-		result: CreateSessionTokenResult
-	}
-
-	type CreateSessionTokenError {
-		code: String!
-		developerMessage: String!
-	}
-
-	type CreateSessionTokenResult {
-		token: String!
-		person: Person!
-	}
-
-	type Person {
-		id: String!
-		email: String
-		name: String
-	}
 `)
+
+const olderEngines = [
+	{ version: '2.0.x', schema: v20Schema },
+	{ version: '2.1.x', schema: v21Schema },
+]
 
 const person = { id: 'person-1', email: 'jane@example.com', name: 'Jane', otpEnabled: false }
 

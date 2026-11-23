@@ -5,7 +5,7 @@ import { ModelType, ParameterRef } from 'graphql-ts-client-api'
 import { createTenantMutation, TenantMutationResponse } from '../../useTenantMutation.js'
 
 // Explicit fields and arguments, not `$$` and the generated defaults: password sign-in must work against older engines too,
-// which have neither `SignInResult.backupCodes`, `SignInError.retryAfter` (< 2.1), the `backupCode` argument nor `SignInOptions`.
+// which lack `SignInError.retryAfter` (before 2.1), `SignInResult.backupCodes`, the `backupCode` argument and `SignInOptions` (before 2.2).
 const signInResultFragment = TenantApi.signInResult$.token.person(TenantApi.person$.id.email.name)
 
 export type SignInMutationResult = ModelType<typeof signInResultFragment>
@@ -15,15 +15,17 @@ const signInResponseFragment = TenantApi
 	.error(TenantApi.signInError$.code.developerMessage)
 	.result(signInResultFragment)
 
+const signInArguments = {
+	email: ParameterRef.of('email'),
+	password: ParameterRef.of('password'),
+	expiration: ParameterRef.of('expiration'),
+	otpToken: ParameterRef.of('otpToken'),
+}
+
 export const signInMutation = TenantApi
 	.mutation$
 	.signIn(
-		{
-			email: ParameterRef.of('email'),
-			password: ParameterRef.of('password'),
-			expiration: ParameterRef.of('expiration'),
-			otpToken: ParameterRef.of('otpToken'),
-		},
+		signInArguments,
 		signInResponseFragment,
 		options => options.alias('mutation'),
 	)
@@ -33,10 +35,7 @@ const signInWithNewerArgumentsMutation = TenantApi
 	.mutation$
 	.signIn(
 		{
-			email: ParameterRef.of('email'),
-			password: ParameterRef.of('password'),
-			expiration: ParameterRef.of('expiration'),
-			otpToken: ParameterRef.of('otpToken'),
+			...signInArguments,
 			backupCode: ParameterRef.of('backupCode'),
 			options: ParameterRef.of('options'),
 		},

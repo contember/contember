@@ -13,14 +13,16 @@ const createSessionTokenResponseFragment = TenantApi
 	.error(TenantApi.createSessionTokenError$.code.developerMessage)
 	.result(createSessionTokenMutationResult)
 
+const createSessionTokenArguments = {
+	email: ParameterRef.of('email'),
+	personId: ParameterRef.of('personId'),
+	expiration: ParameterRef.of('expiration'),
+}
+
 // Explicit arguments, not the generated defaults: engines before 2.2 have no `SignInOptions` input.
 export const createSessionTokenMutation = TenantApi.mutation$
 	.createSessionToken(
-		{
-			email: ParameterRef.of('email'),
-			personId: ParameterRef.of('personId'),
-			expiration: ParameterRef.of('expiration'),
-		},
+		createSessionTokenArguments,
 		createSessionTokenResponseFragment,
 		options => options.alias('mutation'),
 	)
@@ -29,9 +31,7 @@ export const createSessionTokenMutation = TenantApi.mutation$
 const createSessionTokenWithOptionsMutation = TenantApi.mutation$
 	.createSessionToken(
 		{
-			email: ParameterRef.of('email'),
-			personId: ParameterRef.of('personId'),
-			expiration: ParameterRef.of('expiration'),
+			...createSessionTokenArguments,
 			options: ParameterRef.of('options'),
 		},
 		createSessionTokenResponseFragment,

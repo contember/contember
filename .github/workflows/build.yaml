@@ -8,9 +8,15 @@ on:
       - docs/**
   workflow_dispatch:
 
+# A new push to a PR cancels its superseded run; every other run (main, tags, dispatch) gets its own group and is never cancelled or queued.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check:
     needs: [ ]
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -66,6 +72,7 @@ jobs:
     # fast-path) and diffs their schemas. Fails if snapshot.ts drifted —
     # regenerate with ./scripts/create-migrations-snapshot/run.sh <tenant|system>.
     needs: [ ]
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -100,6 +107,7 @@ jobs:
     # migration would replay in a different relative order on a fresh DB than on
     # an already-migrated production DB. Pure-git, no database needed.
     needs: [ ]
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -110,6 +118,7 @@ jobs:
 
   test-db:
     needs: [ ]
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:

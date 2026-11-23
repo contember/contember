@@ -29,6 +29,8 @@ export class DispatchWorkerSupervisor implements Runnable {
 		const projectContainerResolver = projectGroup.projectContainerResolver
 
 		const running = new Map<string, { worker: Promise<Running>; container: ProjectContainer }>()
+		// every slug a worker was started for, including ones a container destroy already ended, so a reload can drop their metrics
+		const startedSlugs = new Set<string>()
 
 		const cleanupListener = projectContainerResolver.on('destroy', async ({ container }) => {
 			const runningForProject = running.get(container.project.slug)
@@ -58,6 +60,7 @@ export class DispatchWorkerSupervisor implements Runnable {
 				},
 			})
 			running.set(container.project.slug, { worker, container })
+			startedSlugs.add(container.project.slug)
 			try {
 				if (current) {
 					await (await current.worker).end()
@@ -76,12 +79,12 @@ export class DispatchWorkerSupervisor implements Runnable {
 				'project_updated',
 				async () => {
 					logger.debug('Project config change detected, reloading dispatch workers')
-					const previousSlugs = [...running.keys()]
 					await endProjectWorkers()
 					try {
 						const existingSlugs = await startWorkers(true)
-						for (const slug of previousSlugs) {
+						for (const slug of startedSlugs) {
 							if (!existingSlugs.has(slug)) {
+								startedSlugs.delete(slug)
 								this.projectDispatcherFactory.removeProjectMetrics(slug)
 							}
 						}

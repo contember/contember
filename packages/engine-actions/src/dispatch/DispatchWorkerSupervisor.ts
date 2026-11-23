@@ -29,6 +29,8 @@ export class DispatchWorkerSupervisor implements Runnable {
 		const projectContainerResolver = projectGroup.projectContainerResolver
 
 		const running = new Map<string, { worker: Promise<Running>; container: ProjectContainer }>()
+		// every slug a worker was started for, including ones a container destroy already ended, so a reload can drop their metrics
+		const startedSlugs = new Set<string>()
 
 		const cleanupListener = projectContainerResolver.on('destroy', async ({ container }) => {
 			const runningForProject = running.get(container.project.slug)
@@ -45,15 +47,12 @@ export class DispatchWorkerSupervisor implements Runnable {
 			if (current && current.container === container) {
 				return
 			}
-			const dispatcher = this.projectDispatcherFactory.create({
+			const supervisedDispatcher = this.projectDispatcherFactory.create({
 				db,
 				contentSchemaResolver: container.contentSchemaResolver,
 				projectSlug: container.project.slug,
+				supervisorOptions: { startupMax: isReloading ? Number.MAX_VALUE : 10 },
 			})
-			const supervisedDispatcher = new Supervisor(
-				dispatcher,
-				{ startupMax: isReloading ? Number.MAX_VALUE : 10 },
-			)
 			const worker = supervisedDispatcher.run({
 				logger,
 				onError: () => {
@@ -61,6 +60,7 @@ export class DispatchWorkerSupervisor implements Runnable {
 				},
 			})
 			running.set(container.project.slug, { worker, container })
+			startedSlugs.add(container.project.slug)
 			try {
 				if (current) {
 					await (await current.worker).end()
@@ -81,7 +81,13 @@ export class DispatchWorkerSupervisor implements Runnable {
 					logger.debug('Project config change detected, reloading dispatch workers')
 					await endProjectWorkers()
 					try {
-						await startWorkers(true)
+						const existingSlugs = await startWorkers(true)
+						for (const slug of startedSlugs) {
+							if (!existingSlugs.has(slug)) {
+								startedSlugs.delete(slug)
+								this.projectDispatcherFactory.removeProjectMetrics(slug)
+							}
+						}
 					} catch (e) {
 						logger.error(e, { message: 'Dispatch workers reload failed, terminating' })
 						await endAll()
@@ -99,7 +105,7 @@ export class DispatchWorkerSupervisor implements Runnable {
 		})
 		const fetchProjects = async () => await tenantContainer.projectManager.getProjects(tenantContainer.databaseContext)
 
-		const startWorkers = async (isReloading: boolean) => {
+		const startWorkers = async (isReloading: boolean): Promise<Set<string>> => {
 			try {
 				const projects = await fetchProjects()
 				for (const project of projects) {
@@ -108,6 +114,7 @@ export class DispatchWorkerSupervisor implements Runnable {
 						await refreshProjectWorker(container, isReloading)
 					}
 				}
+				return new Set(projects.map(it => it.slug))
 			} catch (e) {
 				await endAll()
 				throw e

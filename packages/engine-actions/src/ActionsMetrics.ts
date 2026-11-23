@@ -78,8 +78,33 @@ export class ActionsMetrics {
 		})
 	}
 
+	/** Last writer of each project's heartbeat, so a worker ending after its replacement started keeps the replacement's series. */
+	private readonly heartbeatOwners = new Map<string, ProjectActionsMetrics>()
+
 	public forProject(projectSlug: string): ProjectActionsMetrics {
 		return new ProjectActionsMetrics(this, projectSlug)
+	}
+
+	public setHeartbeat(projectSlug: string, owner: ProjectActionsMetrics): void {
+		this.heartbeatOwners.set(projectSlug, owner)
+		this.workerHeartbeat.set({ [LABEL_PROJECT]: projectSlug }, Date.now() / 1000)
+	}
+
+	public removeHeartbeat(projectSlug: string, owner: ProjectActionsMetrics): void {
+		if (this.heartbeatOwners.get(projectSlug) !== owner) {
+			return
+		}
+		this.heartbeatOwners.delete(projectSlug)
+		this.workerHeartbeat.remove(projectSlug)
+	}
+
+	/** Drops every series of a project that no longer exists. */
+	public removeProject(projectSlug: string): void {
+		this.heartbeatOwners.delete(projectSlug)
+		for (const metric of [this.eventsEnqueued, this.eventsSucceeded, this.deliveryAttemptsFailed, this.eventsFailed, this.workerCrashed]) {
+			metric.remove(projectSlug)
+		}
+		this.workerHeartbeat.remove(projectSlug)
 	}
 }
 
@@ -121,7 +146,7 @@ export class ProjectActionsMetrics {
 	}
 
 	public heartbeat(): void {
-		this.metrics.workerHeartbeat.set(this.labels, Date.now() / 1000)
+		this.metrics.setHeartbeat(this.projectSlug, this)
 	}
 
 	public crashed(): void {
@@ -130,6 +155,6 @@ export class ProjectActionsMetrics {
 
 	/** Drop the per-project heartbeat series when the worker stops, so a removed project doesn't look stuck. */
 	public dispose(): void {
-		this.metrics.workerHeartbeat.remove(this.projectSlug)
+		this.metrics.removeHeartbeat(this.projectSlug, this)
 	}
 }

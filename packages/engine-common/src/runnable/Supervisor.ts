@@ -23,6 +23,7 @@ export class Supervisor implements Runnable {
 		let restartCount = 0
 		const abortController = new AbortController()
 		let innerRunning: Running | undefined
+		let pendingStart: Promise<Running> | undefined
 		let wasHealthy = false
 		let startedAt: number | undefined
 		const endRun = () => {
@@ -38,7 +39,7 @@ export class Supervisor implements Runnable {
 				try {
 					await new Promise<void>(async (resolveRunning, rejectRunning) => {
 						try {
-							innerRunning = await this.runnable.run({
+							const starting = this.runnable.run({
 								onClose: () => {
 									runEnded = true
 									resolveRunning()
@@ -49,6 +50,12 @@ export class Supervisor implements Runnable {
 								},
 								logger: logger.child({ runningId: Math.random().toString().substring(2) }),
 							})
+							pendingStart = starting
+							try {
+								innerRunning = await starting
+							} finally {
+								pendingStart = undefined
+							}
 							// a run that ended before run() returned was already handled as a crash; recording it as started would count the backoff as uptime
 							if (!runEnded) {
 								if (!wasHealthy) {
@@ -99,7 +106,10 @@ export class Supervisor implements Runnable {
 		return {
 			async end(): Promise<void> {
 				abortController.abort()
-				await innerRunning?.end()
+				// a restart that is still starting would otherwise come up after end() and keep running
+				const starting = pendingStart
+				const running = starting ? await starting.catch(() => undefined) : innerRunning
+				await running?.end()
 			},
 		}
 	}

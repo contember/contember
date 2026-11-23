@@ -7,7 +7,7 @@ import { emptySchema } from '@contember/schema-utils'
 import { Registry } from 'prom-client'
 import { ActionsMetrics } from '../../../src/ActionsMetrics.js'
 import { EventDispatcher } from '../../../src/dispatch/EventDispatcher.js'
-import { ProjectDispatcher } from '../../../src/dispatch/ProjectDispatcher.js'
+import { ProjectDispatcher, ProjectDispatcherFactory } from '../../../src/dispatch/ProjectDispatcher.js'
 import { createMock } from '../../src/utils.js'
 import { testUuid } from '../../src/uuid.js'
 
@@ -111,4 +111,56 @@ test('end() gives up on a hanging batch after the timeout', async () => {
 
 	expect(await measure(() => running.end())).toBeLessThan(1_000)
 	expect(warnings()).toEqual(['Worker did not finish its batch in time, events still in processing will be delivered again'])
+})
+
+const blogSeries = (registry: Registry, metric: string) =>
+	registry.getSingleMetricAsString(metric).split('\n').filter(line => line.startsWith(`${metric}{contember_project="blog"}`))
+
+const hasHeartbeat = (registry: Registry) => blogSeries(registry, 'contember_actions_worker_heartbeat_timestamp_seconds').length > 0
+
+const hasCrashed = (registry: Registry) => blogSeries(registry, 'contember_actions_worker_crashed_total').length > 0
+
+const startSupervisedDispatcher = async (metrics: ActionsMetrics, processBatch: () => Promise<ProcessBatchResult>) => {
+	const factory = new ProjectDispatcherFactory(createMock<EventDispatcher>({ processBatch }), metrics)
+	return await factory.create({
+		db: createDatabaseContext(),
+		contentSchemaResolver,
+		projectSlug: 'blog',
+		supervisorOptions: { startupMax: 10 },
+	}).run({
+		logger: createLogger(new TestLoggerHandler()),
+		onError: e => {
+			throw e
+		},
+	})
+}
+
+test('ending a running supervised worker removes its heartbeat series', async () => {
+	const registry = new Registry()
+	const running = await startSupervisedDispatcher(new ActionsMetrics(registry), async () => emptyQueue)
+	await new Promise(resolve => setTimeout(resolve, 10))
+	expect(hasHeartbeat(registry)).toBe(true)
+
+	await running.end()
+
+	expect(hasHeartbeat(registry)).toBe(false)
+})
+
+test('ending a worker that crashed and waits for a restart removes its heartbeat series', async () => {
+	// A dropped project: its system schema disappears first, the loop crashes, then the project removal ends the worker.
+	const registry = new Registry()
+	const running = await startSupervisedDispatcher(new ActionsMetrics(registry), async () => {
+		throw new Error('relation "p_blog_system.schema" does not exist')
+	})
+	for (let i = 0; i < 100 && !hasCrashed(registry); i++) {
+		await new Promise(resolve => setTimeout(resolve, 5))
+	}
+	expect(blogSeries(registry, 'contember_actions_worker_crashed_total')).toEqual([
+		'contember_actions_worker_crashed_total{contember_project="blog"} 1',
+	])
+	expect(hasHeartbeat(registry)).toBe(true)
+
+	expect(await measure(() => running.end())).toBeLessThan(500)
+
+	expect(hasHeartbeat(registry)).toBe(false)
 })

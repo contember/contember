@@ -73,4 +73,44 @@ describe('ActionsMetrics', () => {
 
 		expect(await valueFor(registry, 'contember_actions_worker_crashed_total', 'blog')).toBe(2)
 	})
+
+	test('a worker that ends after its replacement started keeps the replacement heartbeat', async () => {
+		const oldWorker = metrics.forProject('blog')
+		const newWorker = metrics.forProject('blog')
+		oldWorker.heartbeat()
+		newWorker.heartbeat()
+
+		oldWorker.dispose()
+		expect(await valueFor(registry, 'contember_actions_worker_heartbeat_timestamp_seconds', 'blog')).toBeGreaterThan(1_700_000_000)
+
+		newWorker.dispose()
+		expect(await valueFor(registry, 'contember_actions_worker_heartbeat_timestamp_seconds', 'blog')).toBeUndefined()
+	})
+
+	test('removeProject drops every series of the project and keeps other projects', async () => {
+		const names = [
+			'contember_actions_events_enqueued_total',
+			'contember_actions_events_succeeded_total',
+			'contember_actions_delivery_attempts_failed_total',
+			'contember_actions_events_failed_total',
+			'contember_actions_worker_crashed_total',
+			'contember_actions_worker_heartbeat_timestamp_seconds',
+		]
+		for (const slug of ['blog', 'shop']) {
+			const project = metrics.forProject(slug)
+			project.enqueued(1)
+			project.succeeded(1)
+			project.deliveryAttemptFailed(1)
+			project.failed(1)
+			project.crashed()
+			project.heartbeat()
+		}
+
+		metrics.removeProject('blog')
+
+		for (const name of names) {
+			expect(await valueFor(registry, name, 'blog')).toBeUndefined()
+			expect(await valueFor(registry, name, 'shop')).toBeGreaterThan(0)
+		}
+	})
 })

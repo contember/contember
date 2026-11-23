@@ -390,3 +390,47 @@ test('supervisor: max limits restarts of runs that crash before becoming stable'
 		'Runnable crashed, stopping: crashed #4',
 	])
 })
+
+test('supervisor: end() during a restart that is still starting ends the restarted run', async () => {
+	const { logger, testLogger } = createTestLogger()
+	let attempt = 0
+	let restartStarting = () => {}
+	const restartStarted = new Promise<void>(resolve => {
+		restartStarting = resolve
+	})
+	const runnable = new class implements Runnable {
+		async run(args: RunnableArgs): Promise<Running> {
+			const thisAttempt = ++attempt
+			logger.info(`Starting runnable #${thisAttempt}`)
+			if (thisAttempt === 1) {
+				setTimeout(() => args.onError(new Error()), 1)
+			} else {
+				restartStarting()
+				await new Promise(resolve => setTimeout(resolve, 50))
+				logger.info(`Runnable #${thisAttempt} started`)
+			}
+			return {
+				end: async () => {
+					logger.info(`Runnable #${thisAttempt} terminated`)
+					args.onClose()
+				},
+			}
+		}
+	}()
+
+	const supervisor = new Supervisor(runnable, { minBackoff: 1 })
+	const running = await supervisor.run({
+		logger,
+		onError: shouldNotHappenCallback,
+	})
+	await restartStarted
+	await running.end()
+	expect(testLogger.messages.map(it => it.message)).toStrictEqual([
+		'Starting runnable #1',
+		'Runnable crashed, restarting in 1 ms ...',
+		'Restarting runnable now',
+		'Starting runnable #2',
+		'Runnable #2 started',
+		'Runnable #2 terminated',
+	])
+})

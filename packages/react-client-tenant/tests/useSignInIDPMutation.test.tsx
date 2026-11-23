@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import { renderHook } from '@testing-library/react'
-import { GraphQlClient, GraphQlClientOptions } from '@contember/graphql-client'
-import { ApiBaseUrlContext, GraphQlClientFactoryContext, LoginTokenContext } from '@contember/react-client'
-import { buildSchema, graphql, parse, validate } from 'graphql'
-import { ReactNode } from 'react'
+import { buildSchema } from 'graphql'
 import { useSignInIDPMutation } from '../src/hooks/mutations/idp/useSignInIdpMutation.js'
+import { createTenantApiWrapper } from './tenantApiMock.js'
 
 // The signInIDP contract of a tenant API released before `SignInIDPResult.idpResponse` (engine < 2.0.0-alpha.19);
 // `SignInOptions` arrived even later (2.2.0-alpha.1).
@@ -81,30 +79,7 @@ const rootValue = {
 	}),
 }
 
-const jsonResponse = (status: number, body: unknown) =>
-	new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
-
-// Answers like a GraphQL server: a query the schema rejects gets a 400, a valid one is executed.
-const olderTenantApi = async (_input: RequestInfo, init?: RequestInit): Promise<Response> => {
-	const { query, variables } = JSON.parse(String(init?.body))
-	const errors = validate(olderTenantSchema, parse(query))
-	if (errors.length > 0) {
-		return jsonResponse(400, { errors: errors.map(it => ({ message: it.message })) })
-	}
-	return jsonResponse(200, await graphql({ schema: olderTenantSchema, source: query, variableValues: variables, rootValue }))
-}
-
-const clientFactory = (options: GraphQlClientOptions) => new GraphQlClient({ ...options, fetcher: olderTenantApi })
-
-const wrapper = ({ children }: { children: ReactNode }) => (
-	<ApiBaseUrlContext.Provider value="http://localhost">
-		<LoginTokenContext.Provider value="login-token">
-			<GraphQlClientFactoryContext.Provider value={clientFactory}>
-				{children}
-			</GraphQlClientFactoryContext.Provider>
-		</LoginTokenContext.Provider>
-	</ApiBaseUrlContext.Provider>
-)
+const { wrapper } = createTenantApiWrapper(olderTenantSchema, rootValue)
 
 describe('useSignInIDPMutation', () => {
 	it('signs in against a tenant API without SignInIDPResult.idpResponse and SignInOptions', async () => {

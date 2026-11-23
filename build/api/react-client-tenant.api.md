@@ -721,12 +721,16 @@ export const createSessionTokenMutation: TenantApi.MutationFetcher<{
             };
         }) | undefined;
     }) | undefined;
+}, UnresolvedVariables<    {
+email: ParameterRef<"email">;
+personId: ParameterRef<"personId">;
+expiration: ParameterRef<"expiration">;
 }, {
-    readonly email?: string;
-    readonly personId?: string;
-    readonly expiration?: number;
-    readonly options?: TenantApi.SignInOptions;
-}>;
+readonly email?: string;
+readonly personId?: string;
+readonly expiration?: number;
+readonly options?: TenantApi.SignInOptions;
+}>>;
 
 // Warning: (ae-forgotten-export) The symbol "createSessionTokenMutationResult" needs to be exported by the entry point index.d.ts
 //
@@ -734,7 +738,7 @@ export const createSessionTokenMutation: TenantApi.MutationFetcher<{
 export type CreateSessionTokenMutationResult = ModelType<typeof createSessionTokenMutationResult>;
 
 // @public (undocumented)
-export type CreateSessionTokenMutationVariables = Parameters<ReturnType<typeof useCreateSessionTokenMutation>>[0];
+export type CreateSessionTokenMutationVariables = TenantApi.MutationArgs['createSessionToken'];
 
 // @public (undocumented)
 export const createTenantMutation: <TResult, TError extends string = never, TVariables extends object = {}>(fetcher: MutationFetcher<TenantMutation<TResult, TError>, TVariables>, defaultOptions?: TenantApiOptions) => (input?: TenantApiOptions) => (variables: TVariables) => Promise<TenantMutationResponse<TResult, TError>>;
@@ -2111,16 +2115,10 @@ export const signInMutation: TenantApi.MutationFetcher<{
             readonly code: TenantApi.SignInErrorCode;
         } & {
             readonly developerMessage: string;
-        } & {
-            readonly endUserMessage?: string;
-        } & {
-            readonly retryAfter?: number;
         }) | undefined;
     } & {
         readonly result?: ({
             readonly token: string;
-        } & {
-            readonly backupCodes?: ReadonlyArray<string>;
         } & {
             readonly person: {
                 readonly id: string;
@@ -2131,14 +2129,19 @@ export const signInMutation: TenantApi.MutationFetcher<{
             };
         }) | undefined;
     }) | undefined;
+}, UnresolvedVariables<    {
+email: ParameterRef<"email">;
+password: ParameterRef<"password">;
+expiration: ParameterRef<"expiration">;
+otpToken: ParameterRef<"otpToken">;
 }, {
-    readonly email: string;
-    readonly password: string;
-    readonly expiration?: number;
-    readonly otpToken?: string;
-    readonly backupCode?: string;
-    readonly options?: TenantApi.SignInOptions;
-}>;
+readonly email: string;
+readonly password: string;
+readonly expiration?: number;
+readonly otpToken?: string;
+readonly backupCode?: string;
+readonly options?: TenantApi.SignInOptions;
+}>>;
 
 // Warning: (ae-forgotten-export) The symbol "signInResultFragment" needs to be exported by the entry point index.d.ts
 //
@@ -2146,7 +2149,7 @@ export const signInMutation: TenantApi.MutationFetcher<{
 export type SignInMutationResult = ModelType<typeof signInResultFragment>;
 
 // @public (undocumented)
-export type SignInMutationVariables = Parameters<ReturnType<typeof useSignInMutation>>[0];
+export type SignInMutationVariables = TenantApi.MutationArgs['signIn'];
 
 // Warning: (ae-forgotten-export) The symbol "signInResultFragment_2" needs to be exported by the entry point index.d.ts
 //
@@ -2633,22 +2636,7 @@ export const useCreateResetPasswordRequestMutation: (input?: TenantApiOptions) =
 export const useCreateSessionTokenForm: () => CreateSessionTokenFormContextValue;
 
 // @public (undocumented)
-export const useCreateSessionTokenMutation: (input?: TenantApiOptions) => (variables: {
-    readonly email?: string;
-    readonly personId?: string;
-    readonly expiration?: number;
-    readonly options?: TenantApi.SignInOptions;
-}) => Promise<TenantMutationResponse<    {
-readonly token: string;
-} & {
-readonly person: {
-readonly id: string;
-} & {
-readonly email?: string;
-} & {
-readonly name?: string;
-};
-}, TenantApi.CreateSessionTokenErrorCode>>;
+export const useCreateSessionTokenMutation: (options?: TenantApiOptions) => (variables: CreateSessionTokenMutationVariables) => Promise<TenantMutationResponse<CreateSessionTokenMutationResult, TenantApi.CreateSessionTokenErrorCode>>;
 
 // @public (undocumented)
 export const useDisableApiKeyMutation: (input?: TenantApiOptions) => (variables: {
@@ -2928,26 +2916,7 @@ export const useSetProjectSecretMutation: (input?: TenantApiOptions) => (variabl
 export const useSignInIDPMutation: (options?: TenantApiOptions) => (variables: SignInIDPMutationVariables) => Promise<TenantMutationResponse<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode>>;
 
 // @public (undocumented)
-export const useSignInMutation: (input?: TenantApiOptions) => (variables: {
-    readonly email: string;
-    readonly password: string;
-    readonly expiration?: number;
-    readonly otpToken?: string;
-    readonly backupCode?: string;
-    readonly options?: TenantApi.SignInOptions;
-}) => Promise<TenantMutationResponse<    {
-readonly token: string;
-} & {
-readonly backupCodes?: ReadonlyArray<string>;
-} & {
-readonly person: {
-readonly id: string;
-} & {
-readonly email?: string;
-} & {
-readonly name?: string;
-};
-}, TenantApi.SignInErrorCode>>;
+export const useSignInMutation: (options?: TenantApiOptions) => (variables: SignInMutationVariables) => Promise<TenantMutationResponse<SignInMutationResult, TenantApi.SignInErrorCode>>;
 
 // @public (undocumented)
 export const useSignInPasswordlessMutation: (input?: TenantApiOptions) => (variables: {

@@ -51,7 +51,9 @@ ${query}`
 			body = await response.text()
 		} catch (e) {
 			const abortError = typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'AbortError'
-			const aborted = abortError || options.signal?.aborted === true || isPageLeaving()
+			// A caller's timeout is a failure to report, not a cancellation.
+			const callerAborted = options.signal?.aborted === true && options.signal.reason?.name !== 'TimeoutError'
+			const aborted = abortError || callerAborted || isPageLeaving()
 			throw createError(aborted ? 'aborted' : 'network error', undefined, e)
 		} finally {
 			// Start once the body has arrived, and even if reading it or a user hook failed: an earlier mutation field may have committed.

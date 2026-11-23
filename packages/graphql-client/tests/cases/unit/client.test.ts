@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, jest, test } from 'bun:test'
+import { afterEach, describe, expect, setSystemTime, test } from 'bun:test'
 import { GraphQlClient, GraphQlClientError, GraphQlClientRequestOptions, GraphQlErrorType } from '../../../src/index.js'
 
 const failingClient = (error: unknown) =>
@@ -26,7 +26,7 @@ const browserCancelled = () => new TypeError('Load failed')
 describe('client', () => {
 	afterEach(() => {
 		globalThis.dispatchEvent(new Event('pageshow'))
-		jest.useRealTimers()
+		setSystemTime()
 	})
 
 	test('returns data of a successful response', async () => {
@@ -47,6 +47,13 @@ describe('client', () => {
 		expect(await errorType(failingClient(browserCancelled()), { signal: controller.signal })).toBe('aborted')
 	})
 
+	test('a timeout of the signal passed by the caller is a network error', async () => {
+		const controller = new AbortController()
+		const timeout = new DOMException('The operation timed out.', 'TimeoutError')
+		controller.abort(timeout)
+		expect(await errorType(failingClient(timeout), { signal: controller.signal })).toBe('network error')
+	})
+
 	test('a fetch failure while the page stays is a network error', async () => {
 		expect(await errorType(failingClient(browserCancelled()))).toBe('network error')
 	})
@@ -60,12 +67,13 @@ describe('client', () => {
 	})
 
 	test('a fetch failure right after beforeunload is an aborted request, later it is a network error again', async () => {
-		jest.useFakeTimers()
+		setSystemTime(new Date('2026-01-01T00:00:00.000Z'))
 		const client = failingClient(browserCancelled())
 		globalThis.dispatchEvent(new Event('beforeunload'))
+		setSystemTime(new Date('2026-01-01T00:00:00.999Z'))
 		expect(await errorType(client)).toBe('aborted')
 		// The navigation did not happen (a download link, a cancelled prompt): the page stays.
-		jest.advanceTimersByTime(1000)
+		setSystemTime(new Date('2026-01-01T00:00:01.000Z'))
 		expect(await errorType(client)).toBe('network error')
 	})
 

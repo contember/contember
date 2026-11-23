@@ -5,8 +5,9 @@
 const BEFORE_UNLOAD_GRACE_MS = 1000
 
 let watching = false
-let leaving = false
-let beforeUnloadTimer: ReturnType<typeof setTimeout> | undefined
+let pageHidden = false
+// A timestamp, not a timer: Deno fires `beforeunload` whenever its event loop empties, and a timer would keep it alive.
+let beforeUnloadAt: number | undefined
 
 export const watchPageLeave = (): void => {
 	if (watching || typeof globalThis.addEventListener !== 'function') {
@@ -14,19 +15,15 @@ export const watchPageLeave = (): void => {
 	}
 	watching = true
 	globalThis.addEventListener('beforeunload', () => {
-		leaving = true
-		clearTimeout(beforeUnloadTimer)
-		beforeUnloadTimer = setTimeout(() => {
-			leaving = false
-		}, BEFORE_UNLOAD_GRACE_MS)
+		beforeUnloadAt = Date.now()
 	})
 	globalThis.addEventListener('pagehide', () => {
-		clearTimeout(beforeUnloadTimer)
-		leaving = true
+		pageHidden = true
 	})
 	globalThis.addEventListener('pageshow', () => {
-		leaving = false
+		pageHidden = false
+		beforeUnloadAt = undefined
 	})
 }
 
-export const isPageLeaving = (): boolean => leaving
+export const isPageLeaving = (): boolean => pageHidden || (beforeUnloadAt !== undefined && Date.now() - beforeUnloadAt < BEFORE_UNLOAD_GRACE_MS)

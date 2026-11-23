@@ -32,6 +32,7 @@ import { MembershipInput } from '@contember/graphql-client-tenant';
 import { ModelType } from 'graphql-ts-client-api';
 import { MouseEventHandler } from 'react';
 import { MutationFetcher } from '@contember/graphql-client-tenant';
+import { ParameterRef } from 'graphql-ts-client-api';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RegenerateBackupCodesErrorCode } from '@contember/graphql-client-tenant';
@@ -47,6 +48,7 @@ import { SignInIDPErrorCode } from '@contember/graphql-client-tenant';
 import { SignUpErrorCode } from '@contember/graphql-client-tenant';
 import * as TenantApi from '@contember/graphql-client-tenant';
 import { ToggleMyPasswordlessErrorCode } from '@contember/graphql-client-tenant';
+import { UnresolvedVariables } from 'graphql-ts-client-api';
 import { UpdateProjectMemberErrorCode } from '@contember/graphql-client-tenant';
 import { VerifyEmailErrorCode } from '@contember/graphql-client-tenant';
 
@@ -2059,8 +2061,6 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
         readonly result?: ({
             readonly token: string;
         } & {
-            readonly idpResponse?: unknown;
-        } & {
             readonly person: {
                 readonly id: string;
             } & {
@@ -2070,15 +2070,19 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
             };
         }) | undefined;
     }) | undefined;
+}, UnresolvedVariables<    {
+identityProvider: ParameterRef<"identityProvider">;
+data: ParameterRef<"data">;
+expiration: ParameterRef<"expiration">;
 }, {
-    readonly identityProvider: string;
-    readonly data?: unknown;
-    readonly expiration?: number;
-    readonly options?: TenantApi.SignInOptions;
-    readonly idpResponse?: TenantApi.IDPResponseInput;
-    readonly redirectUrl?: string;
-    readonly sessionData?: unknown;
-}>;
+readonly identityProvider: string;
+readonly data?: unknown;
+readonly expiration?: number;
+readonly options?: TenantApi.SignInOptions;
+readonly idpResponse?: TenantApi.IDPResponseInput;
+readonly redirectUrl?: string;
+readonly sessionData?: unknown;
+}>>;
 
 // Warning: (ae-forgotten-export) The symbol "signInIdpFragment" needs to be exported by the entry point index.d.ts
 //
@@ -2921,19 +2925,7 @@ export const useSetProjectSecretMutation: (input?: TenantApiOptions) => (variabl
 }) => Promise<TenantMutationResponse<unknown, "PROJECT_NOT_FOUND">>;
 
 // @public (undocumented)
-export const useSignInIDPMutation: (input?: TenantApiOptions) => (variables: SignInIDPMutationVariables) => Promise<TenantMutationResponse<    {
-readonly token: string;
-} & {
-readonly idpResponse?: unknown;
-} & {
-readonly person: {
-readonly id: string;
-} & {
-readonly email?: string;
-} & {
-readonly name?: string;
-};
-}, TenantApi.SignInIDPErrorCode>>;
+export const useSignInIDPMutation: (options?: TenantApiOptions) => (variables: SignInIDPMutationVariables) => Promise<TenantMutationResponse<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode>>;
 
 // @public (undocumented)
 export const useSignInMutation: (input?: TenantApiOptions) => (variables: {

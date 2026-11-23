@@ -1,15 +1,23 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
-import { LoginToken } from '../../useTenantApi.js'
-import { createTenantMutation } from '../../useTenantMutation.js'
-import { ModelType } from 'graphql-ts-client-api'
+import { useCallback } from 'react'
+import { LoginToken, TenantApiOptions } from '../../useTenantApi.js'
+import { createTenantMutation, TenantMutationResponse } from '../../useTenantMutation.js'
+import { ModelType, ParameterRef } from 'graphql-ts-client-api'
 
-const signInIdpFragment = TenantApi.signInIDPResult$$.person(TenantApi.person$.id.email.name)
+// Explicit fields and arguments, not `$$` and the generated defaults: an admin built with this client signs in
+// against older engines too, which have neither `SignInIDPResult.idpResponse` nor the `SignInOptions` input.
+const signInIdpFragment = TenantApi.signInIDPResult$.token.person(TenantApi.person$.id.email.name)
 
 export type SignInIDPMutationResult = ModelType<typeof signInIdpFragment>
 
 export const signInIDPMutation = TenantApi
 	.mutation$
 	.signInIDP(
+		{
+			identityProvider: ParameterRef.of('identityProvider'),
+			data: ParameterRef.of('data'),
+			expiration: ParameterRef.of('expiration'),
+		},
 		TenantApi
 			.signInIDPResponse$$
 			.error(TenantApi.signInIDPError$$)
@@ -29,9 +37,21 @@ export type SignInIDPMutationVariables = {
 		& { [key: string]: any }
 }
 
-export const useSignInIDPMutation = createTenantMutation<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode, SignInIDPMutationVariables>(
+// Explicit argument refs make every variable a required key, so `expiration` is passed through as possibly undefined.
+type SignInIDPFetcherVariables = Omit<SignInIDPMutationVariables, 'expiration'> & { expiration: number | undefined }
+
+const useSignInIDPFetcherMutation = createTenantMutation<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode, SignInIDPFetcherVariables>(
 	signInIDPMutation,
 	{
 		apiToken: LoginToken,
 	},
 )
+
+export const useSignInIDPMutation = (options?: TenantApiOptions) => {
+	const signIn = useSignInIDPFetcherMutation(options)
+	return useCallback(
+		(variables: SignInIDPMutationVariables): Promise<TenantMutationResponse<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode>> =>
+			signIn({ ...variables, expiration: variables.expiration }),
+		[signIn],
+	)
+}

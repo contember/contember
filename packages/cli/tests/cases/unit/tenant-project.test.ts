@@ -576,7 +576,8 @@ describe('TenantConfigShowCommand ("tenant config show")', () => {
 					revealLoginMethod: true,
 					defaultTokenExpiration: 'PT30M',
 					mfaGraceDuration: 'P0D',
-					anomalyDetection: { enabled: false, historySize: 10, emailThreshold: 5, stepUpThreshold: 8 },
+					mfaChangeRequiresReauthentication: true,
+					anomalyDetection: { enabled: false, historySize: 10, emailThreshold: 5, stepUpThreshold: 8, missingSignalIsNew: true },
 				},
 				captcha: { protect: { signUp: false, passwordReset: false, passwordlessInit: false, emailVerification: false } },
 				rateLimits: {
@@ -599,6 +600,8 @@ describe('TenantConfigShowCommand ("tenant config show")', () => {
 		expect(parsed.password.revokeSessionsOnChange).toBe(true)
 		expect(parsed.password.pattern).toBeNull()
 		expect(parsed.login.maxTokenExpiration).toBeNull()
+		expect(parsed.login.mfaChangeRequiresReauthentication).toBe(true)
+		expect(parsed.login.anomalyDetection).toEqual({ enabled: false, historySize: 10, emailThreshold: 5, stepUpThreshold: 8, missingSignalIsNew: true })
 		expect(parsed.captcha).toEqual({
 			provider: null,
 			threshold: null,

@@ -32,8 +32,8 @@ const configuration = {
 		defaultTokenExpiration: 'PT30M',
 		maxTokenExpiration: null,
 		mfaGraceDuration: 'P0D',
-		mfaChangeRequiresReauthentication: false,
-		anomalyDetection: { enabled: false, historySize: 10, emailThreshold: 5, stepUpThreshold: 8, missingSignalIsNew: false },
+		mfaChangeRequiresReauthentication: true,
+		anomalyDetection: { enabled: false, historySize: 10, emailThreshold: 5, stepUpThreshold: 8, missingSignalIsNew: true },
 	},
 	captcha: {
 		provider: null,
@@ -100,6 +100,15 @@ describe('TenantConfigView', () => {
 		expect(requestedQueries[0]).toContain('requireReauthentication')
 		expect(requestedQueries[0]).toContain('revokeSessionsOnChange')
 		expect(requestedQueries[0]).toContain('uniformResponse')
+	})
+
+	test('shows the MFA-change re-authentication and missing-signal settings in the login sections', async () => {
+		const { container } = render(<TenantConfigView />, { wrapper })
+
+		expect(await settingValue(container, 'Login', 'mfaChangeRequiresReauthentication')).toBe('Enabled')
+		expect(await settingValue(container, 'Anomaly detection', 'missingSignalIsNew')).toBe('Enabled')
+		expect(requestedQueries[0]).toContain('mfaChangeRequiresReauthentication')
+		expect(requestedQueries[0]).toContain('missingSignalIsNew')
 	})
 })
 

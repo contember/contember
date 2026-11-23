@@ -140,6 +140,7 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 						['defaultTokenExpiration', formatConfigValue(config.login.defaultTokenExpiration)],
 						['maxTokenExpiration', formatConfigValue(config.login.maxTokenExpiration)],
 						['mfaGraceDuration', formatConfigValue(config.login.mfaGraceDuration)],
+						['mfaChangeRequiresReauthentication', formatConfigValue(config.login.mfaChangeRequiresReauthentication)],
 					]}
 				/>
 			</ConfigSection>
@@ -151,6 +152,7 @@ export const TenantConfigView = ({ controller }: TenantConfigViewProps) => {
 						['historySize', formatConfigValue(config.login.anomalyDetection.historySize)],
 						['emailThreshold', formatConfigValue(config.login.anomalyDetection.emailThreshold)],
 						['stepUpThreshold', formatConfigValue(config.login.anomalyDetection.stepUpThreshold)],
+						['missingSignalIsNew', formatConfigValue(config.login.anomalyDetection.missingSignalIsNew)],
 					]}
 				/>
 			</ConfigSection>

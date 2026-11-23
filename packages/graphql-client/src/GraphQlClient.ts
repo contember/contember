@@ -1,11 +1,14 @@
 import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError.js'
 import { GraphQlClientBaseOptions, GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
 import { PrimaryReadWindow } from './PrimaryReadWindow.js'
+import { isPageLeaving, watchPageLeave } from './pageLeave.js'
 
 export class GraphQlClient {
 	constructor(
 		private readonly options: GraphQlClientOptions,
-	) {}
+	) {
+		watchPageLeave()
+	}
 
 	get apiUrl(): string {
 		return this.options.url
@@ -47,7 +50,8 @@ ${query}`
 
 			body = await response.text()
 		} catch (e) {
-			const aborted = typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'AbortError'
+			const abortError = typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'AbortError'
+			const aborted = abortError || options.signal?.aborted === true || isPageLeaving()
 			throw createError(aborted ? 'aborted' : 'network error', undefined, e)
 		} finally {
 			// Start once the body has arrived, and even if reading it or a user hook failed: an earlier mutation field may have committed.

@@ -45,15 +45,12 @@ export class DispatchWorkerSupervisor implements Runnable {
 			if (current && current.container === container) {
 				return
 			}
-			const dispatcher = this.projectDispatcherFactory.create({
+			const supervisedDispatcher = this.projectDispatcherFactory.create({
 				db,
 				contentSchemaResolver: container.contentSchemaResolver,
 				projectSlug: container.project.slug,
+				supervisorOptions: { startupMax: isReloading ? Number.MAX_VALUE : 10 },
 			})
-			const supervisedDispatcher = new Supervisor(
-				dispatcher,
-				{ startupMax: isReloading ? Number.MAX_VALUE : 10 },
-			)
 			const worker = supervisedDispatcher.run({
 				logger,
 				onError: () => {

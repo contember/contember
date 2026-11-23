@@ -1,7 +1,7 @@
 import { DatabaseContext } from '@contember/engine-system-api'
 import { EventDispatcher } from './EventDispatcher.js'
 import { ContentSchemaResolver } from '@contember/engine-http'
-import { Runnable, RunnableArgs, Running } from '@contember/engine-common'
+import { Runnable, RunnableArgs, Running, Supervisor, SupervisorOptions } from '@contember/engine-common'
 import { Listener } from '@contember/database'
 import { NOTIFY_CHANNEL_NAME } from '../utils/notifyChannel.js'
 import { ActionsMetrics, ProjectActionsMetrics } from '../ActionsMetrics.js'
@@ -31,10 +31,40 @@ export class ProjectDispatcherFactory {
 	) {
 	}
 
+	/**
+	 * A supervised dispatch worker for one project. Its heartbeat series is removed only when the worker is ended for good:
+	 * after a crash the supervisor drops the crashed run, so an end() during the restart backoff never reaches the dispatcher.
+	 */
 	public create(
-		{ db, contentSchemaResolver, projectSlug }: { db: DatabaseContext; contentSchemaResolver: ContentSchemaResolver; projectSlug: string },
-	): ProjectDispatcher {
-		return new ProjectDispatcher(this.dispatcher, db, contentSchemaResolver, projectSlug, this.metrics.forProject(projectSlug))
+		{ db, contentSchemaResolver, projectSlug, supervisorOptions }: {
+			db: DatabaseContext
+			contentSchemaResolver: ContentSchemaResolver
+			projectSlug: string
+			supervisorOptions: SupervisorOptions
+		},
+	): Runnable {
+		const metrics = this.metrics.forProject(projectSlug)
+		const supervisor = new Supervisor(new ProjectDispatcher(this.dispatcher, db, contentSchemaResolver, projectSlug, metrics), supervisorOptions)
+		return {
+			run: async (args: RunnableArgs): Promise<Running> => {
+				let running: Running
+				try {
+					running = await supervisor.run(args)
+				} catch (e) {
+					metrics.dispose()
+					throw e
+				}
+				return {
+					end: async () => {
+						try {
+							await running.end()
+						} finally {
+							metrics.dispose()
+						}
+					},
+				}
+			},
+		}
 	}
 }
 
@@ -104,7 +134,6 @@ export class ProjectDispatcher implements Runnable {
 								if (!finished) {
 									logger.warn('Worker did not finish its batch in time, events still in processing will be delivered again')
 								}
-								this.metrics.dispose()
 								logger.info('Worker terminated', {
 									succeed: succeedTotal,
 									failed: failedTotal,

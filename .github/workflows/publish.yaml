@@ -10,6 +10,8 @@ permissions:
 jobs:
   publish-node:
     runs-on: ubuntu-latest
+    # 14 successful tag runs (2026-10-28..11-23) took 6.7-12.7 min, mostly the sequential npm publish; ~2x the slowest.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
         with:
@@ -46,6 +48,8 @@ jobs:
 
   publish-docker:
     runs-on: ubuntu-latest
+    # 14 successful tag runs: engine image 2.3-9.5 min (multi-arch build), cli 1.3-2.9 min; ~2x the slowest.
+    timeout-minutes: 20
     strategy:
       matrix:
         image: [cli, engine]

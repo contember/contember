@@ -48,7 +48,7 @@ jobs:
 
   publish-docker:
     runs-on: ubuntu-latest
-    # 14 successful tag runs: engine image 2.3-9.5 min (multi-arch build), cli 1.3-2.9 min; ~2x the slowest.
+    # 14 successful tag runs: engine image 2.3-9.6 min (multi-arch build), cli 1.3-2.9 min; ~2x the slowest.
     timeout-minutes: 20
     strategy:
       matrix:

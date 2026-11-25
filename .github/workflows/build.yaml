@@ -116,6 +116,79 @@ jobs:
       - name: Check migration ordering against base
         run: ./scripts/migrations/check-migration-order.sh "origin/${{ github.base_ref || github.event.repository.default_branch }}"
 
+  engine-image:
+    # The node runtime images are otherwise built only on a tag. Builds each one, checks it carries no package manager,
+    # boots it on an empty PostgreSQL (tenant migrations) and migrates a project through it (system + content migrations).
+    needs: [ ]
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [ node-alpine, node-debian ]
+    services:
+      mailhog:
+        image: mailhog/mailhog
+        env:
+          MH_CORS_ORIGIN: "*"
+        ports:
+          - 8025:8025
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build image
+        run: docker build -f scripts/docker/server-${{ matrix.image }}.dockerfile -t contember-engine:ci .
+      - name: No package manager in the image
+        run: |
+          docker run --rm --entrypoint sh contember-engine:ci -c \
+            '! command -v npm && ! command -v npx && ! command -v corepack && test ! -e /usr/local/lib/node_modules/npm && test ! -e /usr/local/lib/node_modules/corepack'
+      - name: Start engine
+        run: |
+          docker run --detach --name engine --network host \
+            -e DEFAULT_DB_HOST=127.0.0.1 \
+            -e DEFAULT_DB_PORT=5432 \
+            -e DEFAULT_DB_USER=postgres \
+            -e DEFAULT_DB_PASSWORD=postgres \
+            -e TENANT_DB_NAME=test_tenant \
+            -e CONTEMBER_ROOT_TOKEN=0000000000000000000000000000000000000000 \
+            -e CONTEMBER_LOGIN_TOKEN=1111111111111111111111111111111111111111 \
+            contember-engine:ci
+          for _ in $(seq 1 30); do
+            curl --silent --fail localhost:4000/ && exit 0
+            sleep 1
+          done
+          docker logs engine
+          exit 1
+      - name: Tenant migrations ran
+        run: |
+          count=$(docker exec ${{ job.services.postgres.id }} psql -U postgres -d test_tenant -tAc 'select count(*) from tenant.migrations')
+          echo "tenant migrations executed: $count"
+          test "$count" -gt 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - name: Install deps
+        # pre-build generates the tenant client the e2e tester calls.
+        run: |
+          bun install --frozen-lockfile
+          bun run pre-build
+      - name: Migrate a project through the image
+        run: bun test --conditions=typescript e2e/cases/homepage.test.ts e2e/cases/system/system-migrate.test.ts
+        env:
+          CONTEMBER_API_URL: "http://localhost:4000"
+          CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+          CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+          MAILHOG_URL: "http://localhost:8025"
+      - name: Engine logs
+        if: always()
+        run: docker logs engine || true
+
   test-db:
     needs: [ ]
     timeout-minutes: 10

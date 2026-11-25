@@ -19,6 +19,7 @@ export const useTenantApi = ({ headers, apiToken }: TenantApiOptions = {}) => {
 			readonly variables?: TVariables
 			readonly headers?: Record<string, string>
 			readonly apiToken?: string | typeof LoginToken
+			readonly signal?: AbortSignal
 		},
 	): Promise<TData> => {
 		const writer = new TextWriter()
@@ -42,6 +43,7 @@ export const useTenantApi = ({ headers, apiToken }: TenantApiOptions = {}) => {
 				...options?.headers,
 			},
 			apiToken: apiTokenResolved === LoginToken ? loginToken : apiTokenResolved,
+			signal: options?.signal,
 		})
 	}, [apiToken, client, headers, loginToken])
 }

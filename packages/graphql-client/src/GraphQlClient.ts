@@ -47,8 +47,7 @@ ${query}`
 
 			body = await response.text()
 		} catch (e) {
-			const aborted = typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'AbortError'
-			throw createError(aborted ? 'aborted' : 'network error', undefined, e)
+			throw createError(isAborted(e, options.signal) ? 'aborted' : 'network error', undefined, e)
 		} finally {
 			// Start once the body has arrived, and even if reading it or a user hook failed: an earlier mutation field may have committed.
 			if (response !== null) {
@@ -120,6 +119,15 @@ ${query}`
 	private resolvePrimaryReadWindow(options: GraphQlClientBaseOptions): PrimaryReadWindow | undefined {
 		return (options.primaryReadWindow ?? this.options.primaryReadWindow) || undefined
 	}
+}
+
+// A caller's timeout is a failure to report, not a cancellation.
+const isAborted = (error: unknown, signal: AbortSignal | undefined): boolean => {
+	const reason: unknown = signal?.reason
+	if (reason instanceof Error && reason.name === 'TimeoutError') {
+		return false
+	}
+	return (error instanceof Error && error.name === 'AbortError') || signal?.aborted === true
 }
 
 const defaultFetcher = async (url: string, options: RequestInit) => fetch(url, options)

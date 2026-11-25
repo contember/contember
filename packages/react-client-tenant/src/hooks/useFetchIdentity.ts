@@ -17,7 +17,10 @@ const deniedGlobalPermissions: IdentityGlobalPermissions = {
 	canCreateGlobalApiKey: false,
 }
 
-export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Identity | undefined }, IdentityMethods] => {
+export const useFetchIdentity = (
+	// Keep the signal stable across renders: a new one is a new `refreshIdentity`.
+	{ signal }: { signal?: AbortSignal } = {},
+): [{ state: IdentityStateValue; identity: Identity | undefined }, IdentityMethods] => {
 	const sessionToken = useSessionToken()
 	const fetchMe = useMeQuery()
 
@@ -32,7 +35,7 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 	const fetch = useCallback(async () => {
 		setIdentityState({ state: 'loading', identity: undefined })
 		try {
-			const response = await fetchMe({})
+			const response = await fetchMe({ signal })
 			const person = response.person
 			const projects = response.projects
 
@@ -54,6 +57,10 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 				},
 			})
 		} catch (e) {
+			// Cancelled on purpose, e.g. right before a redirect away from the page: not a failure.
+			if (e instanceof GraphQlClientError && e.type === 'aborted') {
+				return
+			}
 			console.error(e)
 			if (e instanceof GraphQlClientError && e.response?.status === 401) {
 				logout({ noRedirect: true })
@@ -61,7 +68,7 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 				setIdentityState({ state: 'failed', identity: undefined })
 			}
 		}
-	}, [fetchMe, logout])
+	}, [fetchMe, logout, signal])
 
 	return [
 		identityState,

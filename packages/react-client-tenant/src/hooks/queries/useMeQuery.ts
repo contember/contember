@@ -22,7 +22,7 @@ export type MeQueryData = ModelType<typeof identityFragment>
 
 export const useMeQuery = (options: TenantApiOptions = {}) => {
 	const executor = useTenantApi(options)
-	return useCallback(async ({}: {}): Promise<MeQueryData> => {
-		return (await executor(TenantApi.query$.me(identityFragment))).me
+	return useCallback(async ({ signal }: { signal?: AbortSignal }): Promise<MeQueryData> => {
+		return (await executor(TenantApi.query$.me(identityFragment), { signal })).me
 	}, [executor])
 }

@@ -18,6 +18,7 @@ const deniedGlobalPermissions: IdentityGlobalPermissions = {
 }
 
 export const useFetchIdentity = (
+	// Keep the signal stable across renders: a new one is a new `refreshIdentity`.
 	{ signal }: { signal?: AbortSignal } = {},
 ): [{ state: IdentityStateValue; identity: Identity | undefined }, IdentityMethods] => {
 	const sessionToken = useSessionToken()

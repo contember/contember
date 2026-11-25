@@ -37,6 +37,7 @@ describe('client', () => {
 		expect(await errorType(failingClient(new DOMException('The operation was aborted.', 'AbortError')))).toBe('aborted')
 	})
 
+	// Browsers reject with an AbortError here; this covers a fetcher that rejects with something else.
 	test('a fetch failure after the caller aborted the signal is an aborted request', async () => {
 		const controller = new AbortController()
 		controller.abort()

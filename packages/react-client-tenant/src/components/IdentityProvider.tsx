@@ -11,8 +11,19 @@ export interface IdentityProviderProps {
 export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) => {
 	const sessionToken = useSessionToken()
 	// Aborted by a redirect to the backlink, which also cancels a `me` query that starts after it.
-	const [fetchAbortController] = useState(() => new AbortController())
+	const [fetchAbortController, setFetchAbortController] = useState(() => new AbortController())
 	const [{ identity, state }, methods] = useFetchIdentity({ signal: fetchAbortController.signal })
+
+	// Back to a page kept in the back-forward cache after the redirect: a new signal refreshes the identity below.
+	useEffect(() => {
+		const onPageShow = (event: PageTransitionEvent) => {
+			if (event.persisted && fetchAbortController.signal.aborted) {
+				setFetchAbortController(new AbortController())
+			}
+		}
+		window.addEventListener('pageshow', onPageShow)
+		return () => window.removeEventListener('pageshow', onPageShow)
+	}, [fetchAbortController])
 
 	const { refreshIdentity, clearIdentity } = methods
 	useEffect(() => {

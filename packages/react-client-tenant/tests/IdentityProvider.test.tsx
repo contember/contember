@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test'
-import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { GraphQlClient, GraphQlClientOptions } from '@contember/graphql-client'
 import { ApiBaseUrlContext, GraphQlClientFactoryContext, SessionTokenContext, SetSessionTokenContext } from '@contember/react-client'
 import { ReactNode, useEffect, useState } from 'react'
@@ -93,7 +93,7 @@ describe('LoginForm redirecting to the backlink', () => {
 		window.happyDOM.setURL('about:blank')
 	})
 
-	it('aborts the identity query the new session token starts', async () => {
+	const signInWithBacklink = async () => {
 		window.happyDOM.setURL('http://localhost/?backlink=%2Fapp%2F')
 		const meSignals: (AbortSignal | null | undefined)[] = []
 		const fetcher: Fetcher = async (_input, init) => {
@@ -123,12 +123,27 @@ describe('LoginForm redirecting to the backlink', () => {
 			</ClientProvider>,
 		)
 		fireEvent.click(getByText('sign in'))
-
 		await waitFor(() => expect(meSignals).toHaveLength(1))
 		await act(async () => {})
+		return { meSignals, getByTestId }
+	}
+
+	it('aborts the identity query the new session token starts', async () => {
+		const { meSignals, getByTestId } = await signInWithBacklink()
 		expect(window.location.href).toBe('http://localhost/app/')
 		expect(meSignals[0]?.aborted).toBe(true)
 		expect(getByTestId('identity-state').textContent).toBe('loading')
 		expect(consoleError).not.toHaveBeenCalled()
+	})
+
+	it('loads the identity again when the page comes back from the back-forward cache', async () => {
+		const { meSignals } = await signInWithBacklink()
+		// happy-dom has no PageTransitionEvent; the provider reads only `persisted`.
+		act(() => {
+			window.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }))
+		})
+		expect(await screen.findByText('success')).toBeTruthy()
+		expect(meSignals).toHaveLength(2)
+		expect(meSignals[1]?.aborted).toBe(false)
 	})
 })

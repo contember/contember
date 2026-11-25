@@ -11,9 +11,10 @@ type Fetcher = (input: RequestInfo, init?: RequestInit) => Promise<Response>
 
 const jsonResponse = (body: unknown) => new Response(JSON.stringify({ data: body }), { headers: { 'Content-Type': 'application/json' } })
 
-const meResponse = jsonResponse({
-	me: { id: 'identity-1', roles: [], person: null, projects: [], permissions: null },
-})
+const meResponse = () =>
+	jsonResponse({
+		me: { id: 'identity-1', roles: [], person: null, projects: [], permissions: null },
+	})
 
 const ClientProvider = ({ fetcher, initialToken, children }: { fetcher: Fetcher; initialToken?: string; children: ReactNode }) => {
 	const [token, setToken] = useState(initialToken)
@@ -78,6 +79,27 @@ describe('IdentityProvider', () => {
 		expect(getByTestId('identity-state').textContent).toBe('loading')
 		expect(consoleError).not.toHaveBeenCalled()
 	})
+
+	it('does not reload the identity on a back-forward cache restore when nothing aborted it', async () => {
+		let requests = 0
+		const fetcher: Fetcher = async () => {
+			requests++
+			return meResponse()
+		}
+		render(
+			<ClientProvider initialToken="session-token" fetcher={fetcher}>
+				<IdentityProvider>
+					<IdentityStateProbe />
+				</IdentityProvider>
+			</ClientProvider>,
+		)
+		expect(await screen.findByText('success')).toBeTruthy()
+		act(() => {
+			window.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }))
+		})
+		await act(async () => {})
+		expect(requests).toBe(1)
+	})
 })
 
 const FillCredentials = () => {
@@ -107,7 +129,7 @@ describe('LoginForm redirecting to the backlink', () => {
 			if (init?.signal?.aborted) {
 				throw new DOMException('The operation was aborted.', 'AbortError')
 			}
-			return meResponse
+			return meResponse()
 		}
 		const { getByText, getByTestId } = render(
 			<ClientProvider fetcher={fetcher}>

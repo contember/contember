@@ -24,7 +24,7 @@ Sentry.init({
 	tracesSampleRate: 1,
 	replaysSessionSampleRate: 0,
 	replaysOnErrorSampleRate: 1,
-	// A request the browser cancelled (navigation, unload) is not a failure; the console breadcrumb still records it.
+	// A request its caller aborted (e.g. before a redirect away from the page) is not a failure.
 	beforeSend: (event, hint) => {
 		const error = hint.originalException
 		return error instanceof GraphQlClientError && error.type === 'aborted' ? null : event

@@ -2680,7 +2680,9 @@ export const useEnablePersonMutation: (input?: TenantApiOptions) => (variables: 
 }) => Promise<TenantMutationResponse<unknown, TenantApi.EnablePersonErrorCode>>;
 
 // @public (undocumented)
-export const useFetchIdentity: () => [{
+export const useFetchIdentity: (input?: {
+    signal?: AbortSignal;
+}) => [{
     state: IdentityStateValue;
     identity: Identity | undefined;
 }, IdentityMethods];
@@ -2781,7 +2783,9 @@ export const useLogout: () => (input?: {
 export const useMailTemplatesQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<MailTemplatesQueryResult>;
 
 // @public (undocumented)
-export const useMeQuery: (options?: TenantApiOptions) => (input: {}) => Promise<MeQueryData>;
+export const useMeQuery: (options?: TenantApiOptions) => (input: {
+    signal?: AbortSignal;
+}) => Promise<MeQueryData>;
 
 // @public (undocumented)
 export const useMyIdentityProvidersQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<MyIdentityProvidersQueryResult>;
@@ -2978,6 +2982,7 @@ export const useTenantApi: (input?: TenantApiOptions) => <TData extends object, 
     readonly variables?: TVariables;
     readonly headers?: Record<string, string>;
     readonly apiToken?: string | typeof LoginToken;
+    readonly signal?: AbortSignal;
 }) => Promise<TData>;
 
 // @public (undocumented)

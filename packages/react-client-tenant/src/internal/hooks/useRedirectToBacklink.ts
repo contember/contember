@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useIdentity } from '../../contexts.js'
+import { useIdentityFetchAbortController } from '../contexts.js'
 
 const getBacklinkFromUrl = () => {
 	return new URLSearchParams(window.location.search).get('backlink')
@@ -22,6 +23,7 @@ export const useSaveBacklink = ({ storage = 'session' }: {
 }
 
 export const useRedirectToBacklinkCallback = () => {
+	const identityFetchAbortController = useIdentityFetchAbortController()
 	return useCallback(() => {
 		const backlink = getBacklinkFromUrl() ?? sessionStorage.getItem('backlink') ?? localStorage.getItem('backlink')
 		if (!backlink) {
@@ -31,9 +33,11 @@ export const useRedirectToBacklinkCallback = () => {
 		localStorage.removeItem('backlink')
 		const resolvedBacklink = new URL(backlink, window.location.href)
 		if (resolvedBacklink.origin === window.location.origin) {
+			// The navigation would cancel the `me` query a new session token starts, as a plain network error.
+			identityFetchAbortController?.abort()
 			window.location.href = resolvedBacklink.toString()
 		}
-	}, [])
+	}, [identityFetchAbortController])
 }
 
 export const useRedirectToBacklink = () => {

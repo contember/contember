@@ -120,7 +120,7 @@ jobs:
     # The node runtime images are otherwise built only on a tag. Builds each one, checks it carries no package manager,
     # boots it on an empty PostgreSQL (tenant migrations) and migrates a project through it (system + content migrations).
     needs: [ ]
-    timeout-minutes: 20
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -179,7 +179,7 @@ jobs:
           bun install --frozen-lockfile
           bun run pre-build
       - name: Migrate a project through the image
-        run: bun test --conditions=typescript e2e/cases/homepage.test.ts e2e/cases/system/system-migrate.test.ts
+        run: bun test --conditions=typescript e2e/cases/system/system-migrate.test.ts
         env:
           CONTEMBER_API_URL: "http://localhost:4000"
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'

@@ -58,8 +58,9 @@ export const createDefaultLogger = (): Logger => {
 						: 'yellowBright'
 					const timeInfo = attributes.totalTimeMs !== undefined ? ` ${attributes.totalTimeMs}ms` : ''
 					const statusInfo = attributes.status !== undefined ? ` [${attributes.status}]` : ''
+					const requestIdInfo = attributes.requestId !== undefined ? ` ${style(['white', 'dim'], '#' + attributes.requestId)}` : ''
 					return {
-						line: style(color, `${attributes.method}${statusInfo} ${attributes.uri}${timeInfo} ${style(['white', 'dim'], '#' + attributes.requestId)}`),
+						line: style(color, `${attributes.method}${statusInfo} ${attributes.uri}${timeInfo}${requestIdInfo}`),
 					}
 				},
 				method: () => undefined,

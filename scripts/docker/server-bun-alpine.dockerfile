@@ -9,7 +9,9 @@ RUN /src/scripts/server-build/run.sh
 FROM oven/bun:1.3.10-alpine
 
 WORKDIR /src
-RUN apk --no-cache add curl ca-certificates \
+# The bun base image lags behind Alpine security fixes for OS packages (libssl3, libcrypto3, zlib, ...).
+RUN apk --no-cache upgrade \
+    && apk --no-cache add curl ca-certificates \
     && curl -o /usr/local/share/ca-certificates/rds-combined-ca-bundle.crt https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
     && update-ca-certificates
 ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt

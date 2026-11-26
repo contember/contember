@@ -279,6 +279,7 @@ export class EventManager {
 						listener(state.getAccessor())
 					}
 				}
+				state.fieldsWithPendingConnectionUpdates.clear()
 			}
 
 			switch (state.type) {

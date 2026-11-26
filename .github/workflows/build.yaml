@@ -215,6 +215,8 @@ jobs:
               grep -q '^contember_info' <<<"$metrics"
               exit 0
             fi
+            # a master that crashed at boot does not come back
+            test "$(docker inspect --format '{{.State.Running}}' engine-cluster)" = true || break
             sleep 1
           done
           docker logs engine-cluster

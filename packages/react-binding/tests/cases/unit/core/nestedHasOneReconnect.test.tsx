@@ -32,6 +32,9 @@ const linkBId = 'bbbbbbbb-0000-0000-0000-000000000002'
 const pageAId = 'cccccccc-0000-0000-0000-000000000001'
 const pageBId = 'cccccccc-0000-0000-0000-000000000002'
 const pageCId = 'cccccccc-0000-0000-0000-000000000003'
+const blockAId = 'dddddddd-0000-0000-0000-000000000001'
+const blockBId = 'dddddddd-0000-0000-0000-000000000002'
+const blockCId = 'dddddddd-0000-0000-0000-000000000003'
 
 const pageFields = (
 	<>
@@ -81,15 +84,15 @@ const EntityListProbe = Component(
 	),
 )
 
-const page = (id: string, url: string, label: string) => ({ id, url, blocks: [{ id: id.replace(/^c/, 'd'), label }] })
+const page = (id: string, url: string, blockId: string, label: string) => ({ id, url, blocks: [{ id: blockId, label }] })
 
 const mount = () =>
 	createBindingHarness({
 		schema,
 		data: {
-			item: { id: itemId, link: { id: linkAId, target: page(pageAId, 'A', 'a') } },
-			linkB: { id: linkBId, target: page(pageCId, 'C', 'c') },
-			pageB: page(pageBId, 'B', 'b'),
+			item: { id: itemId, link: { id: linkAId, target: page(pageAId, 'A', blockAId, 'a') } },
+			linkB: { id: linkBId, target: page(pageCId, 'C', blockCId, 'c') },
+			pageB: page(pageBId, 'B', blockBId, 'b'),
 		},
 		node: (
 			<>
@@ -141,7 +144,7 @@ describe('hooks resolving a path through a reconnected has-one relation', () => 
 		await h.update(() => {
 			const target = h.getEntity('item').getEntity('link').getEntity('target')
 			target.getField('url').updateValue('B2')
-			target.getEntityList('blocks').getChildEntityById('dccccccc-0000-0000-0000-000000000002').getField('label').updateValue('b2')
+			target.getEntityList('blocks').getChildEntityById(blockBId).getField('label').updateValue('b2')
 		})
 
 		expect(rendered()).toEqual({ field: 'B2', entity: 'B2', list: 'b2' })
@@ -160,6 +163,7 @@ describe('hooks resolving a path through a reconnected has-one relation', () => 
 		expect(rendered()).toEqual({ field: 'null', entity: 'null', list: '' })
 	})
 
+	// Passes on the old code too: a reconnected relation keeps refiring connectionUpdate on later updates, which masks a stale listener.
 	it('follow a reconnect of the first relation and then of the second one', async () => {
 		const h = (harness = await mount())
 		await h.update(() => {

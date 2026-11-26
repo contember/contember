@@ -1,4 +1,4 @@
-FROM oven/bun:1.3.10-alpine as builder
+FROM oven/bun:1.4.5-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
@@ -6,7 +6,7 @@ RUN apk add --no-cache bash
 RUN bun install
 RUN /src/scripts/server-build/run.sh
 
-FROM oven/bun:1.3.10-alpine
+FROM oven/bun:1.4.5-alpine
 
 WORKDIR /src
 # The bun base image lags behind Alpine security fixes for OS packages (libssl3, libcrypto3, zlib, ...).

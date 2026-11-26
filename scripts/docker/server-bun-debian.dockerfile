@@ -8,7 +8,9 @@ RUN /src/scripts/server-build/run.sh
 FROM oven/bun:1.4.5-debian
 
 WORKDIR /src
+# The bun base image lags behind Debian security fixes for OS packages (libc6, zlib1g, libzstd1, ...).
 RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends ca-certificates curl \
     && curl -o /usr/local/share/ca-certificates/rds-combined-ca-bundle.crt https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
     && update-ca-certificates \

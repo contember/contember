@@ -117,7 +117,7 @@ jobs:
         run: ./scripts/migrations/check-migration-order.sh "origin/${{ github.base_ref || github.event.repository.default_branch }}"
 
   engine-image:
-    # The engine images are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack (and, on alpine, no outdated OS package),
+    # The engine images are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack (and, on alpine and bun-debian, no outdated OS package),
     # boots it on an empty PostgreSQL (tenant migrations), migrates a project through it (system + content migrations) and boots it again with two cluster workers.
     needs: [ ]
     timeout-minutes: 10
@@ -153,7 +153,14 @@ jobs:
         # `apk update` fails on an unreachable index; `apk version` alone would print nothing and pass.
         run: |
           docker run --rm --entrypoint sh contember-engine:ci -c \
-            'set -e; apk update >/dev/null; outdated=$(apk version -l "<" | tail -n +2); echo "$outdated"; test -z "$outdated"'
+            'set -e; apk update >/dev/null; apk version -l "<" >/tmp/v; outdated=$(tail -n +2 /tmp/v); echo "$outdated"; test -z "$outdated"'
+      - name: OS packages upgraded (debian)
+        if: matrix.image == 'bun-debian'
+        # Without `--error-on=any`, `apt-get update` only warns on an unreachable index and the check would pass on stale lists.
+        # `full-upgrade` also lists a fix that the Dockerfile's `upgrade` keeps back because it needs a new dependency.
+        run: |
+          docker run --rm --entrypoint sh contember-engine:ci -c \
+            'set -e; apt-get update --error-on=any >/dev/null; apt-get -s full-upgrade >/tmp/u; outdated=$(grep "^Inst" /tmp/u || true); echo "$outdated"; test -z "$outdated"'
       - name: Start engine
         run: |
           docker run --detach --name engine --network host \
@@ -226,6 +233,30 @@ jobs:
         run: |
           docker logs engine || true
           docker logs engine-cluster || true
+
+  cli-image:
+    # The CLI images are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack and no outdated OS package, and runs it.
+    needs: [ ]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [ bun, node ]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build image
+        run: docker build -f scripts/docker/cli-${{ matrix.image }}.dockerfile -t contember-cli:ci .
+      - name: No npm/corepack in the image
+        run: |
+          docker run --rm --entrypoint sh contember-cli:ci -c \
+            '! command -v npm && ! command -v npx && ! command -v corepack && test ! -e /usr/local/lib/node_modules/npm && test ! -e /usr/local/lib/node_modules/corepack'
+      - name: OS packages upgraded
+        # `apk update` fails on an unreachable index; `apk version` alone would print nothing and pass.
+        run: |
+          docker run --rm --entrypoint sh contember-cli:ci -c \
+            'set -e; apk update >/dev/null; apk version -l "<" >/tmp/v; outdated=$(tail -n +2 /tmp/v); echo "$outdated"; test -z "$outdated"'
+      - name: CLI runs
+        run: docker run --rm --network none contember-cli:ci version
 
   test-db:
     needs: [ ]

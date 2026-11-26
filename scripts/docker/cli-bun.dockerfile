@@ -9,6 +9,8 @@ RUN /src/scripts/cli-build/run.sh
 FROM oven/bun:1.4.5-alpine
 
 WORKDIR /src
+# The bun base image lags behind Alpine security fixes for OS packages (libssl3, libcrypto3, zlib, ...).
+RUN apk --no-cache upgrade
 ENV NODE_ENV "production"
 
 COPY --from=builder /src/dist/ /opt/contember/

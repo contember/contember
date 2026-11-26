@@ -11,7 +11,9 @@ FROM node:24-alpine
 WORKDIR /src
 # The engine only runs `node ./server.js`; the bundled package managers are unused and their dependencies show up in image scans.
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
-RUN apk --no-cache add curl ca-certificates \
+# The node base image lags behind Alpine security fixes for OS packages (libssl3, libcrypto3, zlib, ...).
+RUN apk --no-cache upgrade \
+    && apk --no-cache add curl ca-certificates \
     && curl -o /usr/local/share/ca-certificates/rds-combined-ca-bundle.crt https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
     && update-ca-certificates
 ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt

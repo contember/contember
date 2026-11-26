@@ -117,7 +117,7 @@ jobs:
         run: ./scripts/migrations/check-migration-order.sh "origin/${{ github.base_ref || github.event.repository.default_branch }}"
 
   engine-image:
-    # The node runtime images are otherwise built only on a tag. Builds each one, checks it carries no package manager,
+    # The node runtime images are otherwise built only on a tag. Builds each one, checks it carries no package manager (and, on alpine, no outdated OS package),
     # boots it on an empty PostgreSQL (tenant migrations) and migrates a project through it (system + content migrations).
     needs: [ ]
     timeout-minutes: 10
@@ -148,6 +148,11 @@ jobs:
         run: |
           docker run --rm --entrypoint sh contember-engine:ci -c \
             '! command -v npm && ! command -v npx && ! command -v corepack && test ! -e /usr/local/lib/node_modules/npm && test ! -e /usr/local/lib/node_modules/corepack'
+      - name: OS packages upgraded
+        if: matrix.image == 'node-alpine'
+        run: |
+          docker run --rm --entrypoint sh contember-engine:ci -c \
+            'outdated=$(apk --no-cache version -l "<" | tail -n +2); echo "$outdated"; test -z "$outdated"'
       - name: Start engine
         run: |
           docker run --detach --name engine --network host \

@@ -1,4 +1,4 @@
-FROM oven/bun:1.3.10 AS build
+FROM oven/bun:1.4.5 AS build
 WORKDIR /src
 COPY . /src
 RUN bun install --frozen-lockfile

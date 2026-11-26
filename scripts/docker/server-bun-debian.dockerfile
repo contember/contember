@@ -1,11 +1,11 @@
-FROM oven/bun:1.3.10-debian as builder
+FROM oven/bun:1.4.5-debian as builder
 
 WORKDIR /src
 COPY ./ ./
-RUN bun install
+RUN bun install --frozen-lockfile
 RUN /src/scripts/server-build/run.sh
 
-FROM oven/bun:1.3.10-debian
+FROM oven/bun:1.4.5-debian
 
 WORKDIR /src
 RUN apt-get update \

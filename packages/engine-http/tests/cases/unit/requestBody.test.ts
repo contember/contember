@@ -244,8 +244,10 @@ describe('request body middleware', () => {
 			await new Promise(resolve => setTimeout(resolve, 50))
 			socket.destroy()
 		}
-		await waitFor(() => errors.length >= 2)
-		expect(errors.map(it => [Reflect.get(it, 'status'), it.message])).toEqual([[400, 'request aborted'], [400, 'request aborted']])
+		// Node and Bun 1.4+ also report the dropped socket itself (HPE_INVALID_EOF_STATE); only the middleware's failures are asserted.
+		const bodyErrors = () => errors.filter(it => Reflect.get(it, 'code') !== 'HPE_INVALID_EOF_STATE')
+		await waitFor(() => bodyErrors().length >= 2)
+		expect(bodyErrors().map(it => [Reflect.get(it, 'status'), it.message])).toEqual([[400, 'request aborted'], [400, 'request aborted']])
 	})
 })
 

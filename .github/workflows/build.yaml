@@ -56,7 +56,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.14
+          bun-version: 1.4.5
       - name: Install deps
         run: |
           bun --version
@@ -87,7 +87,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.14
+          bun-version: 1.4.5
       - name: Install deps
         run: |
           bun --version
@@ -117,14 +117,14 @@ jobs:
         run: ./scripts/migrations/check-migration-order.sh "origin/${{ github.base_ref || github.event.repository.default_branch }}"
 
   engine-image:
-    # The node images and the bun alpine image are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack (and, on alpine, no outdated OS package),
-    # boots it on an empty PostgreSQL (tenant migrations) and migrates a project through it (system + content migrations).
+    # The engine images are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack (and, on alpine, no outdated OS package),
+    # boots it on an empty PostgreSQL (tenant migrations), migrates a project through it (system + content migrations) and boots it again with two cluster workers.
     needs: [ ]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [ node-alpine, node-debian, bun-alpine ]
+        image: [ node-alpine, node-debian, bun-alpine, bun-debian ]
     services:
       mailhog:
         image: mailhog/mailhog
@@ -178,7 +178,7 @@ jobs:
           test "$count" -gt 0
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.14
+          bun-version: 1.4.5
       - name: Install deps
         # pre-build generates the tenant client the e2e tester calls.
         run: |
@@ -191,9 +191,41 @@ jobs:
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
           CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
           MAILHOG_URL: "http://localhost:8025"
+      - name: Boot in cluster mode
+        # The master forks the workers and collects default metrics itself; "Contember API running" is logged only once every worker reported in.
+        run: |
+          docker stop engine
+          docker run --detach --name engine-cluster --network host \
+            -e DEFAULT_DB_HOST=127.0.0.1 \
+            -e DEFAULT_DB_PORT=5432 \
+            -e DEFAULT_DB_USER=postgres \
+            -e DEFAULT_DB_PASSWORD=postgres \
+            -e TENANT_DB_NAME=test_tenant \
+            -e CONTEMBER_ROOT_TOKEN=0000000000000000000000000000000000000000 \
+            -e CONTEMBER_LOGIN_TOKEN=1111111111111111111111111111111111111111 \
+            -e CONTEMBER_WORKER_COUNT=2 \
+            contember-engine:ci
+          for _ in $(seq 1 60); do
+            if docker logs engine-cluster 2>&1 | grep -q 'Contember API running'; then
+              workers=$(docker logs engine-cluster 2>&1 | grep -c 'Starting worker')
+              echo "workers started: $workers"
+              test "$workers" -eq 2
+              curl --silent --fail --output /dev/null localhost:4000/
+              metrics=$(curl --silent --fail localhost:4001/metrics)
+              grep -q '^contember_info' <<<"$metrics"
+              exit 0
+            fi
+            # a master that crashed at boot does not come back
+            test "$(docker inspect --format '{{.State.Running}}' engine-cluster)" = true || break
+            sleep 1
+          done
+          docker logs engine-cluster
+          exit 1
       - name: Engine logs
         if: always()
-        run: docker logs engine || true
+        run: |
+          docker logs engine || true
+          docker logs engine-cluster || true
 
   test-db:
     needs: [ ]
@@ -227,7 +259,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
         with:
-            bun-version: 1.3.14
+            bun-version: 1.4.5
       - name: Install deps
         run: |
           bun --version

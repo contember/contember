@@ -1,9 +1,9 @@
-FROM oven/bun:1.3.10-alpine as builder
+FROM oven/bun:1.4.5-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
 RUN apk add --no-cache bash
-RUN bun install
+RUN bun install --frozen-lockfile
 RUN /src/scripts/cli-build/run.sh --esbuild
 
 FROM node:24-alpine

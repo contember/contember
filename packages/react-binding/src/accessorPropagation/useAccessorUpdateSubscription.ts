@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export const useAccessorUpdateSubscription = <
 	Accessor extends {
 		addEventListener: (event: { type: 'update' }, cb: (accessor: Accessor) => void) => () => void
+		getAccessor: () => Accessor
 	},
 >(getAccessor: () => Accessor): [Accessor, { update: () => void }] => {
 	const [state, setState] = useState<Accessor>(() => getAccessor())
@@ -18,20 +19,25 @@ export const useAccessorUpdateSubscription = <
 		getterRef.current = getAccessor
 	}
 
+	// A state node's getter is stable, so this changes exactly when `getAccessor` resolves to another node.
+	const getSubscribedAccessor = accessor.getAccessor
+
 	useEffect(() => {
 		let isStillSubscribed = true
-		const unsubscribe = getAccessor().addEventListener({ type: 'update' }, newAccessor => {
+		const unsubscribe = getSubscribedAccessor().addEventListener({ type: 'update' }, newAccessor => {
 			if (!isStillSubscribed || getterRef.current !== getAccessor) {
 				return
 			}
 			setState(newAccessor)
 		})
+		// Catches up with updates that landed between the render and this subscription.
+		setState(getAccessor())
 
 		return () => {
 			isStillSubscribed = false
 			unsubscribe()
 		}
-	}, [getAccessor])
+	}, [getAccessor, getSubscribedAccessor])
 
 	const update = useCallback(() => {
 		setState(getAccessor())

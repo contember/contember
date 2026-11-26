@@ -3,7 +3,7 @@ FROM oven/bun:1.4.5-alpine as builder
 WORKDIR /src
 COPY ./ ./
 RUN apk add --no-cache bash
-RUN bun install
+RUN bun install --frozen-lockfile
 RUN /src/scripts/cli-build/run.sh
 
 FROM oven/bun:1.4.5-alpine

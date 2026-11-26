@@ -10,7 +10,9 @@ FROM node:24
 WORKDIR /src
 # The engine only runs `node ./server.js`; the bundled package managers are unused and their dependencies show up in image scans.
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
+# The node base image lags behind Debian security fixes for OS packages (libpam0g, librsvg2-2, ...).
 RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends ca-certificates curl \
     && curl -o /usr/local/share/ca-certificates/rds-combined-ca-bundle.crt https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
     && update-ca-certificates \

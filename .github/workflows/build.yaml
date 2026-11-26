@@ -117,7 +117,7 @@ jobs:
         run: ./scripts/migrations/check-migration-order.sh "origin/${{ github.base_ref || github.event.repository.default_branch }}"
 
   engine-image:
-    # The engine images are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack (and, on alpine and bun-debian, no outdated OS package),
+    # The engine images are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack (and no outdated OS package),
     # boots it on an empty PostgreSQL (tenant migrations), migrates a project through it (system + content migrations) and boots it again with two cluster workers.
     needs: [ ]
     timeout-minutes: 10
@@ -155,7 +155,7 @@ jobs:
           docker run --rm --entrypoint sh contember-engine:ci -c \
             'set -e; apk update >/dev/null; apk version -l "<" >/tmp/v; outdated=$(tail -n +2 /tmp/v); echo "$outdated"; test -z "$outdated"'
       - name: OS packages upgraded (debian)
-        if: matrix.image == 'bun-debian'
+        if: endsWith(matrix.image, '-debian')
         # Without `--error-on=any`, `apt-get update` only warns on an unreachable index and the check would pass on stale lists.
         # `full-upgrade` also lists a fix that the Dockerfile's `upgrade` keeps back because it needs a new dependency.
         run: |

@@ -1,7 +1,20 @@
 import { afterEach, describe, expect, it } from 'bun:test'
 import { screen } from '@testing-library/react'
 import { c, createSchema } from '@contember/schema-definition'
-import { Component, EntitySubTree, Field, HasMany, HasOne, useEntity, useEntityList, useField } from '../../../../src/index.js'
+import { ReactNode, useCallback } from 'react'
+import {
+	Component,
+	EntitySubTree,
+	Field,
+	HasMany,
+	HasOne,
+	useAccessorUpdateSubscription,
+	useEntity,
+	useEntityKey,
+	useEntityList,
+	useField,
+	useGetEntityByKey,
+} from '../../../../src/index.js'
 import { convertModelToAdminSchema } from '../../../lib/convertModelToAdminSchema.js'
 import { BindingHarness, createBindingHarness } from '../../../lib/harness/index.js'
 
@@ -86,7 +99,15 @@ const EntityListProbe = Component(
 
 const page = (id: string, url: string, blockId: string, label: string) => ({ id, url, blocks: [{ id: blockId, label }] })
 
-const mount = () =>
+const probes = (
+	<>
+		<FieldProbe />
+		<EntityProbe />
+		<EntityListProbe />
+	</>
+)
+
+const mount = (itemChildren: ReactNode = probes) =>
 	createBindingHarness({
 		schema,
 		data: {
@@ -97,9 +118,7 @@ const mount = () =>
 		node: (
 			<>
 				<EntitySubTree entity={`Item(id = '${itemId}')`} alias="item">
-					<FieldProbe />
-					<EntityProbe />
-					<EntityListProbe />
+					{itemChildren}
 				</EntitySubTree>
 				<EntitySubTree entity={`Link(id = '${linkBId}')`} alias="linkB">
 					<HasOne field="target">{pageFields}</HasOne>
@@ -163,7 +182,19 @@ describe('hooks resolving a path through a reconnected has-one relation', () => 
 		expect(rendered()).toEqual({ field: 'null', entity: 'null', list: '' })
 	})
 
-	// Passes on the old code too: a reconnected relation keeps refiring connectionUpdate on later updates, which masks a stale listener.
+	it('follow edits made in the same update as the reconnect', async () => {
+		const h = (harness = await mount())
+		await h.update(() => {
+			const link = h.getEntity('item').getEntity('link')
+			link.connectEntityAtField('target', h.getEntity('pageB'))
+			const target = link.getEntity('target')
+			target.getField('url').updateValue('B2')
+			target.getEntityList('blocks').getChildEntityById(blockBId).getField('label').updateValue('b2')
+		})
+
+		expect(rendered()).toEqual({ field: 'B2', entity: 'B2', list: 'b2' })
+	})
+
 	it('follow a reconnect of the first relation and then of the second one', async () => {
 		const h = (harness = await mount())
 		await h.update(() => {
@@ -176,5 +207,74 @@ describe('hooks resolving a path through a reconnected has-one relation', () => 
 		})
 
 		expect(rendered()).toEqual({ field: 'B', entity: 'B', list: 'b' })
+	})
+})
+
+describe('connectionUpdate of a reconnected has-one relation', () => {
+	it('fires once per reconnect, not on later updates through the same entity', async () => {
+		const h = (harness = await mount())
+		let connectionUpdates = 0
+		h.getEntity('item').getEntity('link').addEventListener({ type: 'connectionUpdate', key: 'target' }, () => {
+			connectionUpdates++
+		})
+
+		await h.update(() => {
+			h.getEntity('item').getEntity('link').connectEntityAtField('target', h.getEntity('pageB'))
+		})
+		expect(connectionUpdates).toBe(1)
+
+		await h.update(() => {
+			h.getEntity('item').getEntity('link').getEntity('target').getField('url').updateValue('B2')
+		})
+		expect(connectionUpdates).toBe(1)
+
+		await h.update(() => {
+			h.getEntity('item').getEntity('link').disconnectEntityAtField('target')
+		})
+		expect(connectionUpdates).toBe(2)
+	})
+})
+
+describe('useAccessorUpdateSubscription', () => {
+	// Kept outside React so the test can ask the probe to re-resolve its getter, as a connectionUpdate listener would.
+	let refreshProbe: (() => void) | undefined
+	afterEach(() => {
+		refreshProbe = undefined
+	})
+
+	const SubscriptionProbe = Component(
+		() => {
+			const entityKey = useEntityKey()
+			const getEntityByKey = useGetEntityByKey()
+			const getUrl = useCallback(() => getEntityByKey(entityKey).getField<string>('link.target.url'), [entityKey, getEntityByKey])
+			const [url, { update }] = useAccessorUpdateSubscription(getUrl)
+			refreshProbe = update
+			return <span data-testid="subscription">{url.value ?? 'null'}</span>
+		},
+		() => (
+			<HasOne field="link">
+				<HasOne field="target">
+					<Field field="url" />
+				</HasOne>
+			</HasOne>
+		),
+	)
+
+	it('follows updates of the accessor the getter resolves to now, not of the one from mount', async () => {
+		const h = (harness = await mount(<SubscriptionProbe />))
+		await h.update(() => {
+			h.getEntity('item').getEntity('link').connectEntityAtField('target', h.getEntity('pageB'))
+			if (refreshProbe === undefined) {
+				throw new Error('SubscriptionProbe has not rendered.')
+			}
+			refreshProbe()
+		})
+		expect(screen.getByTestId('subscription').textContent).toBe('B')
+
+		await h.update(() => {
+			h.getEntity('item').getEntity('link').getEntity('target').getField('url').updateValue('B2')
+		})
+
+		expect(screen.getByTestId('subscription').textContent).toBe('B2')
 	})
 })

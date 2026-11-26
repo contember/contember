@@ -692,6 +692,7 @@ export const useAccessorUpdateSubscription: <Accessor extends {
     addEventListener: (event: {
         type: 'update';
     }, cb: (accessor: Accessor) => void) => () => void;
+    getAccessor: () => Accessor;
 }>(getAccessor: () => Accessor) => [Accessor, {
     update: () => void;
 }];

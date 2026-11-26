@@ -117,14 +117,14 @@ jobs:
         run: ./scripts/migrations/check-migration-order.sh "origin/${{ github.base_ref || github.event.repository.default_branch }}"
 
   engine-image:
-    # The node runtime images are otherwise built only on a tag. Builds each one, checks it carries no package manager (and, on alpine, no outdated OS package),
+    # The node images and the bun alpine image are otherwise built only on a tag. Builds each one, checks it carries no npm/corepack (and, on alpine, no outdated OS package),
     # boots it on an empty PostgreSQL (tenant migrations) and migrates a project through it (system + content migrations).
     needs: [ ]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [ node-alpine, node-debian ]
+        image: [ node-alpine, node-debian, bun-alpine ]
     services:
       mailhog:
         image: mailhog/mailhog
@@ -144,12 +144,12 @@ jobs:
       - uses: actions/checkout@v5
       - name: Build image
         run: docker build -f scripts/docker/server-${{ matrix.image }}.dockerfile -t contember-engine:ci .
-      - name: No package manager in the image
+      - name: No npm/corepack in the image
         run: |
           docker run --rm --entrypoint sh contember-engine:ci -c \
             '! command -v npm && ! command -v npx && ! command -v corepack && test ! -e /usr/local/lib/node_modules/npm && test ! -e /usr/local/lib/node_modules/corepack'
       - name: OS packages upgraded
-        if: matrix.image == 'node-alpine'
+        if: endsWith(matrix.image, '-alpine')
         # `apk update` fails on an unreachable index; `apk version` alone would print nothing and pass.
         run: |
           docker run --rm --entrypoint sh contember-engine:ci -c \

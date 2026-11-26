@@ -24,6 +24,25 @@ import { maskRequestBody, maskRequestUri } from './requestBodyMasking.js'
 
 const websocketCloseTimeoutMs = 5_000
 
+const clientDisconnectCodes: ReadonlySet<string> = new Set(['ECONNRESET', 'ECONNABORTED', 'EPIPE'])
+
+/**
+ * The code of an error from a client that dropped the connection or sent bytes the HTTP parser rejects (llhttp's
+ * `HPE_*` codes, e.g. a body cut short); `undefined` for any other error.
+ */
+const getClientConnectionErrorCode = (error: unknown, request: IncomingMessage | undefined): string | undefined => {
+	if (!(error instanceof Error) || !('code' in error) || typeof error.code !== 'string') {
+		return undefined
+	}
+	const isConnectionCode = error.code.startsWith('HPE_') || clientDisconnectCodes.has(error.code)
+	// outgoing requests fail with the same codes; only those of a client whose socket is gone are the client's
+	return isConnectionCode && request?.socket.destroyed === true ? error.code : undefined
+}
+
+/** Koa's default handler skips these as well: an HTTP error meant for the client, already sent as the response. */
+const isClientHttpError = (error: unknown): boolean =>
+	error instanceof Error && (('status' in error && error.status === 404) || ('expose' in error && error.expose === true))
+
 type Route<C> = { match: RequestMatcher; controller: C; module: string; mask: string; carriesCredentials: boolean }
 
 export type RouteOptions = {
@@ -95,6 +114,8 @@ export class Application {
 
 	async listen(): Promise<RunningApplication> {
 		const koa = new Koa()
+		// replaces Koa's default handler, which prints the stack of every error to stderr
+		koa.on('error', (error: unknown, ctx: { req: IncomingMessage } | undefined) => this.logKoaError(error, ctx?.req))
 		const wss = new WebSocketServer({ noServer: true })
 		let closing = false
 		koa.use(async (ctx, next) => {
@@ -572,6 +593,19 @@ export class Application {
 				+ '\r\n\r\n'
 				+ (response.body ?? ''),
 		)
+	}
+
+	private logKoaError(error: unknown, request: IncomingMessage | undefined): void {
+		if (isClientHttpError(error)) {
+			return
+		}
+		const clientErrorCode = getClientConnectionErrorCode(error, request)
+		if (clientErrorCode !== undefined) {
+			// the code says it all; the stack only shows Node's HTTP internals
+			this.logger.debug('Client closed the connection or sent a malformed request', { code: clientErrorCode })
+			return
+		}
+		this.logger.error(error)
 	}
 
 	/** `loggedBody` must already be masked (`maskRequestBody`): it reaches logs and error reports. */

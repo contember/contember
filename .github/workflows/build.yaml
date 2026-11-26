@@ -150,9 +150,10 @@ jobs:
             '! command -v npm && ! command -v npx && ! command -v corepack && test ! -e /usr/local/lib/node_modules/npm && test ! -e /usr/local/lib/node_modules/corepack'
       - name: OS packages upgraded
         if: matrix.image == 'node-alpine'
+        # `apk update` fails on an unreachable index; `apk version` alone would print nothing and pass.
         run: |
           docker run --rm --entrypoint sh contember-engine:ci -c \
-            'outdated=$(apk --no-cache version -l "<" | tail -n +2); echo "$outdated"; test -z "$outdated"'
+            'set -e; apk update >/dev/null; outdated=$(apk version -l "<" | tail -n +2); echo "$outdated"; test -z "$outdated"'
       - name: Start engine
         run: |
           docker run --detach --name engine --network host \

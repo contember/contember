@@ -61,7 +61,9 @@ test('a client that drops the connection mid-upload is logged at debug level, wi
 	const isParseError = (entry: LogEntry) => entry.ownAttributes.code === 'HPE_INVALID_EOF_STATE'
 	await waitFor(() => consoleError.mock.calls.length > 0 || logs.messages.some(isParseError))
 	expect(consoleError).not.toHaveBeenCalled()
-	expect(logs.messages.filter(isParseError).map(it => [it.level.name, it.error])).toEqual([['debug', undefined]])
+	expect(logs.messages.filter(isParseError).map(it => [it.level.name, it.error, it.ownAttributes])).toEqual([
+		['debug', undefined, { method: 'POST', uri: '/upload', code: 'HPE_INVALID_EOF_STATE' }],
+	])
 	expect(logs.messages.filter(it => it.level.name !== 'debug')).toEqual([])
 })
 
@@ -80,8 +82,9 @@ const loggedErrors = async (): Promise<unknown[]> => {
 }
 
 test('any other error that reaches Koa is still logged as an error', async () => {
-	expect(await requestStatus('/failing-middleware')).toBe(500)
+	expect(await requestStatus('/failing-middleware?token=secret')).toBe(500)
 	expect(await loggedErrors()).toEqual(['middleware failed'])
+	expect(logs.messages.find(it => it.level.name === 'error')?.ownAttributes).toEqual({ method: 'GET', uri: '/failing-middleware?[redacted]' })
 })
 
 test('a connection error of an outgoing call is still logged as an error while the client stays connected', async () => {

@@ -599,13 +599,15 @@ export class Application {
 		if (isClientHttpError(error)) {
 			return
 		}
+		// the route is not known here, so the query is masked as if it carried credentials
+		const requestAttributes = { method: request?.method, uri: maskRequestUri(request?.url, true) }
 		const clientErrorCode = getClientConnectionErrorCode(error, request)
 		if (clientErrorCode !== undefined) {
 			// the code says it all; the stack only shows Node's HTTP internals
-			this.logger.debug('Client closed the connection or sent a malformed request', { code: clientErrorCode })
+			this.logger.debug('Client closed the connection or sent a malformed request', { ...requestAttributes, code: clientErrorCode })
 			return
 		}
-		this.logger.error(error)
+		this.logger.error(error, requestAttributes)
 	}
 
 	/** `loggedBody` must already be masked (`maskRequestBody`): it reaches logs and error reports. */

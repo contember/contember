@@ -238,6 +238,9 @@ describe('connectionUpdate of a reconnected has-one relation', () => {
 describe('useAccessorUpdateSubscription', () => {
 	// Kept outside React so the test can ask the probe to re-resolve its getter, as a connectionUpdate listener would.
 	let refreshProbe: (() => void) | undefined
+	afterEach(() => {
+		refreshProbe = undefined
+	})
 
 	const SubscriptionProbe = Component(
 		() => {
@@ -261,7 +264,10 @@ describe('useAccessorUpdateSubscription', () => {
 		const h = (harness = await mount(<SubscriptionProbe />))
 		await h.update(() => {
 			h.getEntity('item').getEntity('link').connectEntityAtField('target', h.getEntity('pageB'))
-			refreshProbe?.()
+			if (refreshProbe === undefined) {
+				throw new Error('SubscriptionProbe has not rendered.')
+			}
+			refreshProbe()
 		})
 		expect(screen.getByTestId('subscription').textContent).toBe('B')
 

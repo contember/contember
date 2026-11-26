@@ -2,9 +2,9 @@ import { useConstantLengthInvariant, useConstantValueInvariant } from '@contembe
 import { useCallback } from 'react'
 import { useEntityKey, useGetEntityByKey } from './index.js'
 import type { FieldAccessor } from '@contember/binding'
-import { useOnConnectionUpdate } from '../entityEvents/index.js'
 import type { FieldValue, SugaredRelativeSingleField } from '@contember/binding'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription.js'
+import { useOnHasOneRelationPathConnectionUpdate } from './useOnHasOneRelationPathConnectionUpdate.js'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField.js'
 
 function useField<Value extends FieldValue = FieldValue>(
@@ -36,9 +36,7 @@ function useField<Value extends FieldValue = FieldValue>(
 		)
 		const [field, { update }] = useAccessorUpdateSubscription(getField)
 
-		if (relativeSingleField.hasOneRelationPath.length) {
-			useOnConnectionUpdate(relativeSingleField.hasOneRelationPath[0].field, update)
-		}
+		useOnHasOneRelationPathConnectionUpdate(relativeSingleField.hasOneRelationPath, update)
 
 		return field
 	}

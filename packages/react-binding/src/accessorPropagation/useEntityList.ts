@@ -2,9 +2,9 @@ import { useConstantLengthInvariant, useConstantValueInvariant } from '@contembe
 import { useCallback } from 'react'
 import { useEntityKey, useGetEntityByKey } from './index.js'
 import type { EntityListAccessor } from '@contember/binding'
-import { useOnConnectionUpdate } from '../entityEvents/index.js'
 import type { SugaredRelativeEntityList } from '@contember/binding'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription.js'
+import { useOnHasOneRelationPathConnectionUpdate } from './useOnHasOneRelationPathConnectionUpdate.js'
 import { useDesugaredRelativeEntityList } from './useDesugaredRelativeEntityList.js'
 
 function useEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): EntityListAccessor
@@ -34,9 +34,7 @@ function useEntityList(
 		)
 		const [entityList, { update }] = useAccessorUpdateSubscription(getEntityList)
 
-		if (relativeEntityList.hasOneRelationPath.length) {
-			useOnConnectionUpdate(relativeEntityList.hasOneRelationPath[0].field, update)
-		}
+		useOnHasOneRelationPathConnectionUpdate(relativeEntityList.hasOneRelationPath, update)
 
 		return entityList
 	}

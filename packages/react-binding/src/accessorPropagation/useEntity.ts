@@ -2,9 +2,9 @@ import { useConstantLengthInvariant, useConstantValueInvariant } from '@contembe
 import { useCallback } from 'react'
 import { useEntityKey, useGetEntityByKey } from './index.js'
 import type { EntityAccessor } from '@contember/binding'
-import { useOnConnectionUpdate } from '../entityEvents/index.js'
 import type { SugaredRelativeSingleEntity } from '@contember/binding'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription.js'
+import { useOnHasOneRelationPathConnectionUpdate } from './useOnHasOneRelationPathConnectionUpdate.js'
 import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity.js'
 
 function useEntity(): EntityAccessor
@@ -37,9 +37,7 @@ function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undef
 		)
 		const [entity, { update }] = useAccessorUpdateSubscription(getEntity)
 
-		if (relativeSingleEntity.hasOneRelationPath.length) {
-			useOnConnectionUpdate(relativeSingleEntity.hasOneRelationPath[0].field, update)
-		}
+		useOnHasOneRelationPathConnectionUpdate(relativeSingleEntity.hasOneRelationPath, update)
 
 		return entity
 	}

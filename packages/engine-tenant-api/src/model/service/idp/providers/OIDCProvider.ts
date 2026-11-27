@@ -187,17 +187,23 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 			configuration.timeout,
 			flow,
 		])
-		let client = this.clients.get(key)
-		if (!client) {
-			client = this.discover(configuration, flow)
-			this.clients.set(key, client)
-			// every configuration change (a rotated secret, a new timeout) adds a key; drop the oldest
-			if (this.clients.size > MAX_CACHED_CLIENTS) {
-				const [oldest] = this.clients.keys()
-				this.clients.delete(oldest)
-			}
+		const cached = this.clients.get(key)
+		// re-inserted on every use, so the map's order is least recently used first
+		this.clients.delete(key)
+		const client = cached ?? this.discover(configuration, flow)
+		this.clients.set(key, client)
+		if (cached === undefined) {
 			// a failed discovery is retried on the next call
-			client.catch(() => this.clients.delete(key))
+			client.catch(() => {
+				if (this.clients.get(key) === client) {
+					this.clients.delete(key)
+				}
+			})
+		}
+		// every configuration change (a rotated secret, a new timeout) adds a key
+		if (this.clients.size > MAX_CACHED_CLIENTS) {
+			const [leastRecentlyUsed] = this.clients.keys()
+			this.clients.delete(leastRecentlyUsed)
 		}
 		return await client
 	}

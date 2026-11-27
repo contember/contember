@@ -257,11 +257,13 @@ export const initOIDCAuth = (
 	client: Configuration,
 	{ redirectUrl, scope, responseMode, responseType }: { redirectUrl: string; scope?: string; responseMode?: string; responseType: string },
 ): InitIDPAuthResult & { sessionData: { nonce: string; state: string } } => {
+	// the token request sends redirect_uri as the parsed callback URL without query and fragment; a redirect URL in any
+	// other form would differ from the authorization request's and fail only after the user signed in at the IdP
 	const redirect = parseUrl(redirectUrl, 'redirectUrl')
-	// the token request derives redirect_uri from the callback URL stripped of query and fragment, so a redirect URL
-	// carrying either would differ from the authorization request's and fail only after the user signed in at the IdP
-	if (flowOfResponseType(responseType) !== 'implicit' && (redirect.search !== '' || redirect.hash !== '')) {
-		throw new IDPValidationError('redirectUrl must not carry a query or a fragment for a response type with a code')
+	redirect.search = ''
+	redirect.hash = ''
+	if (flowOfResponseType(responseType) !== 'implicit' && redirect.href !== redirectUrl) {
+		throw new IDPValidationError(`redirectUrl must be a URL without a query or a fragment, in its normalized form: ${redirect.href}`)
 	}
 	const nonce = randomNonce()
 	const state = randomState()
@@ -454,8 +456,9 @@ const CALLBACK_PARAMETERS: readonly string[] = [
 	'token_type',
 ]
 
+/** An empty value counts as absent, as openid-client reads it: an empty `error` is no error response. */
 const callbackParameters = (params: Record<string, string>): Record<string, string> =>
-	Object.fromEntries(Object.entries(params).filter(([key]) => CALLBACK_PARAMETERS.includes(key)))
+	Object.fromEntries(Object.entries(params).filter(([key, value]) => CALLBACK_PARAMETERS.includes(key) && value !== ''))
 
 const parseUrl = (value: string, name: string): URL => {
 	if (!URL.canParse(value)) {
@@ -502,13 +505,21 @@ const hashAlgorithmOf = (jwsAlg: string): string => {
 	throw new IDPValidationError(`unsupported ID token algorithm ${jwsAlg}`)
 }
 
+/** The header algorithm and `at_hash` of an ID token not yet validated: malformed input is the callback's fault. */
+const decodeIdToken = (idToken: string): { alg: string | undefined; at_hash: unknown } => {
+	try {
+		return { alg: decodeProtectedHeader(idToken).alg, at_hash: decodeJwt(idToken).at_hash }
+	} catch (e) {
+		throw new IDPValidationError(`malformed id_token: ${e instanceof Error ? e.message : String(e)}`)
+	}
+}
+
 /**
  * Binds an access token from the authorization response to the ID token beside it (OIDC Core 3.2.2.9). openid-client 6
  * does not support response types that return an access token there, so it checks the ID token but not this hash.
  */
 const assertAccessTokenHash = (idToken: string, accessToken: string): void => {
-	const { alg } = decodeProtectedHeader(idToken)
-	const { at_hash } = decodeJwt(idToken)
+	const { alg, at_hash } = decodeIdToken(idToken)
 	if (typeof at_hash !== 'string') {
 		throw new IDPValidationError('missing required property at_hash')
 	}
@@ -549,7 +560,11 @@ const errorInBody = async (response: Response): Promise<string | undefined> => {
 
 const challengeError = (e: WWWAuthenticateChallengeError): string | undefined => e.cause.map(it => it.parameters.error).find(it => it !== undefined)
 
+/** Only a 4xx carries an OAuth error (RFC 6749 §5.2, RFC 6750 §3.1); a 5xx is the IdP failing, whatever its body says. */
 const errorCodeInBody = async (response: Response): Promise<string | undefined> => {
+	if (response.status < 400 || response.status >= 500) {
+		return undefined
+	}
 	try {
 		const body: unknown = await response.clone().json()
 		return typeof body === 'object' && body !== null && 'error' in body && typeof body.error === 'string' ? body.error : undefined
@@ -630,7 +645,10 @@ const completeAuthorization = async (
 		if (params.access_token !== undefined) {
 			assertAccessTokenHash(params.id_token, params.access_token)
 		}
-		return { claims, tokens: tokenSetOfParameters(params) }
+		// expires_in comes from the user's own callback; unbounded, it would postpone revalidation at will
+		const tokens = tokenSetOfParameters(params)
+		const expiresAt = tokens.expires_at !== undefined ? Math.min(tokens.expires_at, claims.exp) : undefined
+		return { claims, tokens: { ...tokens, ...(expiresAt !== undefined ? { expires_at: expiresAt } : {}) } }
 	}
 	// an error response is checked for state and issuer and thrown; no code is exchanged, so no redirect URL is needed
 	const base = redirectUrl ?? (params.error !== undefined ? 'about:blank' : undefined)

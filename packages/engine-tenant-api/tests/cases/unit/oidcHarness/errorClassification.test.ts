@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
+import { decodeJwt } from 'jose'
 import { ClientError, ResponseBodyError, WWWAuthenticateChallengeError } from 'openid-client'
 import { IDPSessionState } from '../../../../src/model/service/idp/IdentityProviderHandler.js'
 import { IDPResponseError } from '../../../../src/model/service/idp/IDPResponseError.js'
@@ -116,6 +117,8 @@ describe('OIDC failure classification', () => {
 			['401 invalid_client', respond(401, { error: 'invalid_client' }), bodyError('invalid_client')],
 			['400 unauthorized_client', respond(400, { error: 'unauthorized_client' }), bodyError('unauthorized_client')],
 			['503 temporarily_unavailable', respond(503, { error: 'temporarily_unavailable' }), notConform(503)],
+			// a 5xx is the IdP failing, whatever error code its body names
+			['503 with an invalid_grant body', respond(503, { error: 'invalid_grant' }), notConform(503)],
 			['500 with a plain-text body', respond(500, 'boom'), notConform(500)],
 			['400 with a non-standard JSON error object', respond(400, { error: { message: 'bad refresh token' } }), notConform(400)],
 			['200 without a body', respond(200), [ClientError, { code: 'OAUTH_INVALID_RESPONSE' }]],
@@ -194,6 +197,12 @@ describe('OIDC failure classification', () => {
 				[WWWAuthenticateChallengeError, { status: 403 }],
 			],
 			['500', respond(500, 'boom'), notConform(500)],
+			['500 with an invalid_token body', respond(500, { error: 'invalid_token' }), notConform(500)],
+			[
+				'503 with an invalid_token challenge body',
+				respond(503, { error: 'invalid_token' }, { 'www-authenticate': 'Bearer realm="idp"' }),
+				[WWWAuthenticateChallengeError, { status: 503 }],
+			],
 		]
 
 		test.each(transient)('%s: thrown, session kept', async (_, override, [errorClass, identity]) => {
@@ -344,9 +353,13 @@ describe('OIDC failure classification', () => {
 		})
 
 		test.each<[NonNullable<OIDCConfiguration['responseType']>, string, string]>([
-			['code', `${REDIRECT_URL}?tenant=a`, 'redirectUrl must not carry a query or a fragment'],
-			['code', `${REDIRECT_URL}#/login`, 'redirectUrl must not carry a query or a fragment'],
-			['code id_token', `${REDIRECT_URL}?tenant=a`, 'redirectUrl must not carry a query or a fragment'],
+			['code', `${REDIRECT_URL}?tenant=a`, `normalized form: ${REDIRECT_URL}`],
+			['code', `${REDIRECT_URL}#/login`, `normalized form: ${REDIRECT_URL}`],
+			['code', `${REDIRECT_URL}?`, `normalized form: ${REDIRECT_URL}`],
+			['code', `${REDIRECT_URL}#`, `normalized form: ${REDIRECT_URL}`],
+			['code', 'https://app.example.com', 'normalized form: https://app.example.com/'],
+			['code', 'HTTPS://App.Example.com/callback', `normalized form: ${REDIRECT_URL}`],
+			['code id_token', `${REDIRECT_URL}?tenant=a`, `normalized form: ${REDIRECT_URL}`],
 			['code', 'not a url', 'redirectUrl is not a valid URL'],
 		])('initAuth for %s with redirectUrl %s: IDPValidationError before the redirect', async (responseType, redirectUrl, message) => {
 			const promise = new OIDCProvider(null, null).initAuth(configurationFor(idp, { responseType }), { redirectUrl })
@@ -375,6 +388,57 @@ describe('OIDC failure classification', () => {
 
 			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
 			await expect(promise).rejects.toThrow(message)
+		})
+
+		test('an empty error parameter is no error response: strictResponseType still refuses a bare id_token for code', async () => {
+			const provider = new OIDCProvider(null, signer)
+			const configuration = configurationFor(idp, { strictResponseType: true })
+			const init = await startSignIn(provider, configuration)
+			const authUrl = new URL(init.authUrl)
+			authUrl.searchParams.set('response_type', 'id_token')
+			const authorization = await idp.authorize(authUrl.href)
+
+			const promise = provider.processResponse(configuration, {
+				parameters: { ...authorization.parameters, error: '' },
+				sessionData: init.sessionData,
+			})
+
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow('id_token not expected for response type "code"')
+			expect(idp.requestsTo('token')).toHaveLength(0)
+		})
+
+		test('an implicit expires_in beyond the ID token: the session expires with the ID token', async () => {
+			const provider = new OIDCProvider(null, null)
+			const configuration = configurationFor(idp, { responseType: 'id_token token', revalidation: { enabled: true } })
+			const init = await startSignIn(provider, configuration)
+			const authorization = await idp.authorize(init.authUrl)
+
+			const response = await provider.processResponse(configuration, {
+				parameters: { ...authorization.parameters, expires_in: '999999999' },
+				redirectUrl: REDIRECT_URL,
+				sessionData: init.sessionData,
+			})
+
+			const { exp } = decodeJwt(authorization.parameters.id_token)
+			expect(exp).toBeNumber()
+			expect(response.idpSession?.expiresAt).toEqual(new Date((exp ?? 0) * 1000))
+		})
+
+		test('a malformed id_token beside an access token: IDPValidationError', async () => {
+			const provider = new OIDCProvider(null, null)
+			const configuration = configurationFor(idp, { responseType: 'code id_token token' })
+			const init = await startSignIn(provider, configuration)
+			const authorization = await idp.authorize(init.authUrl)
+
+			const promise = provider.processResponse(configuration, {
+				parameters: { ...authorization.parameters, id_token: 'garbage' },
+				redirectUrl: REDIRECT_URL,
+				sessionData: init.sessionData,
+			})
+
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow('malformed id_token')
 		})
 
 		const tampered = async (change: (it: { parameters: Record<string, string>; sessionData: Record<string, string> }) => void) => {

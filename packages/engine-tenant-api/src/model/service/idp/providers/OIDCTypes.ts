@@ -1,5 +1,4 @@
 import * as Typesafe from '@contember/typesafe'
-import { ClientAuthMethod, ResponseType } from 'openid-client'
 import { IDPRevalidationConfig } from '../IDPRevalidation.js'
 
 export interface OIDCSessionData {
@@ -45,7 +44,7 @@ export const OIDCClaimMapping = Typesafe.partial({
 export type OIDCClaimMapping = ReturnType<typeof OIDCClaimMapping>
 
 export const OIDCConfigurationOptions = Typesafe.partial({
-	responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
+	responseType: Typesafe.enumeration('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
 	claims: Typesafe.string, // deprecated, use scope instead
 	scope: Typesafe.string,
 	additionalAuthorizedParties: Typesafe.array(Typesafe.string),
@@ -56,11 +55,12 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	 */
 	strictResponseType: Typesafe.boolean,
 	/**
-	 * How the client authenticates to the token endpoint. `openid-client` defaults to
-	 * `client_secret_basic`; set `client_secret_post` for providers (e.g. some Apereo CAS
-	 * registrations) that only accept the secret in the request body.
+	 * How the client authenticates to the token endpoint. The default is `client_secret_basic`,
+	 * or `client_secret_post` when the IdP advertises only that one; set `client_secret_post` for
+	 * providers (e.g. some Apereo CAS registrations) that only accept the secret in the request body.
+	 * `private_key_jwt` is refused at sign-in: a configuration holds no client key.
 	 */
-	tokenEndpointAuthMethod: Typesafe.enumeration<ClientAuthMethod>(
+	tokenEndpointAuthMethod: Typesafe.enumeration(
 		'client_secret_basic',
 		'client_secret_post',
 		'client_secret_jwt',

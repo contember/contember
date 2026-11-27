@@ -3,13 +3,15 @@ import { EgressGuard, EgressPolicy } from '@contember/engine-common'
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { FakeIdp, FakeIdpOptions } from './FakeIdp.js'
-import { configurationFor, signIn } from './harness.js'
+import { configurationFor, signIn, useRuntimeGlobals } from './harness.js'
 
 /**
  * Pins how discovery and ID-token issuer validation treat IdPs whose `issuer` differs from the configured URL:
  * trailing slashes, path-based realms and templated multi-tenant issuers.
  */
 describe('OIDC issuer quirks', () => {
+	useRuntimeGlobals()
+
 	const started: FakeIdp[] = []
 	const start = async (options: FakeIdpOptions) => {
 		const idp = await FakeIdp.start(options)
@@ -59,7 +61,7 @@ describe('OIDC issuer quirks', () => {
 		const promise = signIn(new OIDCProvider(null, null), configurationFor(idp), idp)
 
 		await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
-		await expect(promise).rejects.toThrow(`unexpected iss value, expected ${idp.baseUrl}/, got: ${idp.baseUrl}`)
+		await expect(promise).rejects.toThrow('unexpected JWT "iss" (issuer) claim value')
 	})
 
 	test('an issuer unrelated to the discovery URL: accepted, discovery does not compare them', async () => {
@@ -81,7 +83,7 @@ describe('OIDC issuer quirks', () => {
 		const promise = signIn(new OIDCProvider(null, null), configurationFor(idp), idp)
 
 		await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
-		await expect(promise).rejects.toThrow(`unexpected iss value, expected ${new URL(idp.baseUrl).origin}/{tenantid}/v2.0`)
+		await expect(promise).rejects.toThrow('unexpected JWT "iss" (issuer) claim value')
 	})
 
 	test('a back-channel logout token is checked against the advertised issuer, trailing slash included', async () => {

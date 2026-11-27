@@ -1,5 +1,5 @@
 import { timingSafeEqual } from 'node:crypto'
-import { Client, custom, CustomHttpOptionsProvider, Issuer } from 'openid-client'
+import { Configuration, CustomFetch, customFetch, discovery } from 'openid-client'
 import { EgressGuard } from '@contember/engine-common'
 import {
 	IdentityProviderHandler,
@@ -15,11 +15,19 @@ import { catchTypesafe } from './helpers.js'
 import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes.js'
 import {
 	buildOIDCLogoutUrl,
+	clientAuthFor,
+	COMMON_SETUP,
 	createRemoteJwksResolver,
+	discoveryTarget,
+	egressCustomFetch,
+	flowOfResponseType,
+	flowSetup,
 	handleOIDCResponse,
 	initOIDCAuth,
+	OIDCFlow,
 	RemoteJwksResolver,
 	revalidateOIDC,
+	unwrapForeignError,
 	validateOIDCLogoutToken,
 } from './OIDCHelpers.js'
 import { IDPValidationError } from '../IDPValidationError.js'
@@ -30,28 +38,22 @@ const OFFLINE_ACCESS_SCOPE = 'offline_access'
 const SESSION_DATA_SIGNING_PURPOSE = 'oidc-session-data'
 
 export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> {
-	private issuerCache: Record<string, Issuer<Client>> = {}
+	/**
+	 * Discovered clients by everything they are built from, so discovery runs once per IdP URL and the JWKS cached on a
+	 * client is reused. A client cannot be rebuilt from cached metadata: the Entra ID `{tenantid}` handling exists only
+	 * on a client `discovery` returned.
+	 */
+	private readonly clients = new Map<string, Promise<Configuration>>()
 	private readonly resolveJwks: RemoteJwksResolver
 	/** Discovery, JWKS, token and userinfo requests all go to IdP-chosen URLs, so all of them pass the egress guard. */
-	private readonly egressHttpOptions: CustomHttpOptionsProvider | undefined
-	private readonly issuerClass: typeof Issuer<Client>
+	private readonly fetch: CustomFetch | undefined
 
 	constructor(
 		egressGuard: EgressGuard | null,
 		private readonly dataSigner: DataSigner | null,
 	) {
 		this.resolveJwks = createRemoteJwksResolver(egressGuard?.fetch)
-		if (egressGuard) {
-			const httpOptions: CustomHttpOptionsProvider = url => egressGuard.httpOptions(url)
-			this.egressHttpOptions = httpOptions
-			// `Issuer.discover` reads the http options of the class it is called on.
-			this.issuerClass = class GuardedIssuer extends Issuer<Client> {
-				static override [custom.http_options] = httpOptions
-			}
-		} else {
-			this.egressHttpOptions = undefined
-			this.issuerClass = Issuer
-		}
+		this.fetch = egressGuard ? egressCustomFetch(egressGuard.fetch) : undefined
 	}
 
 	validateConfiguration = catchTypesafe(OIDCConfiguration, InvalidIDPConfigurationError)
@@ -61,6 +63,12 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		if (configuration.idTokenSignedResponseAlg?.toLowerCase() === 'none') {
 			throw new InvalidIDPConfigurationError('idTokenSignedResponseAlg "none" is not allowed; use a signing algorithm such as RS256')
 		}
+		// openid-client verifies ID tokens only against keys the IdP publishes, never with the client secret
+		if (configuration.idTokenSignedResponseAlg?.toUpperCase().startsWith('HS')) {
+			throw new InvalidIDPConfigurationError(
+				`idTokenSignedResponseAlg "${configuration.idTokenSignedResponseAlg}" is not supported; use an asymmetric algorithm such as RS256`,
+			)
+		}
 		if (configuration.strictResponseType && !this.dataSigner) {
 			throw new InvalidIDPConfigurationError('strictResponseType requires an encryption key to sign session data; configure CONTEMBER_ENCRYPTION_KEY')
 		}
@@ -68,9 +76,11 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 
 	public async initAuth(configuration: OIDCConfiguration, data: unknown): Promise<InitIDPAuthResult> {
 		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
-		const client = await this.createOIDCClient(configuration)
-		const result = await initOIDCAuth(client, {
+		const responseType = configuration.responseType || 'code'
+		const client = await this.createOIDCClient(configuration, flowOfResponseType(responseType))
+		const result = initOIDCAuth(client, {
 			scope: this.resolveScope(configuration),
+			responseType,
 			...initData,
 		})
 		if (!configuration.strictResponseType) {
@@ -85,9 +95,8 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		if (configuration.strictResponseType) {
 			this.verifySessionData(configuration, sessionData.nonce, sessionData.state, signature)
 		}
-		const client = await this.createOIDCClient(configuration)
 		return await handleOIDCResponse(
-			client,
+			flow => this.createOIDCClient(configuration, flow),
 			{ ...responseData, sessionData },
 			{
 				expectedResponseType: configuration.strictResponseType ? configuration.responseType || 'code' : undefined,
@@ -95,12 +104,13 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 				returnOIDCResult: configuration.returnOIDCResult,
 				captureSession: configuration.revalidation?.enabled === true,
 				claimMapping: configuration.claimMapping,
+				additionalAuthorizedParties: configuration.additionalAuthorizedParties,
 			},
 		)
 	}
 
 	public async revalidate(configuration: OIDCConfiguration, session: IDPSessionState): Promise<RevalidationResult> {
-		const client = await this.createOIDCClient(configuration)
+		const client = await this.createConfiguredClient(configuration)
 		return await revalidateOIDC(client, configuration.revalidation?.method ?? 'refresh', session, {
 			claimMapping: configuration.claimMapping,
 			fetchUserInfo: configuration.fetchUserInfo,
@@ -108,13 +118,13 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	}
 
 	public async buildLogoutUrl(configuration: OIDCConfiguration, request: LogoutUrlRequest): Promise<string | null> {
-		const client = await this.createOIDCClient(configuration)
+		const client = await this.createConfiguredClient(configuration)
 		return buildOIDCLogoutUrl(client, request)
 	}
 
 	public async validateLogoutToken(configuration: OIDCConfiguration, logoutToken: string): Promise<LogoutTokenClaims> {
-		const client = await this.createOIDCClient(configuration)
-		return await validateOIDCLogoutToken(client, client.issuer, logoutToken, this.resolveJwks)
+		const client = await this.createConfiguredClient(configuration)
+		return await validateOIDCLogoutToken(client, logoutToken, this.resolveJwks)
 	}
 
 	/** Binds nonce and state to this provider, so a client cannot choose them for the callback. */
@@ -160,38 +170,48 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		return config
 	}
 
-	private async createOIDCClient(configuration: OIDCConfiguration): Promise<Client> {
-		this.issuerCache[configuration.url] ??= await this.discover(configuration.url)
-
-		const client = new this.issuerCache[configuration.url].Client(
-			{
-				client_id: configuration.clientId,
-				client_secret: configuration.clientSecret,
-				response_types: [configuration.responseType || 'code'],
-				id_token_signed_response_alg: configuration.idTokenSignedResponseAlg ?? 'RS256',
-				...(configuration.tokenEndpointAuthMethod ? { token_endpoint_auth_method: configuration.tokenEndpointAuthMethod } : {}),
-			},
-			undefined,
-			{
-				additionalAuthorizedParties: [...(configuration.additionalAuthorizedParties ?? [])],
-			},
-		)
-
-		const timeout = configuration.timeout ?? DEFAULT_OIDC_TIMEOUT
-		const egressHttpOptions = this.egressHttpOptions
-		client[custom.http_options] = egressHttpOptions
-			? (url, options) => ({ ...egressHttpOptions(url, options), timeout })
-			: () => ({ timeout })
-
-		return client
+	/** The client of the configured response type's flow, which sign-in used, so it shares that client's discovery. */
+	private async createConfiguredClient(configuration: OIDCConfiguration): Promise<Configuration> {
+		return await this.createOIDCClient(configuration, flowOfResponseType(configuration.responseType || 'code'))
 	}
 
-	private async discover(url: string): Promise<Issuer<Client>> {
-		const issuer = await this.issuerClass.discover(url)
-		if (this.egressHttpOptions) {
-			// The discovered issuer fetches its JWKS with its own http options.
-			issuer[custom.http_options] = this.egressHttpOptions
+	private async createOIDCClient(configuration: OIDCConfiguration, flow: OIDCFlow): Promise<Configuration> {
+		const key = JSON.stringify([
+			configuration.url,
+			configuration.clientId,
+			configuration.clientSecret,
+			configuration.tokenEndpointAuthMethod,
+			configuration.idTokenSignedResponseAlg,
+			configuration.timeout,
+			flow,
+		])
+		let client = this.clients.get(key)
+		if (!client) {
+			client = this.discover(configuration, flow)
+			this.clients.set(key, client)
+			// a failed discovery is retried on the next call
+			client.catch(() => this.clients.delete(key))
 		}
-		return issuer
+		return await client
+	}
+
+	private async discover(configuration: OIDCConfiguration, flow: OIDCFlow): Promise<Configuration> {
+		return await discovery(
+			discoveryTarget(configuration.url),
+			configuration.clientId,
+			{
+				client_secret: configuration.clientSecret,
+				id_token_signed_response_alg: configuration.idTokenSignedResponseAlg ?? 'RS256',
+			},
+			clientAuthFor(configuration.tokenEndpointAuthMethod, configuration.clientSecret),
+			{
+				...(this.fetch ? { [customFetch]: this.fetch } : {}),
+				// openid-client 6 counts seconds, the configuration milliseconds
+				timeout: (configuration.timeout ?? DEFAULT_OIDC_TIMEOUT) / 1000,
+				execute: [...COMMON_SETUP, ...flowSetup(flow)],
+			},
+		).catch(e => {
+			throw unwrapForeignError(e)
+		})
 	}
 }

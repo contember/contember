@@ -1,11 +1,20 @@
 import * as Typesafe from '@contember/typesafe'
-import { Client, Issuer } from 'openid-client'
+import { Configuration, ServerMetadata } from 'openid-client'
 import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler.js'
 import { IDPValidationError } from '../IDPValidationError.js'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError.js'
 import { catchTypesafe } from './helpers.js'
 import { BaseOIDCConfiguration, OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes.js'
-import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers.js'
+import {
+	COMMON_SETUP,
+	defaultClientAuth,
+	flowOfResponseType,
+	flowSetup,
+	handleOIDCResponse,
+	initOIDCAuth,
+	JwksCarrier,
+	OIDCFlow,
+} from './OIDCHelpers.js'
 import { createHmac } from 'node:crypto'
 import { IDPResponseError } from '../IDPResponseError.js'
 
@@ -31,7 +40,8 @@ type FacebookResponseData = ReturnType<typeof FacebookResponseData>
 export class FacebookProvider implements IdentityProviderHandler<FacebookConfiguration> {
 	// based on https://www.facebook.com/.well-known/openid-configuration/
 	// facebook .well-known endpoint does have "token_endpoint" field
-	private facebookIssuer = new Issuer({
+	private readonly jwks = new JwksCarrier()
+	private readonly facebookMetadata: ServerMetadata = {
 		issuer: 'https://www.facebook.com',
 		authorization_endpoint: 'https://facebook.com/dialog/oauth/',
 		jwks_uri: 'https://www.facebook.com/.well-known/oauth/openid/jwks/',
@@ -69,15 +79,16 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 			'user_gender',
 		],
 		token_endpoint: 'https://graph.facebook.com/v11.0/oauth/access_token',
-	})
+	}
 
 	validateConfiguration = catchTypesafe(FacebookConfiguration, InvalidIDPConfigurationError)
 
 	public async initAuth(configuration: FacebookConfiguration, data: unknown): Promise<InitIDPAuthResult> {
 		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
-		const client = await this.createOIDCClient(configuration)
-		return await initOIDCAuth(client, {
+		const responseType = configuration.responseType || 'code'
+		return initOIDCAuth(this.createOIDCClient(configuration, flowOfResponseType(responseType)), {
 			scope: configuration.scope ?? configuration.claims,
+			responseType,
 			...initData,
 		})
 	}
@@ -86,8 +97,10 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 		const responseData = catchTypesafe(FacebookResponseData, IDPValidationError)(data)
 
 		if (!('authResponse' in responseData)) {
-			const client = await this.createOIDCClient(configuration)
-			return await handleOIDCResponse(client, responseData)
+			return await this.jwks.run(
+				flow => this.createOIDCClient(configuration, flow),
+				clientFor => handleOIDCResponse(clientFor, responseData, { additionalAuthorizedParties: configuration.additionalAuthorizedParties }),
+			)
 		} else {
 			const [sig, payload] = responseData.authResponse.signedRequest.split('.')
 			const data = catchTypesafe(FacebookResponsePayload, IDPValidationError)(JSON.parse(Buffer.from(payload, 'base64').toString('utf8')))
@@ -116,17 +129,17 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 		return config
 	}
 
-	private async createOIDCClient(configuration: FacebookConfiguration): Promise<Client> {
-		return new this.facebookIssuer.Client(
-			{
-				client_id: configuration.clientId,
-				client_secret: configuration.clientSecret,
-				response_types: [configuration.responseType || 'code'],
-			},
-			undefined,
-			{
-				additionalAuthorizedParties: [...(configuration.additionalAuthorizedParties ?? [])],
-			},
+	private createOIDCClient(configuration: FacebookConfiguration, flow: OIDCFlow): Configuration {
+		// without token_endpoint_auth_methods_supported in the metadata, the default is client_secret_basic, as in openid-client 5
+		const client = new Configuration(
+			this.facebookMetadata,
+			configuration.clientId,
+			{ client_secret: configuration.clientSecret, id_token_signed_response_alg: 'RS256' },
+			defaultClientAuth(configuration.clientSecret),
 		)
+		for (const setup of [...COMMON_SETUP, ...flowSetup(flow)]) {
+			setup(client)
+		}
+		return client
 	}
 }

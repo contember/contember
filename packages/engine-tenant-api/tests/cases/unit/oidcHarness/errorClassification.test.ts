@@ -1,17 +1,24 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
-import { errors } from 'openid-client'
+import { ClientError, ResponseBodyError, WWWAuthenticateChallengeError } from 'openid-client'
 import { IDPSessionState } from '../../../../src/model/service/idp/IdentityProviderHandler.js'
 import { IDPResponseError } from '../../../../src/model/service/idp/IDPResponseError.js'
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
 import { FakeIdp, FakeIdpOverride } from './FakeIdp.js'
-import { configurationFor, REDIRECT_URL, sessionDataOf, signIn, startSignIn } from './harness.js'
+import { configurationFor, REDIRECT_URL, sessionDataOf, signIn, startSignIn, useRuntimeGlobals } from './harness.js'
 
 /**
  * Which IdP failures revoke a session and which propagate as transient (IdP downtime must not log everyone out).
  * The openid-client error classes are named on purpose: `revalidateOIDC` and `handleOIDCResponse` branch on them.
  */
+
+/** How a transient failure reaches the caller: the openid-client error class and what identifies the failure. */
+type Thrown = readonly [typeof ClientError | typeof ResponseBodyError | typeof WWWAuthenticateChallengeError, Record<string, unknown>]
+
+const notConform = (status: number): Thrown => [ClientError, { code: 'OAUTH_RESPONSE_IS_NOT_CONFORM', cause: expect.objectContaining({ status }) }]
+const bodyError = (error: string): Thrown => [ResponseBodyError, { error }]
+const timedOut: Thrown = [ClientError, { code: 'OAUTH_TIMEOUT' }]
 
 const TIMEOUT_MS = 1000
 
@@ -23,6 +30,8 @@ const respond = (status: number, body?: string | object, headers?: Record<string
 })
 
 describe('OIDC failure classification', () => {
+	useRuntimeGlobals()
+
 	let idp: FakeIdp
 
 	beforeAll(async () => {
@@ -75,33 +84,33 @@ describe('OIDC failure classification', () => {
 			expect(idp.requests).toHaveLength(before)
 		})
 
-		const transient: [string, FakeIdpOverride, string][] = [
-			['401 invalid_client', respond(401, { error: 'invalid_client' }), 'invalid_client'],
-			['400 unauthorized_client', respond(400, { error: 'unauthorized_client' }), 'unauthorized_client'],
-			['503 temporarily_unavailable', respond(503, { error: 'temporarily_unavailable' }), 'temporarily_unavailable'],
-			['500 with a plain-text body', respond(500, 'boom'), 'expected 200 OK, got: 500 Internal Server Error'],
-			['400 with a non-standard JSON error object', respond(400, { error: { message: 'bad refresh token' } }), 'expected 200 OK, got: 400 Bad Request'],
-			['200 without a body', respond(200), 'expected 200 OK with body but no body was returned'],
+		const transient: [string, FakeIdpOverride, Thrown][] = [
+			['401 invalid_client', respond(401, { error: 'invalid_client' }), bodyError('invalid_client')],
+			['400 unauthorized_client', respond(400, { error: 'unauthorized_client' }), bodyError('unauthorized_client')],
+			['503 temporarily_unavailable', respond(503, { error: 'temporarily_unavailable' }), notConform(503)],
+			['500 with a plain-text body', respond(500, 'boom'), notConform(500)],
+			['400 with a non-standard JSON error object', respond(400, { error: { message: 'bad refresh token' } }), notConform(400)],
+			['200 without a body', respond(200), [ClientError, { code: 'OAUTH_INVALID_RESPONSE' }]],
 		]
 
-		test.each(transient)('%s: thrown as an OPError, session kept', async (_, override, message) => {
+		test.each(transient)('%s: thrown, session kept', async (_, override, [errorClass, identity]) => {
 			const { provider, session } = await signedIn('refresh')
 			idp.override('token', override)
 
 			const promise = provider.revalidate(configuration('refresh'), session)
 
-			await expect(promise).rejects.toBeInstanceOf(errors.OPError)
-			await expect(promise).rejects.toThrow(message)
+			await expect(promise).rejects.toBeInstanceOf(errorClass)
+			await expect(promise).rejects.toMatchObject(identity)
 		})
 
-		test('a token endpoint that never answers: thrown as an RPError after the configured timeout', async () => {
+		test('a token endpoint that never answers: thrown as a timeout after the configured timeout', async () => {
 			const { provider, session } = await signedIn('refresh')
 			idp.override('token', { kind: 'hang' })
 
 			const promise = provider.revalidate(configuration('refresh'), session)
 
-			await expect(promise).rejects.toBeInstanceOf(errors.RPError)
-			await expect(promise).rejects.toThrow(`outgoing request timed out after ${TIMEOUT_MS}ms`)
+			await expect(promise).rejects.toBeInstanceOf(timedOut[0])
+			await expect(promise).rejects.toMatchObject(timedOut[1])
 		})
 
 		test('an IdP that is down: the connection error is thrown as is', async () => {
@@ -115,8 +124,8 @@ describe('OIDC failure classification', () => {
 
 			// the socket error code depends on the runtime (ECONNREFUSED, EPIPE), so only its presence is pinned
 			await expect(promise).rejects.toMatchObject({ code: expect.any(String) })
-			await expect(promise).rejects.not.toBeInstanceOf(errors.OPError)
-			await expect(promise).rejects.not.toBeInstanceOf(errors.RPError)
+			await expect(promise).rejects.not.toBeInstanceOf(ClientError)
+			await expect(promise).rejects.not.toBeInstanceOf(ResponseBodyError)
 		})
 	})
 
@@ -143,19 +152,23 @@ describe('OIDC failure classification', () => {
 			expect(idp.requests).toHaveLength(before)
 		})
 
-		const transient: [string, FakeIdpOverride, string][] = [
-			['403 insufficient_scope', respond(403, undefined, { 'www-authenticate': 'Bearer error="insufficient_scope"' }), 'insufficient_scope'],
-			['500', respond(500, 'boom'), 'expected 200 OK, got: 500 Internal Server Error'],
+		const transient: [string, FakeIdpOverride, Thrown][] = [
+			[
+				'403 insufficient_scope',
+				respond(403, undefined, { 'www-authenticate': 'Bearer error="insufficient_scope"' }),
+				[WWWAuthenticateChallengeError, { status: 403 }],
+			],
+			['500', respond(500, 'boom'), notConform(500)],
 		]
 
-		test.each(transient)('%s: thrown as an OPError, session kept', async (_, override, message) => {
+		test.each(transient)('%s: thrown, session kept', async (_, override, [errorClass, identity]) => {
 			const { provider, session } = await signedIn('userinfo')
 			idp.override('userinfo', override)
 
 			const promise = provider.revalidate(configuration('userinfo'), session)
 
-			await expect(promise).rejects.toBeInstanceOf(errors.OPError)
-			await expect(promise).rejects.toThrow(message)
+			await expect(promise).rejects.toBeInstanceOf(errorClass)
+			await expect(promise).rejects.toMatchObject(identity)
 		})
 	})
 
@@ -175,39 +188,35 @@ describe('OIDC failure classification', () => {
 			expect(idp.requests).toHaveLength(before)
 		})
 
-		// the error code decides before the method does, so this 4xx revokes although the code comment calls introspection 4xx transient
-		test.each(['invalid_grant', 'invalid_token', 'expired_token'])('400 %s: revoked with that reason', async error => {
-			const { provider, session } = await signedIn('introspection')
-			idp.override('introspection', respond(400, { error }))
-
-			expect(await provider.revalidate(configuration('introspection'), session)).toEqual({ status: 'revoked', reason: error })
-		})
-
-		test.each<[string, FakeIdpOverride, string]>([
-			['401 invalid_client', respond(401, { error: 'invalid_client' }), 'invalid_client'],
-			['401 without a body', respond(401), 'expected 200 OK, got: 401 Unauthorized'],
-			['500', respond(500, 'boom'), 'expected 200 OK, got: 500 Internal Server Error'],
-		])('%s: thrown as an OPError, session kept', async (_, override, message) => {
+		// RFC 7662 reports a dead token as 200 { active: false }; an error response is about the request or the client
+		test.each<[string, FakeIdpOverride, Thrown]>([
+			['400 invalid_grant', respond(400, { error: 'invalid_grant' }), bodyError('invalid_grant')],
+			['400 invalid_token', respond(400, { error: 'invalid_token' }), bodyError('invalid_token')],
+			['400 expired_token', respond(400, { error: 'expired_token' }), bodyError('expired_token')],
+			['401 invalid_client', respond(401, { error: 'invalid_client' }), bodyError('invalid_client')],
+			['401 without a body', respond(401), [ClientError, { code: 'OAUTH_RESPONSE_IS_NOT_JSON', cause: expect.objectContaining({ status: 401 }) }]],
+			['500', respond(500, 'boom'), notConform(500)],
+		])('%s: thrown, session kept', async (_, override, [errorClass, identity]) => {
 			const { provider, session } = await signedIn('introspection')
 			idp.override('introspection', override)
 
 			const promise = provider.revalidate(configuration('introspection'), session)
 
-			await expect(promise).rejects.toBeInstanceOf(errors.OPError)
-			await expect(promise).rejects.toThrow(message)
+			await expect(promise).rejects.toBeInstanceOf(errorClass)
+			await expect(promise).rejects.toMatchObject(identity)
 		})
 	})
 
 	test.each<['userinfo' | 'introspection']>([['userinfo'], ['introspection']])(
-		'%s endpoint that never answers: thrown as an RPError, session kept',
+		'%s endpoint that never answers: thrown as a timeout, session kept',
 		async method => {
 			const { provider, session } = await signedIn(method)
 			idp.override(method, { kind: 'hang' })
 
 			const promise = provider.revalidate(configuration(method), session)
 
-			await expect(promise).rejects.toBeInstanceOf(errors.RPError)
-			await expect(promise).rejects.toThrow(`outgoing request timed out after ${TIMEOUT_MS}ms`)
+			await expect(promise).rejects.toBeInstanceOf(timedOut[0])
+			await expect(promise).rejects.toMatchObject(timedOut[1])
 		},
 	)
 
@@ -217,7 +226,7 @@ describe('OIDC failure classification', () => {
 
 		test.each<[string, FakeIdpOverride, string]>([
 			['400 invalid_grant', respond(400, { error: 'invalid_grant', error_description: 'code expired' }), 'invalid_grant (code expired)'],
-			['500 with a plain-text body', respond(500, 'boom'), 'expected 200 OK, got: 500 Internal Server Error'],
+			['500 with a plain-text body', respond(500, 'boom'), 'unexpected HTTP response status code: 500'],
 			// the `{ error: { message } }` body is read by handleOIDCResponse itself
 			['400 with a non-standard JSON error object', respond(400, { error: { message: 'bad code' } }), 'bad code'],
 		])('token endpoint %s: IDPResponseError', async (_, override, message) => {
@@ -229,13 +238,13 @@ describe('OIDC failure classification', () => {
 			await expect(promise).rejects.toThrow(message)
 		})
 
-		test('a token endpoint that never answers: IDPValidationError, as openid-client reports a timeout as an RPError', async () => {
+		test('a token endpoint that never answers: IDPValidationError, as openid-client 5 reported a timeout as a client-side failure', async () => {
 			idp.override('token', { kind: 'hang' })
 
 			const promise = signInWith()
 
 			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
-			await expect(promise).rejects.toThrow(`outgoing request timed out after ${TIMEOUT_MS}ms`)
+			await expect(promise).rejects.toThrow('operation timed out')
 		})
 
 		test('userinfo failing at sign-in: IDPResponseError', async () => {
@@ -244,7 +253,7 @@ describe('OIDC failure classification', () => {
 			const promise = signInWith({ fetchUserInfo: true })
 
 			await expect(promise).rejects.toBeInstanceOf(IDPResponseError)
-			await expect(promise).rejects.toThrow('expected 200 OK, got: 500 Internal Server Error')
+			await expect(promise).rejects.toThrow('unexpected HTTP response status code: 500')
 		})
 
 		test('an error redirect from the authorization endpoint: IDPResponseError', async () => {
@@ -273,8 +282,8 @@ describe('OIDC failure classification', () => {
 		}
 
 		test.each<[string, (it: { parameters: Record<string, string>; sessionData: Record<string, string> }) => void, string]>([
-			['state mismatch', it => void (it.sessionData.state = 'other-state'), 'state mismatch'],
-			['nonce mismatch', it => void (it.sessionData.nonce = 'other-nonce'), 'nonce mismatch'],
+			['state mismatch', it => void (it.sessionData.state = 'other-state'), 'unexpected "state" response parameter value'],
+			['nonce mismatch', it => void (it.sessionData.nonce = 'other-nonce'), 'unexpected ID Token "nonce" claim value'],
 			[
 				'state in the callback but not in the session data',
 				it => void (it.sessionData = {}),
@@ -304,7 +313,7 @@ describe('OIDC failure classification', () => {
 			})
 
 			await expect(result).rejects.toBeInstanceOf(IDPValidationError)
-			await expect(result).rejects.toThrow("no valid key found in issuer's jwks_uri for key parameters")
+			await expect(result).rejects.toThrow('error when selecting a JWT verification key, no applicable keys found')
 			expect(idp.endpointsHit()).toEqual(['discovery', 'jwks'])
 		})
 	})

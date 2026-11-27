@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
-import { EgressError, EgressFetch, EgressGuard, EgressHttpOptions, EgressPolicy } from '@contember/engine-common'
+import { EgressError, EgressFetch, EgressGuard, EgressPolicy } from '@contember/engine-common'
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 import { IDPSessionState } from '../../../../src/model/service/idp/IdentityProviderHandler.js'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
 import { FakeIdp, FakeIdpEndpoint } from './FakeIdp.js'
-import { configurationFor, signIn, startSignIn } from './harness.js'
+import { configurationFor, signIn, startSignIn, useRuntimeGlobals } from './harness.js'
 
 /** The real guard, recording every URL it is asked to check. */
 class RecordingEgressGuard extends EgressGuard {
@@ -15,11 +15,6 @@ class RecordingEgressGuard extends EgressGuard {
 	constructor(policy: EgressPolicy) {
 		super(policy)
 		this.inner = new EgressGuard(policy)
-	}
-
-	override httpOptions(url: URL): EgressHttpOptions {
-		this.checked.push(url.href)
-		return this.inner.httpOptions(url)
 	}
 
 	override readonly fetch: EgressFetch = async (url, init) => {
@@ -47,6 +42,8 @@ const ALLOWED_HOST = '127.0.0.2'
  * and is refused only when the guard's lookup resolves it, so moving one endpoint there shows its request is guarded.
  */
 describe('OIDCProvider outbound requests and the egress guard', () => {
+	useRuntimeGlobals()
+
 	let idp: FakeIdp
 	const guards: RecordingEgressGuard[] = []
 	const guarded = () => {
@@ -198,7 +195,7 @@ describe('OIDCProvider outbound requests and the egress guard', () => {
 		expect(url).toBe(
 			`${
 				idp.endpointUrl('end_session')
-			}?post_logout_redirect_uri=https%3A%2F%2Fapp.example.com%2Fbye&client_id=${idp.client.clientId}&id_token_hint=id-token`,
+			}?id_token_hint=id-token&post_logout_redirect_uri=https%3A%2F%2Fapp.example.com%2Fbye&client_id=${idp.client.clientId}`,
 		)
 		expect(idp.endpointsHit()).toEqual(['discovery'])
 	})

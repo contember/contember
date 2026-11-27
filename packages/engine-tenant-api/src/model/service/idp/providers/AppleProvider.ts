@@ -4,8 +4,17 @@ import { OIDCConfiguration, OIDCConfigurationOptions, OIDCInitData, OIDCResponse
 import { catchTypesafe } from './helpers.js'
 import { IDPValidationError } from '../IDPValidationError.js'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError.js'
-import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers.js'
-import { Client, Issuer } from 'openid-client'
+import {
+	COMMON_SETUP,
+	defaultClientAuth,
+	flowOfResponseType,
+	flowSetup,
+	handleOIDCResponse,
+	initOIDCAuth,
+	JwksCarrier,
+	OIDCFlow,
+} from './OIDCHelpers.js'
+import { Configuration, discovery, ServerMetadata } from 'openid-client'
 import { importPKCS8, SignJWT } from 'jose'
 
 export const AppleConfiguration = Typesafe.intersection(
@@ -23,34 +32,51 @@ type AppleConfiguration = ReturnType<typeof AppleConfiguration>
 const APPLE_OIDC_CONFIGURATION_ENDPOINT = 'https://appleid.apple.com/.well-known/openid-configuration'
 
 export class AppleProvider implements IdentityProviderHandler<AppleConfiguration> {
-	private issuer: Issuer<Client> | undefined
+	private metadata: ServerMetadata | undefined
+	private readonly jwks = new JwksCarrier()
 
 	validateConfiguration = catchTypesafe(AppleConfiguration, InvalidIDPConfigurationError)
 
 	public async initAuth(configuration: AppleConfiguration, data: unknown): Promise<InitIDPAuthResult> {
 		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
-		const client = await this.createOIDCClient(configuration)
-		return await initOIDCAuth(client, {
+		const responseType = configuration.responseType || 'code'
+		const client = this.createOIDCClient(
+			configuration,
+			await this.discover(configuration),
+			await this.createClientSecret(configuration),
+			flowOfResponseType(responseType),
+		)
+		return initOIDCAuth(client, {
 			scope: configuration.scope ?? configuration.claims,
+			responseType,
 			...initData,
 		})
 	}
 
 	public async processResponse(configuration: AppleConfiguration, data: unknown): Promise<IDPResponse> {
 		const responseData = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
-		const client = await this.createOIDCClient(configuration)
-		return await handleOIDCResponse(client, responseData)
+		const metadata = await this.discover(configuration)
+		const clientSecret = await this.createClientSecret(configuration)
+		return await this.jwks.run(
+			flow => this.createOIDCClient(configuration, metadata, clientSecret, flow),
+			clientFor => handleOIDCResponse(clientFor, responseData, { additionalAuthorizedParties: configuration.additionalAuthorizedParties }),
+		)
 	}
 
 	getPublicConfiguration({ privateKey, ...config }: AppleConfiguration): Partial<AppleConfiguration> {
 		return config
 	}
 
-	private async createOIDCClient(configuration: AppleConfiguration): Promise<Client> {
-		this.issuer ??= await Issuer.discover(APPLE_OIDC_CONFIGURATION_ENDPOINT)
+	private async discover(configuration: AppleConfiguration): Promise<ServerMetadata> {
+		this.metadata ??= (await discovery(new URL(APPLE_OIDC_CONFIGURATION_ENDPOINT), configuration.clientId)).serverMetadata()
+		return this.metadata
+	}
+
+	/** Apple's client secret is a short-lived ES256 JWT signed with the configured key, made anew for every call. */
+	private async createClientSecret(configuration: AppleConfiguration): Promise<string> {
 		const privateKey = await importPKCS8(configuration.privateKey, 'ES256')
 
-		const jwt = await new SignJWT({})
+		return await new SignJWT({})
 			.setProtectedHeader({ alg: 'ES256', typ: 'JWT', kid: configuration.keyId })
 			.setIssuedAt()
 			.setIssuer(configuration.teamId)
@@ -58,17 +84,19 @@ export class AppleProvider implements IdentityProviderHandler<AppleConfiguration
 			.setSubject(configuration.clientId)
 			.setExpirationTime('10m')
 			.sign(privateKey)
+	}
 
-		return new this.issuer.Client(
-			{
-				client_id: configuration.clientId,
-				client_secret: jwt,
-				response_types: [configuration.responseType || 'code'],
-			},
-			undefined,
-			{
-				additionalAuthorizedParties: [...(configuration.additionalAuthorizedParties ?? [])],
-			},
+	private createOIDCClient(configuration: AppleConfiguration, metadata: ServerMetadata, clientSecret: string, flow: OIDCFlow): Configuration {
+		// Apple advertises client_secret_post only, which the default picks, as openid-client 5 did
+		const client = new Configuration(
+			metadata,
+			configuration.clientId,
+			{ client_secret: clientSecret, id_token_signed_response_alg: 'RS256' },
+			defaultClientAuth(clientSecret),
 		)
+		for (const setup of [...COMMON_SETUP, ...flowSetup(flow)]) {
+			setup(client)
+		}
+		return client
 	}
 }

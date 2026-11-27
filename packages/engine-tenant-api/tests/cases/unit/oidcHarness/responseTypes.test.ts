@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:tes
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { FakeIdp, FakeIdpEndpoint } from './FakeIdp.js'
-import { authUrlParameters, configurationFor, REDIRECT_URL, signer, signIn, startSignIn } from './harness.js'
+import { authUrlParameters, configurationFor, REDIRECT_URL, signer, signIn, startSignIn, useRuntimeGlobals } from './harness.js'
 
 /**
  * Pins the sign-in flow for every `responseType` a stored OIDC provider configuration may hold, with and without
@@ -37,6 +37,8 @@ const EXPECTATIONS: Record<ResponseType, Expectation> = {
 const RESPONSE_TYPES = Object.keys(EXPECTATIONS).filter((it): it is ResponseType => it in EXPECTATIONS)
 
 describe('OIDC sign-in per stored response type', () => {
+	useRuntimeGlobals()
+
 	let idp: FakeIdp
 
 	beforeAll(async () => {
@@ -87,13 +89,13 @@ describe('OIDC sign-in per stored response type', () => {
 			})
 		})
 
-		test('none fails after the redirect: openid-client reads claims of a token set without an ID token', async () => {
+		test('none fails after the redirect: there is no code to exchange', async () => {
 			const configuration = configurationFor(idp, { responseType: 'none', strictResponseType: strict })
 
 			const promise = signIn(provider(), configuration, idp)
 
-			await expect(promise).rejects.toBeInstanceOf(TypeError)
-			await expect(promise).rejects.toThrow('id_token not present in TokenSet')
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow('no authorization code in "callbackParameters"')
 			expect(idp.endpointsHit()).toEqual(['discovery', 'authorization'])
 		})
 	})
@@ -157,7 +159,7 @@ describe('OIDC sign-in per stored response type', () => {
 			const promise = signInWithSwapped('code id_token', 'code')
 
 			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
-			await expect(promise).rejects.toThrow('c_hash mismatch')
+			await expect(promise).rejects.toThrow('invalid ID Token "c_hash" (code hash) claim value')
 		})
 
 		test('id_token token with another access token: refused on at_hash', async () => {
@@ -188,7 +190,7 @@ describe('OIDC sign-in per stored response type', () => {
 			const promise = signIn(new OIDCProvider(null, null), configurationFor(idp, { responseType: 'id_token' }), idp, { passAs: 'url' })
 
 			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
-			await expect(promise).rejects.toThrow('state missing from the response')
+			await expect(promise).rejects.toThrow('response parameter "state" missing')
 		})
 
 		test('the scope comes from `scope`, then the deprecated `claims`, then the default', async () => {
@@ -206,7 +208,7 @@ describe('OIDC sign-in per stored response type', () => {
 			await signIn(provider, configurationFor(idp), idp)
 
 			expect(idp.requestsTo('discovery')).toHaveLength(1)
-			// the JWKS is cached on the issuer, so the second ID token is verified without a fetch
+			// the JWKS is cached on the discovered client, so the second ID token is verified without a fetch
 			expect(idp.requestsTo('jwks')).toHaveLength(1)
 		})
 	})

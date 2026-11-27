@@ -1,9 +1,47 @@
+import { afterAll, afterEach, beforeAll, beforeEach } from 'bun:test'
+import { GlobalRegistrator } from '@happy-dom/global-registrator'
 import { createHmac } from 'node:crypto'
 import { DataSigner } from '../../../../src/index.js'
 import { IDPResponse, InitIDPAuthResult } from '../../../../src/model/service/idp/IdentityProviderHandler.js'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
 import { FakeIdp, FakeIdpAuthorization } from './FakeIdp.js'
+
+/**
+ * Runs the enclosing tests with the runtime's globals, as the engine runs, by lifting the test preload's happy-dom for
+ * them. Its `fetch` enforces the browser's same-origin policy, and openid-client's `instanceof` checks fail between its
+ * `URL`, `Response` and `DOMException` and the runtime's. Test files run one after another in one global object.
+ */
+export const useRuntimeGlobals = (): void => {
+	beforeAll(async () => {
+		await GlobalRegistrator.unregister()
+	})
+	afterAll(() => {
+		// as the preload does: Bun's fetch rejects a signal that is not its own
+		const { AbortController, AbortSignal } = globalThis
+		GlobalRegistrator.register()
+		Object.assign(globalThis, { AbortController, AbortSignal })
+	})
+}
+
+/**
+ * Sends each request whose URL `route` maps to the mapped URL instead, for every test of the enclosing block: a
+ * provider with a fixed IdP host (Apple, Facebook, Microsoft) reaches the fake IdP through the global `fetch`.
+ */
+export const useFetchRoutes = (route: (url: URL) => string | undefined): void => {
+	let unrouted: typeof fetch
+	beforeEach(() => {
+		unrouted = globalThis.fetch
+		const routed = async (input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+			const url = new URL(input instanceof Request ? input.url : input)
+			return await unrouted(route(url) ?? input, init)
+		}
+		globalThis.fetch = Object.assign(routed, { preconnect: unrouted.preconnect })
+	})
+	afterEach(() => {
+		globalThis.fetch = unrouted
+	})
+}
 
 export const REDIRECT_URL = 'https://app.example.com/callback'
 

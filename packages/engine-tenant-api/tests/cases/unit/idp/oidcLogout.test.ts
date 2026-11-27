@@ -1,46 +1,24 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { exportJWK, generateKeyPair, SignJWT } from 'jose'
+import { Configuration, ServerMetadata } from 'openid-client'
 import { buildOIDCLogoutUrl, createRemoteJwksResolver, validateOIDCLogoutToken } from '../../../../src/model/service/idp/providers/OIDCHelpers.js'
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 
-const clientWith = (endSessionEndpoint: string | undefined) => {
-	const captured: { params?: any } = {}
-	const client = {
-		issuer: { metadata: { end_session_endpoint: endSessionEndpoint } },
-		endSessionUrl: (params: any) => {
-			captured.params = params
-			const sp = new URLSearchParams()
-			if (params.id_token_hint) {
-				sp.set('id_token_hint', params.id_token_hint)
-			}
-			if (params.post_logout_redirect_uri) {
-				sp.set('post_logout_redirect_uri', params.post_logout_redirect_uri)
-			}
-			const q = sp.toString()
-			return q ? `${endSessionEndpoint}?${q}` : (endSessionEndpoint as string)
-		},
-	} as any
-	return { client, captured }
-}
+const clientWith = (endSessionEndpoint: string | undefined) =>
+	new Configuration({ issuer: 'https://idp.example.com', ...(endSessionEndpoint ? { end_session_endpoint: endSessionEndpoint } : {}) }, 'client-1')
 
 describe('buildOIDCLogoutUrl', () => {
 	test('no end_session_endpoint → null (graceful fallback)', () => {
-		const { client } = clientWith(undefined)
-		expect(buildOIDCLogoutUrl(client, { idToken: 'id-1' })).toBeNull()
+		expect(buildOIDCLogoutUrl(clientWith(undefined), { idToken: 'id-1' })).toBeNull()
 	})
 
 	test('builds URL with id_token_hint and post_logout_redirect_uri', () => {
-		const { client, captured } = clientWith('https://idp.example.com/logout')
-		const url = buildOIDCLogoutUrl(client, { idToken: 'id-1', postLogoutRedirectUri: 'https://app.example.com/' })
-		expect(captured.params).toEqual({ id_token_hint: 'id-1', post_logout_redirect_uri: 'https://app.example.com/' })
-		expect(url).toBe('https://idp.example.com/logout?id_token_hint=id-1&post_logout_redirect_uri=https%3A%2F%2Fapp.example.com%2F')
+		const url = buildOIDCLogoutUrl(clientWith('https://idp.example.com/logout'), { idToken: 'id-1', postLogoutRedirectUri: 'https://app.example.com/' })
+		expect(url).toBe('https://idp.example.com/logout?id_token_hint=id-1&post_logout_redirect_uri=https%3A%2F%2Fapp.example.com%2F&client_id=client-1')
 	})
 
-	test('omits absent optional params (no id_token / redirect)', () => {
-		const { client, captured } = clientWith('https://idp.example.com/logout')
-		const url = buildOIDCLogoutUrl(client, {})
-		expect(captured.params).toEqual({})
-		expect(url).toBe('https://idp.example.com/logout')
+	test('omits absent optional params (no id_token / redirect); the client id is always sent', () => {
+		expect(buildOIDCLogoutUrl(clientWith('https://idp.example.com/logout'), {})).toBe('https://idp.example.com/logout?client_id=client-1')
 	})
 })
 
@@ -65,9 +43,8 @@ describe('validateOIDCLogoutToken', () => {
 	let rs384Key: SigningKey
 	let realFetch: typeof globalThis.fetch
 
-	const clientWithMeta = (meta: Record<string, unknown> = {}) =>
-		({ metadata: { client_id: CLIENT_ID, id_token_signed_response_alg: 'RS256', ...meta } }) as any
-	const issuerWithMeta = (meta: Record<string, unknown> = {}) => ({ metadata: { issuer: ISS, jwks_uri: JWKS_URI, ...meta } }) as any
+	const clientWithServer = (server: Partial<ServerMetadata> = {}) =>
+		new Configuration({ issuer: ISS, jwks_uri: JWKS_URI, ...server }, CLIENT_ID, { id_token_signed_response_alg: 'RS256' })
 
 	const validClaims = (): Record<string, unknown> => ({ iss: ISS, aud: CLIENT_ID, sid: 'sid-1', events: { [LOGOUT_EVENT]: {} } })
 
@@ -87,7 +64,7 @@ describe('validateOIDCLogoutToken', () => {
 	}
 
 	const resolveJwks = createRemoteJwksResolver(undefined)
-	const validate = (token: string, client = clientWithMeta(), issuer = issuerWithMeta()) => validateOIDCLogoutToken(client, issuer, token, resolveJwks)
+	const validate = (token: string, client = clientWithServer()) => validateOIDCLogoutToken(client, token, resolveJwks)
 
 	beforeAll(async () => {
 		const keyPair = await generateKeyPair('RS256')
@@ -179,13 +156,8 @@ describe('validateOIDCLogoutToken', () => {
 		await expect(validate(token)).rejects.toThrow(/sid or sub/)
 	})
 
-	test('rejects when the client has no client_id (aud check must fail closed)', async () => {
-		const token = await signToken(validClaims())
-		await expect(validate(token, clientWithMeta({ client_id: undefined }))).rejects.toThrow(/client_id/)
-	})
-
 	test('rejects when the issuer advertises no jwks_uri', async () => {
 		const token = await signToken(validClaims())
-		await expect(validate(token, clientWithMeta(), issuerWithMeta({ jwks_uri: undefined }))).rejects.toThrow(/jwks_uri/)
+		await expect(validate(token, clientWithServer({ jwks_uri: undefined }))).rejects.toThrow(/jwks_uri/)
 	})
 })

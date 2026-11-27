@@ -77,13 +77,13 @@ export const flowSetup = (flow: OIDCFlow): ((config: Configuration) => void)[] =
 }
 
 /**
- * Executed on every {@link Configuration}, to keep what openid-client 5 did: plain-HTTP endpoints are allowed (the
- * egress policy decides which schemes an IdP may use), and an ID token from the token endpoint has its signature
- * verified against the JWKS, where v6 would trust the TLS connection instead.
+ * Executed on every {@link Configuration}: plain-HTTP endpoints are allowed, because the egress policy decides which
+ * schemes an IdP may use, and an ID token from the token endpoint has its signature verified against the JWKS instead
+ * of being trusted for the TLS connection it came over.
  */
 export const COMMON_SETUP: ((config: Configuration) => void)[] = [allowInsecureRequests, enableNonRepudiationChecks]
 
-/** `application/x-www-form-urlencoded` as openid-client 5 did it: `- _ . ! ~ * ' ( )` stay unencoded. */
+/** `application/x-www-form-urlencoded` with `- _ . ! ~ * ' ( )` unencoded, the form configured IdPs already accept. */
 const formUrlEncode = (value: string): string => encodeURIComponent(value).replace(/%20/g, '+')
 
 /** openid-client 6 percent-encodes `- _ . ! ~ * ' ( )` too, which an IdP that does not decode the credentials rejects. */
@@ -92,7 +92,10 @@ const clientSecretBasic = (clientSecret: string): ClientAuth => (_as, client, _b
 	headers.set('authorization', `Basic ${Buffer.from(credentials).toString('base64')}`)
 }
 
-/** openid-client 5's default: `client_secret_basic`, unless the IdP advertises only `client_secret_post` of the two. */
+/**
+ * `client_secret_basic`, unless the IdP advertises only `client_secret_post` of the two: the method an IdP configured
+ * without `tokenEndpointAuthMethod` has always been sent, and the one RFC 6749 §2.3.1 requires servers to support.
+ */
 export const defaultClientAuth = (clientSecret: string): ClientAuth => {
 	const basic = clientSecretBasic(clientSecret)
 	const post = ClientSecretPost(clientSecret)
@@ -146,8 +149,8 @@ export const egressCustomFetch = (fetch: EgressFetch): CustomFetch => async (url
 	})
 
 /**
- * Where openid-client 5 looked for the discovery document: the configured URL itself when it already points at a
- * `/.well-known/` document, otherwise `/.well-known/openid-configuration` appended to its path.
+ * Where the discovery document is: the configured URL itself when it already points at a `/.well-known/` document,
+ * otherwise `/.well-known/openid-configuration` appended to its path.
  */
 const discoveryDocumentUrl = (url: string): URL => {
 	const parsed = new URL(url)
@@ -164,8 +167,9 @@ const MICROSOFT_MULTITENANT_PATHS = ['/common', '/common/v2.0', '/organizations/
 
 /**
  * The URL to hand to openid-client's `discovery`. A document URL makes it skip comparing the advertised `issuer` with
- * the configured URL, which v5 never compared. Only the Entra ID multi-tenant documents go by their issuer URL: that
- * is the one path on which openid-client substitutes `{tenantid}` in the issuer from the ID token's `tid`, as v5 did.
+ * the configured URL, which configured IdPs (realm paths, trailing slashes) do not always match. Only the Entra ID
+ * multi-tenant documents go by their issuer URL: that is the one path on which openid-client substitutes `{tenantid}`
+ * in the issuer from the ID token's `tid`, without which no multi-tenant sign-in validates.
  */
 export const discoveryTarget = (url: string): URL => {
 	const document = discoveryDocumentUrl(url)
@@ -203,7 +207,7 @@ export class JwksCarrier {
 }
 
 /**
- * The tokens of a completed sign-in or refresh, shaped as openid-client 5's `TokenSet`: what the IdP returned, with
+ * The tokens of a completed sign-in or refresh, in the shape `returnOIDCResult` exposes: what the IdP returned, with
  * `expires_in` turned into an absolute `expires_at` (epoch seconds) at receipt.
  */
 export type OIDCTokenSet = {
@@ -253,6 +257,12 @@ export const initOIDCAuth = (
 	client: Configuration,
 	{ redirectUrl, scope, responseMode, responseType }: { redirectUrl: string; scope?: string; responseMode?: string; responseType: string },
 ): InitIDPAuthResult & { sessionData: { nonce: string; state: string } } => {
+	const redirect = parseUrl(redirectUrl, 'redirectUrl')
+	// the token request derives redirect_uri from the callback URL stripped of query and fragment, so a redirect URL
+	// carrying either would differ from the authorization request's and fail only after the user signed in at the IdP
+	if (flowOfResponseType(responseType) !== 'implicit' && (redirect.search !== '' || redirect.hash !== '')) {
+		throw new IDPValidationError('redirectUrl must not carry a query or a fragment for a response type with a code')
+	}
 	const nonce = randomNonce()
 	const state = randomState()
 	const url = buildAuthorizationUrl(client, {
@@ -426,11 +436,39 @@ export const buildSignInClaims = (
 	return normalizeClaims({ ...claimsWithoutHashes, ...userInfo }, claimMapping, idTokenClaims.sub)
 }
 
-/** Parameter of an authorization response that each part of a `response_type` puts there. */
-const RESPONSE_TYPE_PARAMETERS: Record<string, string> = { code: 'code', id_token: 'id_token', token: 'access_token' }
+/**
+ * The authorization-response parameters (RFC 6749 §4.1.2, §4.2.2, OIDC Core 3.2.2.5, RFC 9207) a callback is read for.
+ * The callback is user input: anything else in it would reach the token set, and through it the claim mapping.
+ */
+const CALLBACK_PARAMETERS: readonly string[] = [
+	'access_token',
+	'code',
+	'error',
+	'error_description',
+	'error_uri',
+	'expires_in',
+	'id_token',
+	'iss',
+	'session_state',
+	'state',
+	'token_type',
+]
+
+const callbackParameters = (params: Record<string, string>): Record<string, string> =>
+	Object.fromEntries(Object.entries(params).filter(([key]) => CALLBACK_PARAMETERS.includes(key)))
+
+const parseUrl = (value: string, name: string): URL => {
+	if (!URL.canParse(value)) {
+		throw new IDPValidationError(`${name} is not a valid URL`)
+	}
+	return new URL(value)
+}
+
+/** Parameters of an authorization response that each part of a `response_type` puts there. */
+const RESPONSE_TYPE_PARAMETERS: Record<string, readonly string[]> = { code: ['code'], id_token: ['id_token'], token: ['access_token', 'token_type'] }
 
 const assertResponseType = (params: Record<string, string>, expectedResponseType: string): void => {
-	const expected = new Set(expectedResponseType.split(' ').map(part => RESPONSE_TYPE_PARAMETERS[part]).filter(it => it !== undefined))
+	const expected = new Set(expectedResponseType.split(' ').flatMap(part => RESPONSE_TYPE_PARAMETERS[part] ?? []))
 	const unexpected = ['id_token', 'access_token', 'code'].filter(param => !expected.has(param) && params[param] !== undefined)
 	if (unexpected.length > 0) {
 		throw new IDPValidationError(`${unexpected.join(', ')} not expected for response type "${expectedResponseType}"`)
@@ -480,7 +518,7 @@ const assertAccessTokenHash = (idToken: string, accessToken: string): void => {
 	}
 }
 
-/** openid-client 6 checks `azp` only when `aud` has several values; v5 also refused a single-audience token for another party. */
+/** openid-client checks `azp` only when `aud` has several values; a single-audience token issued to another party is refused here. */
 const assertAuthorizedParty = (claims: IDToken, clientId: string, additionalAuthorizedParties: readonly string[]): void => {
 	if (claims.azp !== undefined && claims.azp !== clientId && !additionalAuthorizedParties.includes(claims.azp)) {
 		throw new IDPValidationError(`azp mismatch, got: ${claims.azp}`)
@@ -511,6 +549,32 @@ const errorInBody = async (response: Response): Promise<string | undefined> => {
 
 const challengeError = (e: WWWAuthenticateChallengeError): string | undefined => e.cause.map(it => it.parameters.error).find(it => it !== undefined)
 
+const errorCodeInBody = async (response: Response): Promise<string | undefined> => {
+	try {
+		const body: unknown = await response.clone().json()
+		return typeof body === 'object' && body !== null && 'error' in body && typeof body.error === 'string' ? body.error : undefined
+	} catch {
+		return undefined
+	}
+}
+
+/**
+ * The OAuth error code of a failed request, wherever the IdP put it: openid-client reads the JSON body only for a 4xx
+ * without a `WWW-Authenticate` challenge, and otherwise passes the response on unread.
+ */
+const oauthErrorOf = async (e: unknown): Promise<string | undefined> => {
+	if (e instanceof ResponseBodyError) {
+		return e.error
+	}
+	if (e instanceof WWWAuthenticateChallengeError) {
+		return challengeError(e) ?? (await errorCodeInBody(e.response))
+	}
+	if (e instanceof ClientError && e.cause instanceof Response) {
+		return await errorCodeInBody(e.cause)
+	}
+	return undefined
+}
+
 /**
  * openid-client wraps a failure it does not recognize, such as a refused or broken connection or an egress-guard
  * refusal, in a `ClientError` without a code. Unwrap it, so it reaches the caller as before: a transient failure.
@@ -540,7 +604,7 @@ const toSignInError = async (e: unknown): Promise<unknown> => {
 
 /** The redirect back to the client, rebuilt from its parameters: query for the code flow, fragment otherwise. */
 const callbackUrl = (redirectUrl: string, params: Record<string, string>, flow: OIDCFlow): URL => {
-	const url = new URL(redirectUrl)
+	const url = parseUrl(redirectUrl, 'redirectUrl')
 	if (flow === 'code') {
 		for (const [key, value] of Object.entries(params)) {
 			url.searchParams.append(key, value)
@@ -568,17 +632,19 @@ const completeAuthorization = async (
 		}
 		return { claims, tokens: tokenSetOfParameters(params) }
 	}
-	if (redirectUrl === undefined) {
+	// an error response is checked for state and issuer and thrown; no code is exchanged, so no redirect URL is needed
+	const base = redirectUrl ?? (params.error !== undefined ? 'about:blank' : undefined)
+	if (base === undefined) {
 		throw new IDPValidationError('redirectUrl is required to exchange the authorization code')
 	}
-	const response = await authorizationCodeGrant(client, callbackUrl(redirectUrl, params, flow), {
+	if (flow === 'hybrid' && params.access_token !== undefined) {
+		assertAccessTokenHash(params.id_token, params.access_token)
+	}
+	const response = await authorizationCodeGrant(client, callbackUrl(base, params, flow), {
 		expectedNonce: nonce,
 		expectedState: state,
 		idTokenExpected: true,
 	})
-	if (flow === 'hybrid' && params.access_token !== undefined) {
-		assertAccessTokenHash(params.id_token, params.access_token)
-	}
 	const claims = response.claims()
 	if (!claims) {
 		throw new IDPValidationError('id_token not present in the token response')
@@ -597,11 +663,12 @@ export const handleOIDCResponse = async (
 	{ expectedResponseType, fetchUserInfo: withUserInfo, returnOIDCResult, captureSession, claimMapping, additionalAuthorizedParties = [] }:
 		HandleOIDCResponseOptions = {},
 ): Promise<IDPResponse> => {
-	const params = 'parameters' in otherData ? otherData.parameters : Object.fromEntries(new URL(otherData.url).searchParams)
+	const params = callbackParameters('parameters' in otherData ? otherData.parameters : Object.fromEntries(parseUrl(otherData.url, 'url').searchParams))
 	if (params.state && !sessionData?.state) {
 		throw new IDPValidationError(`state is present in parameters, but missing in session data`)
 	}
-	if (expectedResponseType !== undefined) {
+	// an error response carries none of the response type's parameters; openid-client reports the IdP's error
+	if (expectedResponseType !== undefined && params.error === undefined) {
 		assertResponseType(params, expectedResponseType)
 	}
 	const flow = flowOfParameters(params)
@@ -633,21 +700,16 @@ const REVOKED_OIDC_ERRORS = new Set(['invalid_grant', 'invalid_token', 'expired_
  * that way: introspection reports a dead token as 200 `{ active: false }` (RFC 7662 §2.2), so any error it returns is
  * about the request or the client's own credentials (§2.3) — transient, it must not log users out.
  */
-const revokedBy = (method: 'refresh' | 'userinfo' | 'introspection', e: unknown): RevalidationResult | undefined => {
+const revokedBy = async (method: 'refresh' | 'userinfo' | 'introspection', e: unknown): Promise<RevalidationResult | undefined> => {
 	if (method === 'introspection') {
 		return undefined
 	}
-	if (e instanceof ResponseBodyError && REVOKED_OIDC_ERRORS.has(e.error)) {
-		return { status: 'revoked', reason: e.error }
+	const error = await oauthErrorOf(e)
+	if (error !== undefined && REVOKED_OIDC_ERRORS.has(error)) {
+		return { status: 'revoked', reason: error }
 	}
 	if (method !== 'userinfo') {
 		return undefined
-	}
-	if (e instanceof WWWAuthenticateChallengeError) {
-		const error = challengeError(e)
-		if (error !== undefined && REVOKED_OIDC_ERRORS.has(error)) {
-			return { status: 'revoked', reason: error }
-		}
 	}
 	// The userinfo endpoint signals a rejected access token with a bare HTTP 401 — per RFC 6750 the
 	// `WWW-Authenticate` error code is optional. A 401 is still definitive: the token is no longer accepted.
@@ -669,9 +731,9 @@ export const revalidateOIDC = async (
 	client: Configuration,
 	method: 'refresh' | 'userinfo' | 'introspection',
 	session: IDPSessionState,
-	options: { claimMapping?: OIDCClaimMapping; fetchUserInfo?: boolean } = {},
+	options: { claimMapping?: OIDCClaimMapping; fetchUserInfo?: boolean; additionalAuthorizedParties?: readonly string[] } = {},
 ): Promise<RevalidationResult> => {
-	const { claimMapping, fetchUserInfo: withUserInfo } = options
+	const { claimMapping, fetchUserInfo: withUserInfo, additionalAuthorizedParties = [] } = options
 	const tokens = session.tokens ?? {}
 	const refreshToken = typeof tokens.refresh_token === 'string' ? tokens.refresh_token : undefined
 	const accessToken = typeof tokens.access_token === 'string' ? tokens.access_token : undefined
@@ -681,6 +743,10 @@ export const revalidateOIDC = async (
 				return { status: 'revoked', reason: 'no_refresh_token' }
 			}
 			const response = await refreshTokenGrant(client, refreshToken)
+			const refreshedClaims = response.claims()
+			if (refreshedClaims) {
+				assertAuthorizedParty(refreshedClaims, client.clientMetadata().client_id, additionalAuthorizedParties)
+			}
 			let claims: Record<string, unknown> | undefined
 			let claimsComplete = false
 			try {
@@ -689,7 +755,7 @@ export const revalidateOIDC = async (
 				// normalization (lift nested attributes + map identity fields). An `always` mapping therefore
 				// reconciles against an identical surface on refresh, so `claimsComplete` lets the caller enable
 				// `unmatched: "remove"` reconciliation here too (see IdpSessionRevalidator).
-				const idClaims = response.claims()
+				const idClaims = refreshedClaims
 				if (idClaims) {
 					const userInfo = response.access_token && withUserInfo ? await fetchUserInfo(client, response.access_token, idClaims.sub) : {}
 					claims = normalizeClaims({ ...idClaims, ...userInfo }, claimMapping, idClaims.sub)
@@ -738,7 +804,7 @@ export const revalidateOIDC = async (
 		}
 		return { status: 'valid' }
 	} catch (e) {
-		const revoked = revokedBy(method, e)
+		const revoked = await revokedBy(method, e)
 		if (revoked) {
 			return revoked
 		}

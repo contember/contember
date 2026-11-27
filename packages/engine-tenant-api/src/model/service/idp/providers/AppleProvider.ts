@@ -87,7 +87,7 @@ export class AppleProvider implements IdentityProviderHandler<AppleConfiguration
 	}
 
 	private createOIDCClient(configuration: AppleConfiguration, metadata: ServerMetadata, clientSecret: string, flow: OIDCFlow): Configuration {
-		// Apple advertises client_secret_post only, which the default picks, as openid-client 5 did
+		// Apple advertises client_secret_post only, which the default picks
 		const client = new Configuration(
 			metadata,
 			configuration.clientId,

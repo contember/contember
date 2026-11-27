@@ -6,7 +6,7 @@ import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidat
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
 import { FakeIdp, FakeIdpOverride } from './FakeIdp.js'
-import { configurationFor, REDIRECT_URL, sessionDataOf, signIn, startSignIn, useRuntimeGlobals } from './harness.js'
+import { configurationFor, REDIRECT_URL, sessionDataOf, signer, signIn, startSignIn, useRuntimeGlobals } from './harness.js'
 
 /**
  * Which IdP failures revoke a session and which propagate as transient (IdP downtime must not log everyone out).
@@ -71,6 +71,34 @@ describe('OIDC failure classification', () => {
 			idp.override('token', respond(400, { error }))
 
 			expect(await provider.revalidate(configuration('refresh'), session)).toEqual({ status: 'revoked', reason: error })
+		})
+
+		test('400 invalid_grant beside a WWW-Authenticate challenge: revoked, the error read from the body', async () => {
+			const { provider, session } = await signedIn('refresh')
+			idp.override('token', respond(400, { error: 'invalid_grant' }, { 'www-authenticate': 'Basic realm="idp"' }))
+
+			expect(await provider.revalidate(configuration('refresh'), session)).toEqual({ status: 'revoked', reason: 'invalid_grant' })
+		})
+
+		test('a refreshed ID token for a party no longer authorized: thrown, session kept', async () => {
+			const otherIdp = await FakeIdp.start({ idTokenClaims: { azp: 'other-party' } })
+			try {
+				otherIdp.alwaysIssueRefreshToken = true
+				// the refused refresh still rotated the token at the IdP; the second refresh reuses the stored one
+				otherIdp.rotateRefreshTokens = false
+				const provider = new OIDCProvider(null, null)
+				const authorized = configurationFor(otherIdp, { revalidation: { enabled: true }, additionalAuthorizedParties: ['other-party'] })
+				const { response } = await signIn(provider, authorized, otherIdp)
+				const session = response.idpSession ?? { tokens: {} }
+
+				const promise = provider.revalidate({ ...authorized, additionalAuthorizedParties: [] }, session)
+
+				await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+				await expect(promise).rejects.toThrow('azp mismatch, got: other-party')
+				expect(await provider.revalidate(authorized, session)).toMatchObject({ status: 'valid' })
+			} finally {
+				await otherIdp.stop()
+			}
 		})
 
 		test('no stored refresh token: revoked without a request', async () => {
@@ -142,6 +170,13 @@ describe('OIDC failure classification', () => {
 			idp.override('userinfo', respond(401))
 
 			expect(await provider.revalidate(configuration('userinfo'), session)).toEqual({ status: 'revoked', reason: 'userinfo_unauthorized' })
+		})
+
+		test.each([400, 403])('%d with an invalid_token body and no challenge: revoked, invalid_token', async status => {
+			const { provider, session } = await signedIn('userinfo')
+			idp.override('userinfo', respond(status, { error: 'invalid_token' }))
+
+			expect(await provider.revalidate(configuration('userinfo'), session)).toEqual({ status: 'revoked', reason: 'invalid_token' })
 		})
 
 		test('no stored access token: revoked without a request', async () => {
@@ -256,19 +291,90 @@ describe('OIDC failure classification', () => {
 			await expect(promise).rejects.toThrow('unexpected HTTP response status code: 500')
 		})
 
-		test('an error redirect from the authorization endpoint: IDPResponseError', async () => {
-			const provider = new OIDCProvider(null, null)
-			const configuration = configurationFor(idp)
+		test.each<[string, Partial<OIDCConfiguration>]>([
+			['code', {}],
+			['code, strict', { strictResponseType: true }],
+			['id_token, strict', { responseType: 'id_token', strictResponseType: true }],
+			['code id_token, strict', { responseType: 'code id_token', strictResponseType: true }],
+		])('an error redirect from the authorization endpoint (%s): IDPResponseError', async (_, overrides) => {
+			const provider = new OIDCProvider(null, signer)
+			const configuration = configurationFor(idp, overrides)
 			const init = await startSignIn(provider, configuration)
 
 			const promise = provider.processResponse(configuration, {
 				parameters: { error: 'access_denied', error_description: 'the user cancelled', state: sessionDataOf(init).state },
 				redirectUrl: REDIRECT_URL,
-				sessionData: sessionDataOf(init),
+				sessionData: init.sessionData,
 			})
 
 			await expect(promise).rejects.toBeInstanceOf(IDPResponseError)
 			await expect(promise).rejects.toThrow('access_denied (the user cancelled)')
+		})
+
+		test.each<[string, Partial<OIDCConfiguration>]>([
+			['id_token', { responseType: 'id_token' }],
+			['id_token token', { responseType: 'id_token token' }],
+			['a bare id_token in a non-strict code configuration', {}],
+		])('%s: a parameter the callback is not read for does not reach the response', async (_, overrides) => {
+			const provider = new OIDCProvider(null, null)
+			const configuration = configurationFor(idp, { ...overrides, returnOIDCResult: true })
+			const init = await startSignIn(provider, { ...configuration, responseType: overrides.responseType ?? 'id_token' })
+			const authorization = await idp.authorize(init.authUrl)
+
+			const response = await provider.processResponse(configuration, {
+				parameters: { ...authorization.parameters, groups: 'admins', email: 'someone-else@example.com' },
+				redirectUrl: REDIRECT_URL,
+				sessionData: init.sessionData,
+			})
+
+			expect(response).not.toHaveProperty('groups')
+			expect(response.email).toBe('jane@example.com')
+		})
+
+		test('strict id_token token without token_type: IDPValidationError', async () => {
+			const provider = new OIDCProvider(null, signer)
+			const configuration = configurationFor(idp, { responseType: 'id_token token', strictResponseType: true })
+			const init = await startSignIn(provider, configuration)
+			const { token_type, ...parameters } = (await idp.authorize(init.authUrl)).parameters
+
+			const promise = provider.processResponse(configuration, { parameters, redirectUrl: REDIRECT_URL, sessionData: init.sessionData })
+
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow('token_type missing from the response for response type "id_token token"')
+		})
+
+		test.each<[NonNullable<OIDCConfiguration['responseType']>, string, string]>([
+			['code', `${REDIRECT_URL}?tenant=a`, 'redirectUrl must not carry a query or a fragment'],
+			['code', `${REDIRECT_URL}#/login`, 'redirectUrl must not carry a query or a fragment'],
+			['code id_token', `${REDIRECT_URL}?tenant=a`, 'redirectUrl must not carry a query or a fragment'],
+			['code', 'not a url', 'redirectUrl is not a valid URL'],
+		])('initAuth for %s with redirectUrl %s: IDPValidationError before the redirect', async (responseType, redirectUrl, message) => {
+			const promise = new OIDCProvider(null, null).initAuth(configurationFor(idp, { responseType }), { redirectUrl })
+
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow(message)
+		})
+
+		test('initAuth for id_token keeps a redirectUrl with a query: the ID token comes in the fragment', async () => {
+			const init = await new OIDCProvider(null, null).initAuth(configurationFor(idp, { responseType: 'id_token' }), {
+				redirectUrl: `${REDIRECT_URL}?tenant=a`,
+			})
+
+			expect(new URL(init.authUrl).searchParams.get('redirect_uri')).toBe(`${REDIRECT_URL}?tenant=a`)
+		})
+
+		test.each<[string, { url: string } | { parameters: Record<string, string> }, string, string]>([
+			['callback url', { url: 'not a url' }, REDIRECT_URL, 'url is not a valid URL'],
+			['redirectUrl', { parameters: { code: 'c' } }, 'not a url', 'redirectUrl is not a valid URL'],
+		])('a malformed %s at the callback: IDPValidationError', async (_, data, redirectUrl, message) => {
+			const provider = new OIDCProvider(null, null)
+			const configuration = configurationFor(idp)
+			const init = await startSignIn(provider, configuration)
+
+			const promise = provider.processResponse(configuration, { ...data, redirectUrl, sessionData: { nonce: sessionDataOf(init).nonce } })
+
+			await expect(promise).rejects.toBeInstanceOf(IDPValidationError)
+			await expect(promise).rejects.toThrow(message)
 		})
 
 		const tampered = async (change: (it: { parameters: Record<string, string>; sessionData: Record<string, string> }) => void) => {

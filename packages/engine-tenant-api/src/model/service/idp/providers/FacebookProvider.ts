@@ -130,7 +130,7 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 	}
 
 	private createOIDCClient(configuration: FacebookConfiguration, flow: OIDCFlow): Configuration {
-		// without token_endpoint_auth_methods_supported in the metadata, the default is client_secret_basic, as in openid-client 5
+		// the metadata advertises no token_endpoint_auth_methods_supported, so the default is client_secret_basic
 		const client = new Configuration(
 			this.facebookMetadata,
 			configuration.clientId,

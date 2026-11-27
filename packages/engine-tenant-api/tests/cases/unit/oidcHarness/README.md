@@ -22,6 +22,8 @@ Behaviour an upgrade is likely to change, each pinned by a test:
 - The ID token from the token endpoint has its signature verified (`enableNonRepudiationChecks`); openid-client 6 skips it by default.
 - A request timeout is a `ClientError` (`OAUTH_TIMEOUT`): transient on revalidation, but an `IDPValidationError` at sign-in.
 - `responseType: 'none'` cannot complete a sign-in (`IDPValidationError`: no authorization code).
+- Only the authorization-response parameters (`code`, `id_token`, `access_token`, `token_type`, `expires_in`, `state`, `iss`, `session_state`, `error*`) are read from a callback; anything else a user appends never reaches the response or the claim mapping.
+- A refresh or userinfo failure revokes the session when its OAuth error code is `invalid_grant`, `invalid_token` or `expired_token`, wherever the IdP put it: the JSON body, a `WWW-Authenticate` challenge, or both.
 - Introspection revokes a session only on `active: false`; every error response, `400 invalid_token` included, is thrown and keeps the session.
 - The logout-token JWKS is fetched by jose (the guard's `fetch`, or the global `fetch` without a guard), separately from openid-client's ID-token JWKS; a refused fetch surfaces as `IDPValidationError`.
 

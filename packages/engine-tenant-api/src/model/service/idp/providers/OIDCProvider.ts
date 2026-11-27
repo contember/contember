@@ -36,6 +36,7 @@ import { DataSigner } from '../../../providers.js'
 const DEFAULT_OIDC_TIMEOUT = 5000
 const OFFLINE_ACCESS_SCOPE = 'offline_access'
 const SESSION_DATA_SIGNING_PURPOSE = 'oidc-session-data'
+const MAX_CACHED_CLIENTS = 100
 
 export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> {
 	/**
@@ -114,6 +115,7 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		return await revalidateOIDC(client, configuration.revalidation?.method ?? 'refresh', session, {
 			claimMapping: configuration.claimMapping,
 			fetchUserInfo: configuration.fetchUserInfo,
+			additionalAuthorizedParties: configuration.additionalAuthorizedParties,
 		})
 	}
 
@@ -189,6 +191,11 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		if (!client) {
 			client = this.discover(configuration, flow)
 			this.clients.set(key, client)
+			// every configuration change (a rotated secret, a new timeout) adds a key; drop the oldest
+			if (this.clients.size > MAX_CACHED_CLIENTS) {
+				const [oldest] = this.clients.keys()
+				this.clients.delete(oldest)
+			}
 			// a failed discovery is retried on the next call
 			client.catch(() => this.clients.delete(key))
 		}

@@ -3,10 +3,12 @@ import { IDPSessionState } from '../../../../src/model/service/idp/IdentityProvi
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
 import { FakeIdp } from './FakeIdp.js'
-import { authUrlParameters, configurationFor, signIn } from './harness.js'
+import { authUrlParameters, configurationFor, signIn, useRuntimeGlobals } from './harness.js'
 
 /** Pins the IdP session captured at sign-in and what a successful revalidation stores back. */
 describe('OIDC session capture and revalidation', () => {
+	useRuntimeGlobals()
+
 	let idp: FakeIdp
 
 	beforeAll(async () => {
@@ -72,12 +74,12 @@ describe('OIDC session capture and revalidation', () => {
 			expect(session.sessionId).toBeUndefined()
 		})
 
-		test('returnOIDCResult spreads the token set into the response', async () => {
+		test('returnOIDCResult spreads the token set into the response, its token_type lower-cased by openid-client', async () => {
 			const { response } = await capture(configurationFor(idp, { returnOIDCResult: true }))
 
 			expect(response).toMatchObject({
 				access_token: expect.stringMatching(/^access-/),
-				token_type: 'Bearer',
+				token_type: 'bearer',
 				id_token: expect.any(String),
 				scope: 'openid email',
 				expires_at: expect.any(Number),
@@ -155,6 +157,20 @@ describe('OIDC session capture and revalidation', () => {
 			expect(result).toMatchObject({ status: 'valid', claimsComplete: true, claims: { groups: ['admins'], name: 'Jane Q. Doe' } })
 		})
 
+		test('attributesKey: nested claims are lifted as at sign-in, a signed top-level claim keeps precedence', async () => {
+			const configuration = refreshConfiguration({ claimMapping: { attributesKey: 'attributes' } })
+			const { provider, session } = await capture(configuration)
+			idp.user = { ...idp.user, attributes: { groups: ['IT-Admins'], sub: 'spoofed' } }
+
+			const result = await provider.revalidate(configuration, session)
+
+			expect(result).toMatchObject({
+				status: 'valid',
+				claimsComplete: true,
+				claims: { groups: ['IT-Admins'], sub: 'user-1', externalIdentifier: 'user-1' },
+			})
+		})
+
 		test('userinfo unreachable after a successful refresh: valid, the claim sync skipped', async () => {
 			const configuration = refreshConfiguration({ fetchUserInfo: true })
 			const { provider, session } = await capture(configuration)
@@ -187,6 +203,16 @@ describe('OIDC session capture and revalidation', () => {
 			claimsComplete: false,
 		})
 		expect(idp.requestsTo('userinfo').at(-1)?.headers.authorization).toBe(`Bearer ${String(session.tokens?.access_token)}`)
+	})
+
+	test('userinfo revalidation with attributesKey: the nested userinfo claims are lifted', async () => {
+		const configuration = refreshConfiguration({ revalidation: { enabled: true, method: 'userinfo' }, claimMapping: { attributesKey: 'attributes' } })
+		const { provider, session } = await capture(configuration)
+		idp.userinfoClaims = { attributes: { groups: ['admins'] } }
+
+		const result = await provider.revalidate(configuration, session)
+
+		expect(result).toMatchObject({ status: 'valid', claimsComplete: false, claims: { groups: ['admins'] } })
 	})
 
 	describe('RP-initiated logout URL', () => {

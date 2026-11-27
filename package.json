@@ -98,7 +98,7 @@
       "mime-types": "^3.0.2",
       "mustache": "^4.2.0",
       "nodemailer": "^7.0.13",
-      "openid-client": "^5.7.0",
+      "openid-client": "^6.9.1",
       "otpauth": "^9.5.0",
       "path-to-regexp": "^8.3.0",
       "pg": "^8.20.0",

@@ -3,12 +3,15 @@ import http from 'node:http'
 import { createEgressGuard } from '@contember/engine-common'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
+import { useRuntimeGlobals } from '../oidcHarness/harness.js'
 
 /**
  * An IdP served from localhost whose discovery document points every endpoint at 127.0.0.1, so a guard that
  * allow-lists only `localhost` lets discovery through and must refuse each follow-up request.
  */
 describe('OIDCProvider and the egress guard', () => {
+	useRuntimeGlobals()
+
 	let server: http.Server
 	let port: number
 	const requested: string[] = []

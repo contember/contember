@@ -32,6 +32,8 @@ export interface FakeIdpOptions {
 	readonly idTokenClaims?: Readonly<Record<string, unknown>>
 	/** Host the advertised URLs use. Default `localhost`. */
 	readonly hostname?: string
+	/** The advertised `token_endpoint_auth_methods_supported`. Default the shared-secret methods and `none`. */
+	readonly tokenEndpointAuthMethods?: readonly string[]
 }
 
 export type FakeIdpOverride =
@@ -129,6 +131,8 @@ export class FakeIdp {
 	public endpointHosts: Partial<Record<FakeIdpEndpoint, string>> = {}
 	/** Endpoints left out of the discovery document. */
 	public omittedEndpoints: FakeIdpEndpoint[] = []
+	/** Accept any secret from the registered client, for a secret the test cannot know in advance (it is still recorded). */
+	public acceptAnyClientSecret = false
 
 	private readonly server: http.Server
 	private readonly basePath: string
@@ -193,6 +197,7 @@ export class FakeIdp {
 		this.alwaysIssueRefreshToken = false
 		this.endpointHosts = {}
 		this.omittedEndpoints = []
+		this.acceptAnyClientSecret = false
 	}
 
 	/** Origin plus base path, on the default host: what a provider configuration's `url` points at. */
@@ -393,7 +398,8 @@ export class FakeIdp {
 			grant_types_supported: ['authorization_code', 'implicit', 'refresh_token'],
 			subject_types_supported: ['public'],
 			id_token_signing_alg_values_supported: ['RS256'],
-			token_endpoint_auth_methods_supported: ['client_secret_basic', 'client_secret_post', 'client_secret_jwt', 'none'],
+			token_endpoint_auth_methods_supported: this.options.tokenEndpointAuthMethods
+				?? ['client_secret_basic', 'client_secret_post', 'client_secret_jwt', 'none'],
 			token_endpoint_auth_signing_alg_values_supported: ['HS256'],
 			scopes_supported: ['openid', 'email', 'profile', 'offline_access'],
 			backchannel_logout_supported: true,
@@ -523,7 +529,7 @@ export class FakeIdp {
 		const auth = this.parseClientAuth(req, form)
 		this.clientAuth.push({ endpoint, auth })
 		if (auth.method === 'client_secret_basic' || auth.method === 'client_secret_post') {
-			return auth.clientId === this.client.clientId && auth.clientSecret === this.client.clientSecret
+			return auth.clientId === this.client.clientId && (this.acceptAnyClientSecret || auth.clientSecret === this.client.clientSecret)
 		}
 		return auth.method === 'client_secret_jwt'
 	}

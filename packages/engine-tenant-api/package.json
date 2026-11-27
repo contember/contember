@@ -47,6 +47,7 @@
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
     "@graphql-tools/schema": "catalog:",
+    "@happy-dom/global-registrator": "catalog:",
     "@types/mustache": "catalog:",
     "@types/node": "catalog:",
     "@types/nodemailer": "catalog:",

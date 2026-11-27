@@ -29,3 +29,15 @@ describe('OIDCProvider.validateConfiguration', () => {
 		expect(config.claimMapping).toEqual({ externalIdentifier: 'oid', email: 'email', attributesKey: 'attributes' })
 	})
 })
+
+describe('OIDCProvider.validateWrittenConfiguration', () => {
+	const provider = new OIDCProvider(null, null)
+
+	test.each(['none', 'HS256', 'hs512'])('refuses idTokenSignedResponseAlg %s', alg => {
+		expect(() => provider.validateWrittenConfiguration({ ...baseConfig, idTokenSignedResponseAlg: alg })).toThrow(InvalidIDPConfigurationError)
+	})
+
+	test.each(['RS256', 'ES256', 'PS384'])('accepts idTokenSignedResponseAlg %s', alg => {
+		expect(() => provider.validateWrittenConfiguration({ ...baseConfig, idTokenSignedResponseAlg: alg })).not.toThrow()
+	})
+})

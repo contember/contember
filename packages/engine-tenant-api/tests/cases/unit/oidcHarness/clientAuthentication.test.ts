@@ -4,10 +4,12 @@ import { IDPResponseError } from '../../../../src/model/service/idp/IDPResponseE
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
 import { FakeIdp } from './FakeIdp.js'
-import { configurationFor, signIn } from './harness.js'
+import { configurationFor, signIn, useRuntimeGlobals } from './harness.js'
 
 /** Pins how the client authenticates to the token and introspection endpoints. */
 describe('OIDC client authentication', () => {
+	useRuntimeGlobals()
+
 	let idp: FakeIdp
 
 	beforeAll(async () => {
@@ -87,6 +89,7 @@ describe('OIDC client authentication', () => {
 			sub: idp.client.clientId,
 			aud: idp.issuer,
 			iat: expect.any(Number),
+			nbf: expect.any(Number),
 			exp: expect.any(Number),
 			jti: expect.any(String),
 		})

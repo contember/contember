@@ -1,63 +1,35 @@
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 import { createHmac } from 'node:crypto'
-import http from 'node:http'
-import { SignJWT } from 'jose'
 import { DataSigner } from '../../../../src/index.js'
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 import { InvalidIDPConfigurationError } from '../../../../src/model/service/idp/InvalidIDPConfigurationError.js'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
-
-// HS256 signs the ID token with the client secret, so the client validates it without fetching keys.
-const CLIENT_SECRET = 'a-client-secret-of-at-least-thirty-two-bytes'
-const REDIRECT_URL = 'https://app.example.com/callback'
-
-const signer: DataSigner = (purpose, value) => createHmac('sha256', `test-key:${purpose}`).update(value).digest()
+import { FakeIdp } from '../oidcHarness/FakeIdp.js'
+import { configurationFor, REDIRECT_URL, signer, useRuntimeGlobals } from '../oidcHarness/harness.js'
 
 describe('OIDC session data signing with strictResponseType', () => {
-	let server: http.Server
-	let issuer = ''
+	useRuntimeGlobals()
+
+	let idp: FakeIdp
 
 	beforeAll(async () => {
-		server = http.createServer((req, res) => {
-			req.resume()
-			if (req.url === '/.well-known/openid-configuration') {
-				res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({
-					issuer,
-					authorization_endpoint: `${issuer}/authorize`,
-					token_endpoint: `${issuer}/token`,
-					jwks_uri: `${issuer}/jwks`,
-				}))
-				return
-			}
-			res.writeHead(404).end()
-		})
-		await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
-		const address = server.address()
-		issuer = `http://127.0.0.1:${typeof address === 'object' && address !== null ? address.port : 0}`
+		idp = await FakeIdp.start()
+	})
+	afterAll(async () => {
+		await idp.stop()
+	})
+	beforeEach(() => {
+		idp.reset()
 	})
 
-	afterAll(() => {
-		server.close()
-	})
+	const configuration = (strictResponseType: boolean): OIDCConfiguration => configurationFor(idp, { responseType: 'id_token', strictResponseType })
 
-	const configuration = (strictResponseType: boolean): OIDCConfiguration => ({
-		url: issuer,
-		clientId: 'client',
-		clientSecret: CLIENT_SECRET,
-		responseType: 'id_token',
-		idTokenSignedResponseAlg: 'HS256',
-		strictResponseType,
-	})
-
-	const idToken = (nonce: string) =>
-		new SignJWT({ sub: 'subject-1', email: 'jane@example.com', nonce })
-			.setProtectedHeader({ alg: 'HS256' })
-			.setIssuer(issuer)
-			.setAudience('client')
-			.setIssuedAt()
-			.setExpirationTime('5m')
-			.sign(new TextEncoder().encode(CLIENT_SECRET))
+	/** An ID token for this client carrying a nonce of the caller's choice, as the client itself could obtain one. */
+	const idToken = async (nonce: string) => {
+		const now = Math.floor(Date.now() / 1000)
+		return await idp.sign({ iss: idp.issuer, aud: idp.client.clientId, sub: 'subject-1', email: 'jane@example.com', iat: now, exp: now + 300, nonce })
+	}
 
 	const init = async (provider: OIDCProvider, strict: boolean) => {
 		const result = await provider.initAuth(configuration(strict), { redirectUrl: REDIRECT_URL })
@@ -69,7 +41,7 @@ describe('OIDC session data signing with strictResponseType', () => {
 	}
 
 	const callback = async (provider: OIDCProvider, nonce: string, state: string, sessionData: object) =>
-		provider.processResponse(configuration(true), {
+		await provider.processResponse(configuration(true), {
 			parameters: { id_token: await idToken(nonce), state },
 			redirectUrl: REDIRECT_URL,
 			sessionData,

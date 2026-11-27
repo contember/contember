@@ -7,20 +7,60 @@ import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCPr
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
 import { FakeIdp, FakeIdpAuthorization } from './FakeIdp.js'
 
+type GlobalProperties = Map<PropertyKey, PropertyDescriptor | undefined>
+
+const globalProperties = (): GlobalProperties =>
+	new Map(Reflect.ownKeys(globalThis).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
+
+const sameDescriptor = (a: PropertyDescriptor | undefined, b: PropertyDescriptor | undefined): boolean =>
+	a === undefined || b === undefined ? a === b : a.value === b.value && a.get === b.get && a.set === b.set
+
+const applyGlobals = (keys: readonly PropertyKey[], properties: GlobalProperties): void => {
+	for (const key of keys) {
+		const descriptor = properties.get(key)
+		if (descriptor === undefined) {
+			Reflect.deleteProperty(globalThis, key)
+		} else {
+			Object.defineProperty(globalThis, key, { ...descriptor, configurable: true })
+		}
+	}
+}
+
+/** The global properties the test preload's happy-dom replaces, with their happy-dom and runtime values. */
+type GlobalsSwap = { keys: readonly PropertyKey[]; happyDom: GlobalProperties; runtime: GlobalProperties }
+let globalsSwap: GlobalsSwap | undefined
+
+const captureGlobalsSwap = async (): Promise<GlobalsSwap> => {
+	const happyDom = globalProperties()
+	// unregistering closes the window, whose document modules loaded by earlier test files still hold
+	Object.defineProperty(globalThis, 'happyDOM', { value: undefined, configurable: true })
+	await GlobalRegistrator.unregister()
+	const runtime = globalProperties()
+	// a non-configurable property is the runtime's own, settled between the two snapshots, never one happy-dom defined
+	const keys = [...new Set([...happyDom.keys(), ...runtime.keys()])].filter(key =>
+		!sameDescriptor(happyDom.get(key), runtime.get(key)) && happyDom.get(key)?.configurable !== false && runtime.get(key)?.configurable !== false
+	)
+	return { keys, happyDom, runtime }
+}
+
 /**
  * Runs the enclosing tests with the runtime's globals, as the engine runs, by lifting the test preload's happy-dom for
  * them. Its `fetch` enforces the browser's same-origin policy, and openid-client's `instanceof` checks fail between its
- * `URL`, `Response` and `DOMException` and the runtime's. Test files run one after another in one global object.
+ * `URL`, `Response` and `DOMException` and the runtime's. Test files run one after another in one global object, so
+ * the same happy-dom window is put back afterwards.
  */
 export const useRuntimeGlobals = (): void => {
 	beforeAll(async () => {
-		await GlobalRegistrator.unregister()
+		if (globalsSwap === undefined) {
+			globalsSwap = await captureGlobalsSwap()
+		} else {
+			applyGlobals(globalsSwap.keys, globalsSwap.runtime)
+		}
 	})
 	afterAll(() => {
-		// as the preload does: Bun's fetch rejects a signal that is not its own
-		const { AbortController, AbortSignal } = globalThis
-		GlobalRegistrator.register()
-		Object.assign(globalThis, { AbortController, AbortSignal })
+		if (globalsSwap !== undefined) {
+			applyGlobals(globalsSwap.keys, globalsSwap.happyDom)
+		}
 	})
 }
 

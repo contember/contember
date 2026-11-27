@@ -14,7 +14,7 @@ cd dist
 echo "{}" > package.json
 
 if [[ "$@" == *"--esbuild"* ]]; then
-  bun add esbuild@^0.21.5
+  bun add esbuild@^0.28.2
 fi
 
 

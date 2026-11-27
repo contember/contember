@@ -119,6 +119,11 @@ describe('OIDC failure classification', () => {
 			['503 temporarily_unavailable', respond(503, { error: 'temporarily_unavailable' }), notConform(503)],
 			// a 5xx is the IdP failing, whatever error code its body names
 			['503 with an invalid_grant body', respond(503, { error: 'invalid_grant' }), notConform(503)],
+			[
+				'503 with error="invalid_grant" in its challenge',
+				respond(503, undefined, { 'www-authenticate': 'Bearer error="invalid_grant"' }),
+				[WWWAuthenticateChallengeError, { status: 503 }],
+			],
 			['500 with a plain-text body', respond(500, 'boom'), notConform(500)],
 			['400 with a non-standard JSON error object', respond(400, { error: { message: 'bad refresh token' } }), notConform(400)],
 			['200 without a body', respond(200), [ClientError, { code: 'OAUTH_INVALID_RESPONSE' }]],
@@ -201,6 +206,11 @@ describe('OIDC failure classification', () => {
 			[
 				'503 with an invalid_token challenge body',
 				respond(503, { error: 'invalid_token' }, { 'www-authenticate': 'Bearer realm="idp"' }),
+				[WWWAuthenticateChallengeError, { status: 503 }],
+			],
+			[
+				'503 with error="invalid_token" in its challenge',
+				respond(503, undefined, { 'www-authenticate': 'Bearer error="invalid_token"' }),
 				[WWWAuthenticateChallengeError, { status: 503 }],
 			],
 		]
@@ -408,21 +418,34 @@ describe('OIDC failure classification', () => {
 			expect(idp.requestsTo('token')).toHaveLength(0)
 		})
 
-		test('an implicit expires_in beyond the ID token: the session expires with the ID token', async () => {
+		const implicitSignIn = async (expiresIn: string) => {
 			const provider = new OIDCProvider(null, null)
-			const configuration = configurationFor(idp, { responseType: 'id_token token', revalidation: { enabled: true } })
+			const configuration = configurationFor(idp, { responseType: 'id_token token', revalidation: { enabled: true }, returnOIDCResult: true })
 			const init = await startSignIn(provider, configuration)
 			const authorization = await idp.authorize(init.authUrl)
-
+			const before = Math.floor(Date.now() / 1000)
 			const response = await provider.processResponse(configuration, {
-				parameters: { ...authorization.parameters, expires_in: '999999999' },
+				parameters: { ...authorization.parameters, expires_in: expiresIn },
 				redirectUrl: REDIRECT_URL,
 				sessionData: init.sessionData,
 			})
-
 			const { exp } = decodeJwt(authorization.parameters.id_token)
-			expect(exp).toBeNumber()
-			expect(response.idpSession?.expiresAt).toEqual(new Date((exp ?? 0) * 1000))
+			return { response, before, idTokenExp: exp ?? 0 }
+		}
+
+		test('an implicit expires_in beyond the ID token: the stored session expires with the ID token', async () => {
+			const { response, before, idTokenExp } = await implicitSignIn('999999999')
+
+			expect(response.idpSession?.expiresAt).toEqual(new Date(idTokenExp * 1000))
+			// what the IdP sent is still handed back as is
+			expect(response.expires_at).toBeGreaterThanOrEqual(before + 999999999)
+		})
+
+		test('an implicit expires_in within the ID token lifetime: kept', async () => {
+			const { response, before, idTokenExp } = await implicitSignIn('5')
+
+			expect(idTokenExp).toBeGreaterThan(before + 5)
+			expect(response.idpSession?.expiresAt?.getTime()).toBeWithin((before + 5) * 1000, (before + 7) * 1000)
 		})
 
 		test('a malformed id_token beside an access token: IDPValidationError', async () => {

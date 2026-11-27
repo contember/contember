@@ -582,7 +582,7 @@ const oauthErrorOf = async (e: unknown): Promise<string | undefined> => {
 		return e.error
 	}
 	if (e instanceof WWWAuthenticateChallengeError) {
-		return challengeError(e) ?? (await errorCodeInBody(e.response))
+		return e.status >= 500 ? undefined : challengeError(e) ?? (await errorCodeInBody(e.response))
 	}
 	if (e instanceof ClientError && e.cause instanceof Response) {
 		return await errorCodeInBody(e.cause)
@@ -645,10 +645,7 @@ const completeAuthorization = async (
 		if (params.access_token !== undefined) {
 			assertAccessTokenHash(params.id_token, params.access_token)
 		}
-		// expires_in comes from the user's own callback; unbounded, it would postpone revalidation at will
-		const tokens = tokenSetOfParameters(params)
-		const expiresAt = tokens.expires_at !== undefined ? Math.min(tokens.expires_at, claims.exp) : undefined
-		return { claims, tokens: { ...tokens, ...(expiresAt !== undefined ? { expires_at: expiresAt } : {}) } }
+		return { claims, tokens: tokenSetOfParameters(params) }
 	}
 	// an error response is checked for state and issuer and thrown; no code is exchanged, so no redirect URL is needed
 	const base = redirectUrl ?? (params.error !== undefined ? 'about:blank' : undefined)
@@ -695,7 +692,11 @@ export const handleOIDCResponse = async (
 		const { claims, tokens } = await completeAuthorization(client, flow, params, { redirectUrl, nonce: sessionData?.nonce, state: sessionData?.state })
 		assertAuthorizedParty(claims, client.clientMetadata().client_id, additionalAuthorizedParties)
 		const userInfo = tokens.access_token && withUserInfo ? await fetchUserInfo(client, tokens.access_token, claims.sub) : {}
-		const idpSession = captureSession ? tokenSetToSessionState(tokens, typeof claims.sid === 'string' ? claims.sid : undefined) : undefined
+		// an implicit expires_in comes from the user's own callback; unbounded, it would postpone revalidation at will
+		const sessionTokens = flow === 'implicit' && tokens.expires_at !== undefined
+			? { ...tokens, expires_at: Math.min(tokens.expires_at, claims.exp) }
+			: tokens
+		const idpSession = captureSession ? tokenSetToSessionState(sessionTokens, typeof claims.sid === 'string' ? claims.sid : undefined) : undefined
 
 		return {
 			...(returnOIDCResult ? tokens : {}),
